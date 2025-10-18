@@ -1,0 +1,47 @@
+[
+  {
+    "name": "⚙ Setting",
+    "color": "e3dede",
+    "description": "개발 환경 세팅 및 초기 설정"
+  },
+  {
+    "name": "✨ Feature",
+    "color": "a2eeef",
+    "description": "새로운 기능 개발 또는 주요 기능 추가"
+  },
+  {
+    "name": "🌏 Deploy",
+    "color": "c2e0c6",
+    "description": "배포 및 서버 환경 관련 작업"
+  },
+  {
+    "name": "🐞 BugFix",
+    "color": "d73a4a",
+    "description": "버그 수정 및 예외 처리 개선"
+  },
+  {
+    "name": "🔨 Refactor",
+    "color": "f29a4e",
+    "description": "코드 리팩토링 및 구조 개선"
+  },
+  {
+    "name": "📬 API",
+    "color": "d4c5f9",
+    "description": "API 개발 및 서버 간 통신 로직 수정"
+  },
+  {
+    "name": "📃 Docs",
+    "color": "1d76db",
+    "description": "문서 작성 및 수정 (README, API 명세 등)"
+  },
+  {
+    "name": "✅ Test",
+    "color": "ccffc4",
+    "description": "테스트 코드 및 검증 관련 작업"
+  },
+  {
+    "name": "🙋‍♂️ Question",
+    "color": "9ed447",
+    "description": "질문 또는 논의가 필요한 이슈"
+  }
+]
