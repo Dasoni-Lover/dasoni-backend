@@ -1,0 +1,32 @@
+# --- Build 결과물 ---
+.gradle/
+build/
+out/
+bin/
+target/
+
+# --- IDE 관련 (IntelliJ, VSCode 등) ---
+.idea/
+.vscode/
+*.iml
+
+# --- OS 불필요 파일 ---
+.DS_Store
+Thumbs.db
+
+# --- 로그 & 임시파일 ---
+*.log
+logs/
+tmp/
+
+# --- 환경변수 & 설정 ---
+*.env
+application-*.yml
+application-*.yaml
+application-*.properties
+!application.yml    # 기본 설정 파일은 제외 (즉, git에 포함)
+
+# --- Gradle Wrapper ---
+!gradlew
+!gradlew.bat
+!gradle/wrapper/gradle-wrapper.jar
