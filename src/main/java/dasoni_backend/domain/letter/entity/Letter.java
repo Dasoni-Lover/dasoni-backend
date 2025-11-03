@@ -11,10 +11,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Table(name = "letters")
 public class Letter {
 
@@ -36,8 +38,14 @@ public class Letter {
     @Column(name = "from_name", length = 50, nullable = false)
     private String fromName;
 
+    @Column(name = "content", length = 500, nullable = false)
+    private String content;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    @Column(name = "completed_at")
+    private LocalDateTime completedAt;
 
     @Column(name = "is_completed", nullable = false)
     private Boolean isCompleted = false;
