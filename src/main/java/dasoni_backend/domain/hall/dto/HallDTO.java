@@ -1,5 +1,6 @@
 package dasoni_backend.domain.hall.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -30,12 +31,29 @@ public class HallDTO {
 
             private String name;
 
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
             private LocalDateTime birthday;
 
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
             private LocalDateTime deadday;
 
             private String adminName;
         }
 
+    }
+
+    // 2. 사이드바 정보
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SidebarResponseDTO {
+
+        private String name;
+
+        // 프로필 사진
+        private String myProfile;
+
+        private Integer notiCount; // 알림 수, 추후에 연동
     }
 }
