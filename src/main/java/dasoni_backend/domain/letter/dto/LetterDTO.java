@@ -74,8 +74,6 @@ public class LetterDTO {
     // 4. 편지 보내기 버튼 눌렀을 경우
     @Getter
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class LetterPreCheckResponseDTO {
 
         // 추모관 오픈 여부
@@ -87,8 +85,6 @@ public class LetterDTO {
 
     // 5-1. 추모관에 편지 쓰기 / 임시저장 요청
     @Getter
-    @Builder
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class LetterSaveRequestDTO {
 
@@ -100,8 +96,4 @@ public class LetterDTO {
 
         private boolean isCompleted;
     }
-
-
-
-    // 보내기를 눌렀는데, 오늘 이미 편지를 보냈을 경우
 }
