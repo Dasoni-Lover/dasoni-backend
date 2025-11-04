@@ -1,9 +1,10 @@
 package dasoni_backend.domain.letter.converter;
 
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
-import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO.SentLetterCalenderResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
-import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO.SentLetterResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 
 import java.util.List;
