@@ -1,5 +1,7 @@
 package dasoni_backend.domain.user.controller;
 
+import dasoni_backend.domain.user.dto.UserDTO.RefreshTokenRequestDTO;
+import dasoni_backend.domain.user.dto.UserDTO.AccessTokenResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.LoginRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.LoginResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RegisterRequestDTO;
@@ -7,6 +9,7 @@ import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.service.UserService;
 import dasoni_backend.global.annotation.AuthUser;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -49,6 +52,15 @@ public class UserController {
     public ResponseEntity<Void> logout(@AuthUser User user) {
         userService.logout(user);
         return ResponseEntity.ok().build();
+    }
+
+    // 토큰 갱신
+    @PostMapping("/refresh")
+    public ResponseEntity<AccessTokenResponseDTO> refresh(
+            @Valid @RequestBody RefreshTokenRequestDTO request) {
+
+        AccessTokenResponseDTO response = userService.refresh(request);
+        return ResponseEntity.ok(response);
     }
 
     // Header에서 토큰 추출 (헬퍼 메서드)

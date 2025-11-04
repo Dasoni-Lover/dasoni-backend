@@ -11,26 +11,26 @@ import java.util.concurrent.TimeUnit;
 public class RedisServiceImpl implements RedisService{
     private final RedisTemplate<String, String> redisTemplate;
 
+    private static final String REFRESH_TOKEN_PREFIX = "RT:";
     // Refresh Token 저장
     @Override
     public void saveRefreshToken(String userId, String refreshToken, Long expiration) {
         redisTemplate.opsForValue().set(
-                "RT:" + userId,  // Key: RT:userId
+                REFRESH_TOKEN_PREFIX + userId,  // Key: RT:userId
                 refreshToken,
                 expiration,
                 TimeUnit.MILLISECONDS
         );
     }
-
     // Refresh Token 조회
     @Override
     public String getRefreshToken(String userId) {
-        return redisTemplate.opsForValue().get("RT:" + userId);
+        return redisTemplate.opsForValue().get(REFRESH_TOKEN_PREFIX + userId);
     }
 
     // Refresh Token 삭제
     @Override
     public void deleteRefreshToken(String userId) {
-        redisTemplate.delete("RT:" + userId);
+        redisTemplate.delete(REFRESH_TOKEN_PREFIX + userId);
     }
 }

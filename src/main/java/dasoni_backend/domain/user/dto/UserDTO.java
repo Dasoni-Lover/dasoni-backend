@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 public class UserDTO {
 
     @Getter
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class RegisterRequestDTO {
         @NotBlank
@@ -26,7 +25,6 @@ public class UserDTO {
     }
 
     @Getter
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class LoginRequestDTO{
         @NotBlank
@@ -37,9 +35,20 @@ public class UserDTO {
 
     @Getter
     @Builder
-    @AllArgsConstructor
     public static class LoginResponseDTO {
         private String accessToken;
         private String refreshToken;
+    }
+    @Getter
+    @NoArgsConstructor
+    public static class RefreshTokenRequestDTO {
+        @NotBlank(message = "리프레시 토큰은 필수입니다.")
+        private String refreshToken;
+    }
+
+    @Getter
+    @Builder
+    public static class AccessTokenResponseDTO {
+        private String accessToken;
     }
 }

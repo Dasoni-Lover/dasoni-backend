@@ -31,7 +31,11 @@ public class SecurityConfig {
 
             // 권한 설정
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/users/register/**", "/api/users/login").permitAll()  // 인증 없이 접근 가능
+                    .requestMatchers(
+                            "/api/users/register/**",
+                            "/api/users/login",
+                            "/api/users/refresh")
+                    .permitAll()  // 인증 없이 접근 가능
                     .anyRequest().authenticated()  // 나머지는 인증 필요
             )
 
