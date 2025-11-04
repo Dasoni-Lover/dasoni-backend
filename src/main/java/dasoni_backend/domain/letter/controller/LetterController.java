@@ -1,5 +1,6 @@
 package dasoni_backend.domain.letter.controller;
 
+import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.service.LetterService;
@@ -23,7 +24,13 @@ public class LetterController {
     }
 
     @GetMapping("{hall_id}/letters/{letter_id}")
-    public SentLetterDetailResponseDTO getSentLetterDetail(@PathVariable Long hallId, @PathVariable Long letterId) {
+    public SentLetterDetailResponseDTO getSentLetterDetail(@PathVariable("hall_id") Long hallId, @PathVariable("letter_id") Long letterId) {
         return letterService.getSentLetterDetail(hallId, letterId);
+    }
+
+    @GetMapping("{hall_id}/letters/calendar")
+    public SentLetterCalenderListResponseDTO getSentLetterCalenderList(@PathVariable("hall_id") Long hallId, @RequestParam("user_id") Long userId
+            , @RequestParam int year, @RequestParam int month) {
+        return letterService.getSentLetterCalenderList(hallId, userId, year, month);
     }
 }

@@ -1,5 +1,7 @@
 package dasoni_backend.domain.letter.converter;
 
+import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO.SentLetterCalenderResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO.SentLetterResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
@@ -9,20 +11,24 @@ import java.util.stream.Collectors;
 
 public class LetterConverter {
 
-    public static SentLetterListResponseDTO.SentLetterResponseDTO toSentLetterResponseDTO(Letter letter) {
+    public static SentLetterResponseDTO toSentLetterResponseDTO(Letter letter) {
 
         if(letter == null) return null;
 
         // 임시로 미리보기 글자수 20으로 정함
+        String content = letter.getContent();
         String excerpt;
-        if(letter.getContent().length() > 20) {
-            excerpt = letter.getContent().substring(0, 20) + "...";
+        if(content == null || content.isBlank()) {
+            excerpt = "";
+        }
+        else if(content.length() > 20) {
+            excerpt = content.substring(0, 20) + "...";
         }
         else {
-            excerpt = letter.getContent();
+            excerpt = content;
         }
 
-        return SentLetterListResponseDTO.SentLetterResponseDTO.builder()
+        return SentLetterResponseDTO.builder()
                 .letterId(letter.getId())
                 .date(letter.getCompletedAt())
                 .toName(letter.getToName())
@@ -31,11 +37,45 @@ public class LetterConverter {
     }
 
     public static SentLetterListResponseDTO toSentLetterListResponseDTO(List<Letter> letters) {
-        if(letters == null) return SentLetterListResponseDTO.builder().letters(null).build();
+        // letters가 존재하지 않을 경우
+        if(letters == null)
+            return SentLetterListResponseDTO.builder()
+                    .count(0)
+                    .letters(List.of())
+                    .build();
+
+        // return시 필요한 letter들의 count 값을 세기 위함
+        var sendLetter = letters.stream()
+                .map(LetterConverter::toSentLetterResponseDTO)
+                .collect(Collectors.toList());
 
         return SentLetterListResponseDTO.builder()
-                .letters(letters.stream()
-                        .map(LetterConverter::toSentLetterResponseDTO)
+                .count(sendLetter.size())
+                .letters(sendLetter)
+                .build();
+    }
+
+    public static SentLetterCalenderResponseDTO toSentLetterCalenderResponseDTO(Letter letter) {
+
+        if(letter == null) return null;
+
+        return SentLetterCalenderResponseDTO.builder()
+                .date(letter.getCompletedAt())
+                .letterId(letter.getId())
+                .build();
+    }
+
+    public static SentLetterCalenderListResponseDTO toSentLetterCalenderListResponseDTO(List<Letter> days) {
+
+        if(days == null) {
+            return SentLetterCalenderListResponseDTO.builder()
+                    .days(List.of())
+                    .build();
+        }
+
+        return SentLetterCalenderListResponseDTO.builder()
+                .days(days.stream()
+                        .map(LetterConverter::toSentLetterCalenderResponseDTO)
                         .collect(Collectors.toList()))
                 .build();
     }

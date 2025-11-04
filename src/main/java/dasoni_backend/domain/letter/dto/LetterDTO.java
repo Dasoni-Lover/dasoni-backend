@@ -1,9 +1,11 @@
 package dasoni_backend.domain.letter.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,6 +33,7 @@ public class LetterDTO {
 
             // completedAt, 최신순 조회
             // 2번 필드랑 통일 추후 통일(date -> completedAt)
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
             private LocalDateTime date;
 
             private String toName;
@@ -52,6 +55,29 @@ public class LetterDTO {
 
         private String content;
 
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
         private LocalDateTime completedAt;
+    }
+
+    // 3. 보낸 편지함 달력 조회
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SentLetterCalenderListResponseDTO {
+
+        private List<SentLetterCalenderResponseDTO> days;
+
+        @Getter
+        @Builder
+        @AllArgsConstructor
+        @NoArgsConstructor
+        public static class SentLetterCalenderResponseDTO {
+
+            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+            private LocalDateTime date;
+
+            private Long letterId;
+        }
     }
 }
