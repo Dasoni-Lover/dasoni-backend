@@ -1,5 +1,7 @@
 package dasoni_backend.domain.letter.service;
 
+import dasoni_backend.domain.letter.dto.LetterDTO.LetterPreCheckResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
@@ -15,4 +17,9 @@ public interface LetterService {
     // 보낸 편지 내용 상세 조회
     SentLetterDetailResponseDTO getSentLetterDetail(Long hallId, Long letterId);
 
+    // 편지 보내기 버튼 눌렀을 경우(고인 정보 입력 유무에 따라 다른 창 띄워줌)
+    LetterPreCheckResponseDTO getLetterPreCheck(Long hallId, Long userId);
+
+    // 추모관에 편지 쓰기 / 임시저장
+    void saveLetter(Long hallId, Long userId, LetterSaveRequestDTO request);
 }
