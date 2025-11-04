@@ -15,24 +15,11 @@ public class LetterConverter {
 
         if(letter == null) return null;
 
-        // 임시로 미리보기 글자수 20으로 정함
-        String content = letter.getContent();
-        String excerpt;
-        if(content == null || content.isBlank()) {
-            excerpt = "";
-        }
-        else if(content.length() > 20) {
-            excerpt = content.substring(0, 20) + "...";
-        }
-        else {
-            excerpt = content;
-        }
-
         return SentLetterResponseDTO.builder()
                 .letterId(letter.getId())
                 .date(letter.getCompletedAt())
                 .toName(letter.getToName())
-                .excerpt(excerpt)
+                .excerpt(letter.getContent())
                 .build();
     }
 
@@ -77,6 +64,19 @@ public class LetterConverter {
                 .days(days.stream()
                         .map(LetterConverter::toSentLetterCalenderResponseDTO)
                         .collect(Collectors.toList()))
+                .build();
+    }
+
+    // converter 추가
+    public static SentLetterDetailResponseDTO toSentLetterDetailResponseDTO(Letter letter) {
+
+        if(letter == null) return null;
+
+        return SentLetterDetailResponseDTO.builder()
+                .toName(letter.getToName())
+                .fromName(letter.getFromName())
+                .content(letter.getContent())
+                .completedAt(letter.getCompletedAt())
                 .build();
     }
 }
