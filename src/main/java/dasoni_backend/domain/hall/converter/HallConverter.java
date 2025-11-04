@@ -1,6 +1,7 @@
 package dasoni_backend.domain.hall.converter;
 
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
 
 import java.util.List;
@@ -11,7 +12,7 @@ public class HallConverter {
     public static HallResponseDTO toHallResponseDTO(Hall hall) {
         if(hall == null) return null;
 
-        return HallListResponseDTO.HallResponseDTO.builder()
+        return HallResponseDTO.builder()
                 .profile(hall.getProfile())
                 .name(hall.getName())
                 .birthday(hall.getBirthday())
