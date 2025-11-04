@@ -14,7 +14,7 @@ public class UserDTO {
         @NotBlank
         private String name;
         @NotBlank
-        private String gender;
+        private Boolean gender;
         @NotBlank
         private String birthday;  // "2002.04.08" 형태
         @NotBlank
