@@ -6,6 +6,11 @@ import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
+import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO; 
+import dasoni_backend.domain.hall.entity.Hall;                        
+import dasoni_backend.domain.user.entity.User;                         
+import java.time.LocalDateTime;   
+import org.springframework.util.StringUtils; 
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -79,5 +84,23 @@ public class LetterConverter {
                 .content(letter.getContent())
                 .completedAt(letter.getCompletedAt())
                 .build();
+    }
+    public static Letter fromSaveRequest(LetterSaveRequestDTO req, Hall hall, User user, LocalDateTime now) {
+        if (req == null) return null;
+        if (!StringUtils.hasText(req.getContent())) {
+            throw new IllegalArgumentException("content는 비어있을 수 없습니다.");
+        }
+
+        Letter letter = new Letter();
+        letter.setHall(hall);
+        letter.setUser(user);
+        letter.setToName(req.getToName());
+        letter.setFromName(req.getFromName());
+        letter.setContent(req.getContent());
+        letter.setIsCompleted(req.isCompleted());
+        letter.setCreatedAt(now);
+        letter.setCompletedAt(req.isCompleted() ? now : null);
+
+        return letter;
     }
 }
