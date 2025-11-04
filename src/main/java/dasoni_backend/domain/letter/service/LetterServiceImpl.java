@@ -108,6 +108,7 @@ public class LetterServiceImpl implements LetterService{
     }
 
     // 5. 추모관에 편지 쓰기 / 임시저장
+    @Transactional
     @Override
     public void saveLetter(Long hallId, Long userId, LetterSaveRequestDTO request) {
 
@@ -126,15 +127,7 @@ public class LetterServiceImpl implements LetterService{
 
         LocalDateTime now = LocalDateTime.now();
 
-        Letter letter = new Letter();
-        letter.setHall(hall);
-        letter.setUser(user);
-        letter.setToName(request.getToName());
-        letter.setFromName(request.getFromName());
-        letter.setContent(request.getContent());
-        letter.setIsCompleted(request.isCompleted());
-        letter.setCreatedAt(now);
-        letter.setCompletedAt(request.isCompleted() ? now : null);
+        Letter letter = LetterConverter.fromSaveRequest(request, hall, user, now);
 
         letterRepository.save(letter);
     }
