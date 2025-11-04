@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 public class HallConverter {
 
-    public static HallListResponseDTO.HallResponseDTO toHallResponseDTO(Hall hall) {
+    public static HallResponseDTO toHallResponseDTO(Hall hall) {
         if(hall == null) return null;
 
         return HallListResponseDTO.HallResponseDTO.builder()
