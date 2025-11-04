@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 import static lombok.AccessLevel.PROTECTED;
@@ -41,6 +42,8 @@ public class User {
     @Column(length = 100, nullable = false)
     private String password;
 
-    @Column(name = "my_profile",columnDefinition = "TEXT")
+    @Column(name = "my_profile", columnDefinition = "TEXT")
     private String myProfile;
 }
+
+
