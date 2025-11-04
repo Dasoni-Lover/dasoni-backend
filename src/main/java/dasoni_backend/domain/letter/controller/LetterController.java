@@ -18,8 +18,8 @@ public class LetterController {
     private final LetterService letterService;
 
     @GetMapping("{hall_id}/letters/list")
-    public SentLetterListResponseDTO getSentLetterList(@RequestParam(name = "userId") Long userId) {
-        return letterService.getSentLetterList(userId);
+    public SentLetterListResponseDTO getSentLetterList(@PathVariable("hall_id") Long hallId, @RequestParam(name = "user_id") Long userId) {
+        return letterService.getSentLetterList(hallId, userId);
     }
 
     @GetMapping("{hall_id}/letters/{letter_id}")

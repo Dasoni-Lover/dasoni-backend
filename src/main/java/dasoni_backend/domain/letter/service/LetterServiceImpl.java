@@ -21,7 +21,7 @@ public class LetterServiceImpl implements LetterService{
     // 1. 보낸 편지함 목록 조회
     @Transactional
     @Override
-    public SentLetterListResponseDTO getSentLetterList(Long userId) {
+    public SentLetterListResponseDTO getSentLetterList(Long hallId, Long userId) {
         // 로그인하지 않았을 경우, 빈 리스트 반환(수정 불가능)
         if(userId == null) {
             return LetterConverter.toSentLetterListResponseDTO(List.of());
