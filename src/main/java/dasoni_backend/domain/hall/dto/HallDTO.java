@@ -20,28 +20,27 @@ public class HallDTO {
 
         // 추모관 리스트
         private List<HallResponseDTO> halls;
+    }
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class HallResponseDTO {
 
-        @Getter
-        @Builder
-        @AllArgsConstructor
-        @NoArgsConstructor
-        public static class HallResponseDTO {
+        private String profile;
 
-            private String profile;
+        private String name;
 
-            private String name;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+        private LocalDateTime birthday;
 
-            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-            private LocalDateTime birthday;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+        private LocalDateTime deadday;
 
-            @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-            private LocalDateTime deadday;
-
-            private String adminName;
-        }
-
+        private String adminName;
     }
 
+    
     // 2. 사이드바 정보
     @Getter
     @Builder
