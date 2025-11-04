@@ -70,4 +70,30 @@ public class LetterDTO {
 
         private Long letterId;
     }
+
+    // 4. 편지 보내기 버튼 눌렀을 경우
+    @Getter
+    @Builder
+    public static class LetterPreCheckResponseDTO {
+
+        // 추모관 오픈 여부
+        private boolean isOpen;
+
+        // 첫 편지인지(고인 정보 입력했는지)
+        private boolean isSet;
+    }
+
+    // 5-1. 추모관에 편지 쓰기 / 임시저장 요청
+    @Getter
+    @NoArgsConstructor
+    public static class LetterSaveRequestDTO {
+
+        private String toName;
+
+        private String fromName;
+
+        private String content;
+
+        private boolean isCompleted;
+    }
 }

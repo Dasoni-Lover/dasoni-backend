@@ -14,4 +14,9 @@ public interface LetterRepository extends JpaRepository<Letter, Long> {
     // 보낸 편지함 달력 목록(추모관별, 사용자별, 최신순)
     List<Letter> findAllByHall_IdAndUser_IdAndIsCompletedTrueAndCompletedAtGreaterThanEqualAndCompletedAtLessThanOrderByCompletedAtAsc(
             Long hallId, Long userId, LocalDateTime start, LocalDateTime end);
+
+    // 해당 추모관에서 오늘 이미 보낸 편지 있는지(isCompleted = true && completedAt 날짜 비교)
+    boolean existsByHall_IdAndUser_IdAndIsCompletedTrueAndCompletedAtBetween(
+            Long hallId, Long userId, LocalDateTime start, LocalDateTime end
+    );
 }
