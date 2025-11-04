@@ -1,5 +1,6 @@
 package dasoni_backend.domain.letter.service;
 
+import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 
 public interface LetterService {
@@ -10,6 +11,7 @@ public interface LetterService {
     // 보낸 편지함 달력 조회
 
 
-    // 보낸 편지 확인
+    // 보낸 편지 내용 상세 조회
+    SentLetterDetailResponseDTO getSentLetterDetail(Long hallId, Long letterId);
 
 }

@@ -1,6 +1,7 @@
 package dasoni_backend.domain.letter.service;
 
 import dasoni_backend.domain.letter.converter.LetterConverter;
+import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO.SentLetterResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
@@ -29,5 +30,20 @@ public class LetterServiceImpl implements LetterService{
         List<Letter> letters = letterRepository.findAllByUser_IdAndIsCompletedTrueOrderByCompletedAtDesc(userId);
 
         return LetterConverter.toSentLetterListResponseDTO(letters);
+    }
+
+    @Transactional
+    @Override
+    public SentLetterDetailResponseDTO getSentLetterDetail(Long hallId, Long letterId) {
+
+        Letter letter = letterRepository.findById(letterId)
+                .orElseThrow(() -> new RuntimeException("편지를 찾을 수 없습니다."));
+
+        return SentLetterDetailResponseDTO.builder()
+                .toName(letter.getToName())
+                .fromName(letter.getFromName())
+                .content(letter.getContent())
+                .completedAt(letter.getCompletedAt())
+                .build();
     }
 }

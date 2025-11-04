@@ -30,11 +30,28 @@ public class LetterDTO {
             private Long letterId;
 
             // completedAt, 최신순 조회
+            // 2번 필드랑 통일 추후 통일(date -> completedAt)
             private LocalDateTime date;
 
             private String toName;
 
             private String excerpt;
         }
+    }
+
+    // 2. 보낸 편지 확인(내용)
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SentLetterDetailResponseDTO {
+
+        private String toName;
+
+        private String fromName;
+
+        private String content;
+
+        private LocalDateTime completedAt;
     }
 }
