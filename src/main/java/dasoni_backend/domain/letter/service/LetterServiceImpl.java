@@ -63,13 +63,6 @@ public class LetterServiceImpl implements LetterService{
         Letter letter = letterRepository.findById(letterId)
                 .orElseThrow(() -> new RuntimeException("편지를 찾을 수 없습니다."));
 
-        return SentLetterDetailResponseDTO.builder()
-                .toName(letter.getToName())
-                .fromName(letter.getFromName())
-                .content(letter.getContent())
-                .completedAt(letter.getCompletedAt())
-                .build();
+        return LetterConverter.toSentLetterDetailResponseDTO(letter);
     }
-
-
 }
