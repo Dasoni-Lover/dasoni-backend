@@ -76,3 +76,4 @@ public class Hall {
     @Column(name = "docs", columnDefinition = "TEXT")
     private String docs;
 }
+
