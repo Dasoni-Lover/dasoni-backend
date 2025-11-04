@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -25,8 +24,11 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성
-    public String createAccessToken(String userId) {
-        Claims claims = Jwts.claims().subject(userId).build();
+    public String createAccessToken(Long userId) {
+        Claims claims = Jwts.claims()
+                .subject(userId.toString())  // Long을 String으로 변환
+                .build();
+
         Date now = new Date();
         Date validity = new Date(now.getTime() + jwtProperties.getAccessTokenValidity());
 
@@ -39,9 +41,10 @@ public class JwtTokenProvider {
     }
 
     // Refresh Token 생성
-    public String createRefreshToken(String userId) {
-        Claims claims = Jwts.claims().subject(userId).build();
-
+    public String createRefreshToken(Long userId) {
+        Claims claims = Jwts.claims()
+                .subject(userId.toString())  // Long을 String으로 변환
+                .build();
         Date now = new Date();
         Date validity = new Date(now.getTime() + jwtProperties.getRefreshTokenValidity());
 
@@ -54,13 +57,14 @@ public class JwtTokenProvider {
     }
 
     // 토큰에서 userId 추출
-    public String getUserId(String token) {
-        return Jwts.parser()
+    public Long getUserId(String token) {
+        String userIdStr = Jwts.parser()
                 .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
+        return Long.parseLong(userIdStr);  // String을 Long으로 변환
     }
 
     // 토큰 유효성 검증
