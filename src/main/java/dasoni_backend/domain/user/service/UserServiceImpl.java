@@ -2,6 +2,7 @@ package dasoni_backend.domain.user.service;
 
 import dasoni_backend.domain.user.converter.UserConverter;
 import dasoni_backend.domain.user.dto.UserDTO.LoginRequestDTO;
+import dasoni_backend.domain.user.dto.UserDTO.LoginResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RegisterRequestDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.repository.UserRepository;
@@ -35,17 +36,32 @@ public class UserServiceImpl implements UserService{
 
     @Override
     @Transactional
-    public void login(String username, String password){
+    public LoginResponseDTO login(LoginRequestDTO request) {
+        // 1. logId로 User 조회
+        User user = userRepository.findByLogId(request.getLogId())
+                .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다."));
 
+        // 2. 비밀번호 검증
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+            throw new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 3. JWT 토큰 생성 및 반환
+        String accessToken = jwtTokenProvider.createAccessToken(user.getId());
+        String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+
+        long refreshTtlMs = jwtTokenProvider.getTokenRemainingTime(refreshToken);
+        redisService.saveRefreshToken(user.getId().toString(), refreshToken, refreshTtlMs);
+
+        return LoginResponseDTO.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
+
     @Override
     @Transactional
-    public void logout(LoginRequestDTO request){
-
-        boolean matches = passwordEncoder.matches(
-                request.getPassword(),  // 평문
-                user.getPassword()      // 암호문
-        );
-
+    public void logout(User user){
+        redisService.deleteRefreshToken(String.valueOf(user.getId()));
     }
 }

@@ -2,6 +2,7 @@ package dasoni_backend.domain.user.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -29,9 +30,16 @@ public class UserDTO {
     @NoArgsConstructor
     public static class LoginRequestDTO{
         @NotBlank
-        private String username;
+        private String logId;
         @NotBlank
         private String password;
     }
 
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class LoginResponseDTO {
+        private String accessToken;
+        private String refreshToken;
+    }
 }

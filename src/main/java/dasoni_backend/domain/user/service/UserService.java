@@ -1,10 +1,13 @@
 package dasoni_backend.domain.user.service;
 
+import dasoni_backend.domain.user.dto.UserDTO.LoginRequestDTO;
+import dasoni_backend.domain.user.dto.UserDTO.LoginResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RegisterRequestDTO;
+import dasoni_backend.domain.user.entity.User;
 
 public interface UserService {
     void register(RegisterRequestDTO request);
     boolean checkDuplicate(String logId);
-    void login(String username, String password);
-    void logout();
+    LoginResponseDTO login(LoginRequestDTO request);
+    void logout(User user);
 }

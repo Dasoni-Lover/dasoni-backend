@@ -79,4 +79,15 @@ public class JwtTokenProvider {
             return false;
         }
     }
+    public long getTokenRemainingTime(String token) {
+        Date expiration = Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .getExpiration();
+
+        long now = System.currentTimeMillis();
+        return expiration.getTime() - now;
+    }
 }
