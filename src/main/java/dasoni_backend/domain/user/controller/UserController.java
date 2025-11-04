@@ -62,14 +62,4 @@ public class UserController {
         AccessTokenResponseDTO response = userService.refresh(request);
         return ResponseEntity.ok(response);
     }
-
-    // Header에서 토큰 추출 (헬퍼 메서드)
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
-    }
-
 }
