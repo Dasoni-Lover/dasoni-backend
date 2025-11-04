@@ -1,10 +1,8 @@
 package dasoni_backend.domain.hall.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,8 +12,6 @@ public class HallDTO {
     // 1. 입장한 추모관 / 관리하는 추모관 목록 조회
     @Getter
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class HallListResponseDTO {
 
         // 추모관 리스트
@@ -23,8 +19,6 @@ public class HallDTO {
     }
     @Getter
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class HallResponseDTO {
 
         private String profile;
@@ -44,8 +38,6 @@ public class HallDTO {
     // 2. 사이드바 정보
     @Getter
     @Builder
-    @AllArgsConstructor
-    @NoArgsConstructor
     public static class SidebarResponseDTO {
 
         private String name;
