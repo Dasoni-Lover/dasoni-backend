@@ -1,9 +1,12 @@
 package dasoni_backend.domain.photo.service;
 
+import dasoni_backend.domain.hall.entity.Hall;
+import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.photo.converter.PhotoConverter;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUploadRequestDTO;
 import dasoni_backend.domain.photo.entity.Photo;
 import dasoni_backend.domain.photo.repository.PhotoRepository;
 import dasoni_backend.domain.user.entity.User;
@@ -15,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -26,6 +30,7 @@ import java.util.stream.Collectors;
 public class PhotoServiceImpl implements PhotoService {
 
     private final PhotoRepository photoRepository;
+    private final HallRepository hallRepository;
     private final FileUploadService fileUploadService;
 
     @Override
@@ -77,6 +82,36 @@ public class PhotoServiceImpl implements PhotoService {
     private boolean AIFilter(Photo photo, Boolean isAI) {
         if (isAI == null) return true;
         return photo.getIsAi().equals(isAI);
+    }
+
+    @Override
+    @Transactional
+    public void uploadPhoto(Long hallId, PhotoUploadRequestDTO request, User user){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new IllegalArgumentException("홀을 찾을 수 없습니다."));
+
+        // URL에서 s3Key 추출 후 파일 존재 확인
+        String s3Key = fileUploadService.extractS3Key(request.getUrl());
+        fileUploadService.confirmUpload(s3Key);
+
+        // occurredAt 변환
+        LocalDate occurredAt = null;
+        if (request.getOccurredAt() != null) {
+            occurredAt = parseOccurredAt(request.getOccurredAt());
+        }
+
+        // Photo 엔티티 생성
+        Photo photo = Photo.builder()
+                .hall(hall)
+                .user(user)
+                .content(request.getContent())
+                .url(request.getUrl())
+                .isPrivate(request.getIsPrivate())
+                .isAi(request.getIsAI())
+                .occurredAt(occurredAt)
+                .uploadedAt(LocalDateTime.now())
+                .build();
+        photoRepository.save(photo);
     }
 
     @Override

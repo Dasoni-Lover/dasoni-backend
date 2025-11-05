@@ -20,8 +20,7 @@ public class PhotoDTO {
     @Getter
     @NoArgsConstructor
     public static class PhotoUploadRequestDTO {
-        private String type;
-        private String s3Key;
+        private String url;
         private String content;
         private String occurredAt;
         private Boolean isPrivate;

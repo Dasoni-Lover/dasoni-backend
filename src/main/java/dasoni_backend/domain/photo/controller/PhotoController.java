@@ -32,13 +32,15 @@ public class PhotoController {
                                                            @RequestBody PhotoRequestDTO request,
                                                            @AuthUser User user) {
         PhotoListResponseDTO photos = photoService.getPhotoList(hallId,request,user);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(photos);
     }
 
     // 사진 업로드
     @PatchMapping("/upload")
-    public ResponseEntity<?> uploadPhoto(@PathVariable Long hallId, @RequestBody PhotoUploadRequestDTO request) {
-        // TODO: implement upload logic
+    public ResponseEntity<Void> uploadPhoto(@PathVariable Long hallId,
+                                         @RequestBody PhotoUploadRequestDTO request,
+                                         @AuthUser User user) {
+        photoService.uploadPhoto(hallId,request,user);
         return ResponseEntity.ok().build();
     }
 
@@ -55,8 +57,10 @@ public class PhotoController {
 
     // 사진 삭제
     @DeleteMapping("/{photoId}/delete")
-    public ResponseEntity<?> deletePhoto(@PathVariable Long hallId, @PathVariable Long photoId) {
-        // TODO: implement delete logic
+    public ResponseEntity<?> deletePhoto(@PathVariable Long hallId,
+                                         @PathVariable Long photoId,
+                                         @AuthUser User user) {
+        photoService.deletePhoto(hallId,photoId,user);
         return ResponseEntity.noContent().build();
     }
 
