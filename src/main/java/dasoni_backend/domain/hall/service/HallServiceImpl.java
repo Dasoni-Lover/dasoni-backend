@@ -73,32 +73,18 @@ public class HallServiceImpl implements HallService {
     // 본인 추모관 개설
     @Transactional
     @Override
-    public HallCreateResponseDTO createMyHall(Long userId) {
+    public HallCreateResponseDTO createMyHall(User user) {
 
-        // 본인 추모관이 이미 존재하는지 확인
-        if(hallRepository.existsByAdminId(userId)) {
-            Long existingId = hallRepository.findByAdminId(userId)
-                    .map(Hall::getId).orElse(null);
-
-            return HallCreateResponseDTO.builder()
-                    .hallId(existingId)
-                    .build();
-            // return HallConverter.toHallCreateResponseDTO(existingId);
-        }
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        Hall hall = Hall.builder()
-                .admin(user)
-                .name(user.getName())
-                .profile(user.getMyProfile())
-                .createdAt(LocalDateTime.now())
-                .isOpened(true)
-                .userNum(1)
-                .build();
-
-        Hall saved = hallRepository.save(hall);
-        return HallConverter.toHallCreateResponseDTO(saved);
+        // 본인 추모관 존재 O -> 중복 생성 방지
+        // 본인 추모관 존재 X -> 생성 후, hallId 반환
+        return hallRepository.findByAdminId(user.getId())
+                // O
+                .map(existing -> new HallCreateResponseDTO(existing.getId()))
+                // X
+                .orElseGet(() -> {
+                    Hall hall = HallConverter.fromSaveRequest(user);
+                    Hall saved = hallRepository.save(hall);
+                    return new HallCreateResponseDTO(saved.getId());
+                });
     }
 }

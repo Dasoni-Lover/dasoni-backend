@@ -3,6 +3,8 @@ package dasoni_backend.domain.hall.service;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
+import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.annotation.AuthUser;
 
 public interface HallService {
 
@@ -16,6 +18,6 @@ public interface HallService {
     SidebarResponseDTO getSidebar(Long userId);
 
     // 본인 추모관 개설
-    HallCreateResponseDTO createMyHall(Long userId);
+    HallCreateResponseDTO createMyHall(User user);
 }
 

@@ -43,16 +43,20 @@ public class HallConverter {
     }
 
     // 본인 추모관 필드 채우기
-    public static Hall fromSaveRequest(User user, LocalDateTime now) {
+    public static Hall fromSaveRequest(User user) {
 
-        Hall hall = new Hall();
-        hall.setAdmin(user);
-        hall.setName(user.getName());
-        hall.setBirthday(user.getBirthday());
-        hall.setProfile(user.getMyProfile());
-        hall.setCreatedAt(now);
-        hall.setUserNum(1);
-        hall.setIsOpened(true);
+        // 따로 요청 없이, User의 정보를 바탕으로 엔티티 생성
+        Hall hall = Hall.builder()
+                .admin(user)
+                .subjectId(user.getId())
+                .name(user.getName())
+                .birthday(user.getBirthday())
+                .profile(user.getMyProfile())
+                .createdAt(LocalDateTime.now())
+                .isOpened(true)
+                .userNum(1)
+                .build();
+
         return hall;
     }
 }

@@ -1,8 +1,10 @@
 package dasoni_backend.domain.hall.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,6 +53,8 @@ public class HallDTO {
     // 3. 본인 추모관 개설
     @Getter
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class HallCreateResponseDTO {
 
         private Long hallId;

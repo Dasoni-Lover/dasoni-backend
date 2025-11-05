@@ -43,7 +43,7 @@ public class HallController {
     // 본인 추모관 개설
     @PostMapping("/me/create")
     public ResponseEntity<HallCreateResponseDTO> createMyHall(@AuthUser User user) {
-        HallCreateResponseDTO response = hallService.createMyHall(user.getId());
+        HallCreateResponseDTO response = hallService.createMyHall(user);
         return ResponseEntity.ok(response);
     }
 }
