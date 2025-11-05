@@ -7,6 +7,7 @@ import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
 import dasoni_backend.domain.photo.entity.Photo;
 import dasoni_backend.domain.photo.repository.PhotoRepository;
 import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.S3.service.FileUploadService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +15,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
@@ -25,7 +25,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PhotoServiceImpl implements PhotoService {
 
-    private  final PhotoRepository photoRepository;
+    private final PhotoRepository photoRepository;
+    private final FileUploadService fileUploadService;
 
     @Override
     public PhotoListResponseDTO getPhotoList(Long hallId, PhotoRequestDTO request, User user) {
@@ -118,5 +119,32 @@ public class PhotoServiceImpl implements PhotoService {
         } catch (Exception e) {
             throw new IllegalArgumentException("올바른 날짜 형식이 아닙니다. (yyyy.MM.dd)");
         }
+    }
+
+    @Override
+    public void deletePhoto(Long hallId, Long photoId, User user) {
+        Photo photo = photoRepository.findById(photoId)
+                .orElseThrow(() -> new IllegalArgumentException("사진을 찾을 수 없습니다."));
+
+        if (!photo.getHall().getId().equals(hallId)) {
+            throw new IllegalArgumentException("해당 홀의 사진이 아닙니다.");
+        }
+
+        // 본인도 아니고 관리자도 아니면 안됨
+        boolean isOwner = photo.getUser().getId().equals(user.getId());
+        boolean isAdmin = photo.getHall().getAdmin().getId().equals(user.getId());
+
+        if (!isOwner && !isAdmin) {
+            throw new IllegalArgumentException("본인이 올린 사진이거나 홀 관리자만 삭제할 수 있습니다.");
+        }
+        // S3에서 파일 삭제
+        try {
+            String s3Key = fileUploadService.extractS3Key(photo.getUrl());
+            fileUploadService.deleteFile(s3Key);
+        } catch (Exception e) {
+            log.error("S3 파일 삭제 실패: {}", photo.getUrl(), e);
+        }
+        // DB에서 삭제
+        photoRepository.delete(photo);
     }
 }
