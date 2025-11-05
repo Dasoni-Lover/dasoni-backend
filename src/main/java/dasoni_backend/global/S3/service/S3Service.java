@@ -1,6 +1,4 @@
-package dasoni_backend.global.S3;
-
-import software.amazon.awssdk.services.s3.model.HeadObjectResponse;
+package dasoni_backend.global.S3.service;
 
 public interface S3Service {
     String generatePresignedUploadUrl(String s3Key, String contentType);
