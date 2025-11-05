@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 import lombok.Getter;
 import org.springframework.cglib.core.Local;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -49,5 +50,17 @@ public class Photo {
     private LocalDateTime uploadedAt;
 
     @Column(name = "occurred_at")
-    private LocalDateTime occurredAt;
+    private LocalDate occurredAt;
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateOccurredAt(LocalDate occurredAt) {
+        this.occurredAt = occurredAt;
+    }
+
+    public void updateIsPrivate(Boolean isPrivate) {
+        this.isPrivate = isPrivate;
+    }
 }

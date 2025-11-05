@@ -3,13 +3,19 @@ package dasoni_backend.domain.photo.service;
 import dasoni_backend.domain.photo.converter.PhotoConverter;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoRequestDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
 import dasoni_backend.domain.photo.entity.Photo;
 import dasoni_backend.domain.photo.repository.PhotoRepository;
 import dasoni_backend.domain.user.entity.User;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -70,5 +76,47 @@ public class PhotoServiceImpl implements PhotoService {
     private boolean AIFilter(Photo photo, Boolean isAI) {
         if (isAI == null) return true;
         return photo.getIsAi().equals(isAI);
+    }
+
+    @Override
+    @Transactional
+    public void updatePhoto(Long hallId, Long photoId, PhotoUpdateRequestDTO request, User user) {
+
+        Photo photo = photoRepository.findById(photoId)
+                .orElseThrow(() -> new EntityNotFoundException("사진을 찾을 수 없습니다."));
+
+        if (!photo.getHall().getId().equals(hallId)) {
+            throw new IllegalArgumentException("해당 홀의 사진이 아닙니다.");
+        }
+
+        if (!photo.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("본인이 올린 사진만 수정할 수 있습니다.");
+        }
+
+        // 업데이트
+        if (request.getContent() != null) {
+            photo.updateContent(request.getContent());
+        }
+        if (request.getOccurredAt() != null) {
+            LocalDate occurredAt = parseOccurredAt(request.getOccurredAt());
+            photo.updateOccurredAt(occurredAt);
+        }
+        if (request.getIsPrivate() != null) {
+            boolean isPrivate = request.getIsPrivate() == 1;
+            photo.updateIsPrivate(isPrivate);
+        }
+
+        // 저장
+        photoRepository.save(photo);
+    }
+
+    // "yyyy.MM.dd" -> LocalDate 형식으로
+    private LocalDate parseOccurredAt(String occurredAtStr) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+            return LocalDate.parse(occurredAtStr, formatter);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("올바른 날짜 형식이 아닙니다. (yyyy.MM.dd)");
+        }
     }
 }

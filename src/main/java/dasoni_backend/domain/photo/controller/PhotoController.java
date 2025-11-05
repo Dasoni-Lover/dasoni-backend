@@ -44,11 +44,12 @@ public class PhotoController {
 
     // 사진 수정
     @PatchMapping("/{photoId}/update")
-    public ResponseEntity<?> updatePhoto(
+    public ResponseEntity<Void> updatePhoto(
             @PathVariable Long hallId,
             @PathVariable Long photoId,
-            @RequestBody PhotoUpdateRequestDTO request) {
-        // TODO: implement update logic
+            @RequestBody PhotoUpdateRequestDTO request,
+            @AuthUser User user) {
+        photoService.updatePhoto(hallId,photoId,request,user);
         return ResponseEntity.ok().build();
     }
 
