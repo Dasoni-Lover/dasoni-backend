@@ -31,7 +31,7 @@ public class Photo {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "url", columnDefinition = "TEXT")
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @Column(name = "url", columnDefinition = "TEXT")

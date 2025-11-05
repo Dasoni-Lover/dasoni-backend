@@ -42,6 +42,20 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok'
     testAnnotationProcessor 'org.projectlombok:lombok'
 
+    // Validation
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // presigned
+    implementation platform('software.amazon.awssdk:bom:2.21.0')
+    implementation 'software.amazon.awssdk:s3'
+    implementation 'software.amazon.awssdk:sts'
+
+    // HTTP Client (AI API 호출)
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+    // ConfigurationProperties 자동완성 지원
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
+
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

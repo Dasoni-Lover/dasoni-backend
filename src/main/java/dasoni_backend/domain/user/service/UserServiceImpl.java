@@ -32,8 +32,8 @@ public class UserServiceImpl implements UserService{
     }
     @Override
     @Transactional
-    public boolean checkDuplicate(String logId) {
-        return userRepository.existsByLogId(logId);
+    public boolean checkAvailable(String logId) {
+        return !(userRepository.existsByLogId(logId));
     }
 
     @Override

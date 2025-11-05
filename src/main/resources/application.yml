@@ -27,6 +27,7 @@ spring:
         dialect: org.hibernate.dialect.MySQL8Dialect
     open-in-view: false
 
+
 # JWT 설정
 jwt:
   secret: ${JWT_SECRET}  # secrets에서 가져옴

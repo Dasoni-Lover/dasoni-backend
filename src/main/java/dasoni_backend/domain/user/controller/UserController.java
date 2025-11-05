@@ -35,9 +35,9 @@ public class UserController {
 
     // 회원가입 중복 확인 (아이디 체크)
     @GetMapping("/register/check")
-    public ResponseEntity<Boolean> checkDuplicate(@RequestParam("logid") String logId) {
-        boolean isDuplicate = userService.checkDuplicate(logId);
-        return ResponseEntity.ok(isDuplicate);
+    public ResponseEntity<Boolean> checkAvailable(@RequestParam("logid") String logId) {
+        boolean isAvailable = userService.checkAvailable(logId);
+        return ResponseEntity.ok(isAvailable);
     }
 
     // 로그인
@@ -58,7 +58,6 @@ public class UserController {
     @PostMapping("/refresh")
     public ResponseEntity<AccessTokenResponseDTO> refresh(
             @Valid @RequestBody RefreshTokenRequestDTO request) {
-
         AccessTokenResponseDTO response = userService.refresh(request);
         return ResponseEntity.ok(response);
     }

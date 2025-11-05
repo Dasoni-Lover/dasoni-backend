@@ -9,7 +9,7 @@ import dasoni_backend.domain.user.entity.User;
 
 public interface UserService {
     void register(RegisterRequestDTO request);
-    boolean checkDuplicate(String logId);
+    boolean checkAvailable(String logId);
     LoginResponseDTO login(LoginRequestDTO request);
     AccessTokenResponseDTO refresh(RefreshTokenRequestDTO request);
     void logout(User user);
