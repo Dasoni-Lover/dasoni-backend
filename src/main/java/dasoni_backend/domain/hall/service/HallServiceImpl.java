@@ -3,9 +3,11 @@ package dasoni_backend.domain.hall.service;
 import dasoni_backend.domain.hall.converter.HallConverter;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
+import dasoni_backend.domain.hall.repository.HallQueryRepository;
 import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.repository.UserRepository;
@@ -25,6 +27,7 @@ public class HallServiceImpl implements HallService {
 
     private final HallRepository hallRepository;
     private final UserRepository userRepository;
+    private final HallQueryRepository hallQueryRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -105,5 +108,37 @@ public class HallServiceImpl implements HallService {
         return HallCreateResponseDTO.builder()
                 .hallId(hall.getId())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    @Override
+    public HallDetailDataResponseDTO getHallDetail(Long hallId, User user) {
+
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 추모관입니다."));
+
+        Long userId = user.getId();
+        Long adminId = hall.getAdmin() != null ? hall.getAdmin().getId() : null;
+        Long subjectId = hall.getSubjectId();
+
+        // role 나누기
+        String role;
+        if (userId.equals(subjectId)) {
+            role = "me";
+        } else if (userId.equals(adminId)) {
+            role = "admin";
+        } else {
+            // 베타데모데이 이후로 승인된 사용자면 follower가 될 수 있게 로직 변경
+            role = "follower";
+        }
+
+        // 관리자 리뷰만 추모관에 전시
+        String adminReview = hall.getReview();
+
+        // 상위 4개 natures 전시
+        List<String> top4Natures = hallQueryRepository.findTop4NatureNames(hallId);
+
+        // 변환(me일때는 필요없는 null처리 & 응답에서 숨김처리)
+        return HallConverter.toHallDetailResponse(hall, role, adminReview, top4Natures);
     }
 }

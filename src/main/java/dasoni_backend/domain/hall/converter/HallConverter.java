@@ -2,6 +2,8 @@ package dasoni_backend.domain.hall.converter;
 
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallDetailResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
@@ -79,5 +81,38 @@ public class HallConverter {
                 .userNum(1)
                 .build();
         return hall;
+    }
+
+    // 추모관 내용 조회
+    public static HallDetailDataResponseDTO toHallDetailResponse(Hall hall, String role, String adminReview, List<String> top4Natures) {
+
+        HallDetailResponseDTO.HallDetailResponseDTOBuilder data = HallDetailResponseDTO.builder()
+                .name(hall.getName())
+                .profile(hall.getProfile())
+                .birthday(hall.getBirthday())
+                .deadday(hall.getDeadday())
+                .natures(top4Natures)
+                .place(hall.getPlace())
+                .phone(hall.getPhone())
+                .review(adminReview)
+                .adminName(hall.getAdmin() != null ? hall.getAdmin().getName() : null)
+                .isOpen(Boolean.TRUE.equals(hall.getIsOpened()));
+
+        // role = me인 경우, 필요없는 필드들 null 처리
+        if("me".equals(role)) {
+            data.deadday(null)
+                    .natures(null)
+                    .place(null)
+                    .phone(null)
+                    .review(null)
+                    .adminName(null);
+        }
+
+        return HallDetailDataResponseDTO.builder()
+                .role(role)
+                .data(data.build())
+                .build();
+
+
     }
 }

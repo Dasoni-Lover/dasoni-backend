@@ -1,6 +1,8 @@
 package dasoni_backend.domain.hall.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import dasoni_backend.global.enums.Personality;
 import dasoni_backend.global.enums.RelationKind;
 import jakarta.validation.constraints.NotBlank;
@@ -100,5 +102,44 @@ public class HallDTO {
 
         // 사망확인서
         private String docs;
+    }
+
+    // 추모관 내용 조회
+    @Getter
+    @Builder
+    public static class HallDetailDataResponseDTO {
+
+        // follower, admin, me
+        private String role;
+
+        private HallDetailResponseDTO data;
+    }
+
+    @Getter
+    @Builder
+    @JsonInclude(Include.NON_NULL) // null인 필드는 숨기기
+    public static class HallDetailResponseDTO {
+
+        private String name;
+
+        private String profile;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        private LocalDateTime birthday;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        private LocalDateTime deadday;
+
+        private List<String> natures;
+
+        private String place;
+
+        private String phone;
+
+        private String review;
+
+        private String adminName;
+
+        private boolean isOpen;
     }
 }

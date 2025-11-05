@@ -2,6 +2,7 @@ package dasoni_backend.domain.hall.controller;
 
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
@@ -10,7 +11,9 @@ import dasoni_backend.global.annotation.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -58,5 +61,11 @@ public class HallController {
             @Valid @RequestBody HallCreateRequestDTO request) {
         HallCreateResponseDTO response = hallService.createOtherHall(admin, request);
         return ResponseEntity.ok(response);
+    }
+
+    // 추모관 내용 조회
+    @GetMapping("/{hall_id}")
+    public ResponseEntity<HallDetailDataResponseDTO> getHallDetail(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
+        return ResponseEntity.ok(hallService.getHallDetail(hallId, user));
     }
 }
