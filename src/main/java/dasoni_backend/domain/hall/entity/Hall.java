@@ -3,7 +3,9 @@ package dasoni_backend.domain.hall.entity;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.enums.Personality;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -22,6 +24,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import static lombok.AccessLevel.PROTECTED;
 
@@ -69,10 +73,14 @@ public class Hall {
     @Column(name = "profile", columnDefinition = "TEXT")
     private String profile;
 
-    // target_nature: 여러 값 가능 시 JSON/Text 확장 고려
+    // ElementCollection 사용해 List로 변경
+    // 3개로 고정
+    @ElementCollection(targetClass = Personality.class, fetch = FetchType.EAGER)
+    @CollectionTable(name = "hall_target_natures", joinColumns = @JoinColumn(name = "hall_id"))
     @Enumerated(EnumType.STRING)
     @Column(name = "target_nature", length = 32)
-    private Personality targetNature;
+    @Builder.Default
+    private List<Personality> targetNatures = new ArrayList<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -85,5 +93,9 @@ public class Hall {
 
     @Column(name = "docs", columnDefinition = "TEXT")
     private String docs;
+
+    // 추모관에 띄울 한줄 소개 추가
+    @Column(name = "review", columnDefinition = "TEXT")
+    private String review;
 }
 

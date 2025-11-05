@@ -1,5 +1,6 @@
 package dasoni_backend.domain.hall.converter;
 
+import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallResponseDTO;
@@ -34,7 +35,7 @@ public class HallConverter {
                 .build();
     }
 
-    //  본인 추모관 개설(hallId 반환)
+    //  본인/타인 추모관 개설(hallId 반환)
     public static HallCreateResponseDTO toHallCreateResponseDTO(Hall hall) {
 
         return HallCreateResponseDTO.builder()
@@ -57,6 +58,26 @@ public class HallConverter {
                 .userNum(1)
                 .build();
 
+        return hall;
+    }
+
+    // 타인 추모관 필드 채우기
+    public static Hall fromSaveRequestForOther(User admin, HallCreateRequestDTO request) {
+        Hall hall = Hall.builder()
+                .admin(admin)
+                .name(request.getName())
+                .targetNatures(request.getNatures())
+                .review(request.getReview())
+                .birthday(request.getBirthday())
+                .deadday(request.getDeadday())
+                .profile(request.getProfile())
+                .place(request.getPlace())
+                .phone(request.getPhone())
+                .docs(request.getDocs())
+                .createdAt(LocalDateTime.now())
+                .isOpened(true)
+                .userNum(1)
+                .build();
         return hall;
     }
 }

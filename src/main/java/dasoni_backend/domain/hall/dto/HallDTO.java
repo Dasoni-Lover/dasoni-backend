@@ -1,6 +1,11 @@
 package dasoni_backend.domain.hall.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import dasoni_backend.global.enums.Personality;
+import dasoni_backend.global.enums.RelationKind;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -50,7 +55,7 @@ public class HallDTO {
         private Integer notiCount; // 알림 수, 추후에 연동
     }
 
-    // 3. 본인 추모관 개설
+    // 3. 본인/타인 추모관 개설 응답
     @Getter
     @Builder
     @NoArgsConstructor
@@ -58,5 +63,42 @@ public class HallDTO {
     public static class HallCreateResponseDTO {
 
         private Long hallId;
+    }
+
+    // 4. 타인 추모관 개설 요청
+    @Getter
+    @NoArgsConstructor
+    public static class HallCreateRequestDTO {
+
+        @NotBlank
+        private String name;
+
+        @NotNull
+        // FRIEND, LOVER, FAMILY
+        private RelationKind relation;
+
+        @NotNull
+        private LocalDateTime birthday;
+
+        @NotNull
+        private LocalDateTime deadday;
+
+        @NotNull
+        @Size(min = 3, max = 3)
+        // 3개 고정
+        // GOOD, BAD, INTROVERTED, GENEROUS, OPTIMISTIC
+        private List<Personality> natures;
+
+        @NotBlank
+        private String review;
+
+        private String profile;
+
+        private String place;
+
+        private String phone;
+
+        // 사망확인서
+        private String docs;
     }
 }

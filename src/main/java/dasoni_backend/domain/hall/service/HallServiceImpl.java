@@ -1,6 +1,7 @@
 package dasoni_backend.domain.hall.service;
 
 import dasoni_backend.domain.hall.converter.HallConverter;
+import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
@@ -9,6 +10,7 @@ import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor // 자동 생성자 주입
 public class HallServiceImpl implements HallService {
@@ -79,12 +82,28 @@ public class HallServiceImpl implements HallService {
         // 본인 추모관 존재 X -> 생성 후, hallId 반환
         return hallRepository.findByAdminId(user.getId())
                 // O
-                .map(existing -> new HallCreateResponseDTO(existing.getId()))
+                .map(existing -> HallCreateResponseDTO.builder()
+                        .hallId(existing.getId())
+                        .build())
                 // X
                 .orElseGet(() -> {
-                    Hall hall = HallConverter.fromSaveRequest(user);
-                    Hall saved = hallRepository.save(hall);
-                    return new HallCreateResponseDTO(saved.getId());
+                    Hall hall = hallRepository.save(HallConverter.fromSaveRequest(user));
+                    return HallCreateResponseDTO.builder()
+                            .hallId(hall.getId())
+                            .build();
                 });
+    }
+
+    // 타인 추모관 개설
+    @Transactional
+    @Override
+    public HallCreateResponseDTO createOtherHall(User admin, HallCreateRequestDTO request) {
+
+        // 타인 추모관 개설
+        Hall hall = hallRepository.save(HallConverter.fromSaveRequestForOther(admin, request));
+
+        return HallCreateResponseDTO.builder()
+                .hallId(hall.getId())
+                .build();
     }
 }
