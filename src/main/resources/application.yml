@@ -1,0 +1,61 @@
+spring:
+  config:
+    import: optional:classpath:application-secrets.yml
+  application:
+    name: dasoni-backend
+
+  # Redis 설정
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}  # 환경변수 또는 기본값
+      port: ${REDIS_PORT:6379}
+
+  # 데이터베이스 설정
+  datasource:
+    url: ${DB_URL}  # secrets에서 가져옴
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  # JPA 설정
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    open-in-view: false
+
+
+# JWT 설정
+jwt:
+  secret: ${JWT_SECRET}  # secrets에서 가져옴
+  access-token-validity: 300000  # 5분
+  refresh-token-validity: 604800000  # 7일
+
+# 서버 설정
+server:
+  port: 8080
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    com.dasoni: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+
+aws:
+  s3:
+    bucket-name: ${S3_BUCKET_NAME}  # S3 버킷 이름
+    region: ap-northeast-2          # AWS 리전
+    access-key: ${S3_ACCESS_KEY}     # AWS Access Key
+    secret-key: ${S3_SECRET_KEY}     # AWS Secret Key
+    presigned-url-expiration: 15    # URL 만료 시간 (분)
+
+    paths:
+      image: images/   # 이미지 저장 경로
+      audio: audios/   # 음성 저장 경로
