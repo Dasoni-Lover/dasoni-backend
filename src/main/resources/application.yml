@@ -46,3 +46,16 @@ logging:
     org.springframework.security: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+
+aws:
+  s3:
+    bucket-name: ${S3_BUCKET_NAME}  # S3 버킷 이름
+    region: ap-northeast-2          # AWS 리전
+    access-key: ${S3_ACCESS_KEY}     # AWS Access Key
+    secret-key: ${S3_SECRET_KEY}     # AWS Secret Key
+    presigned-url-expiration: 15    # URL 만료 시간 (분)
+
+    paths:
+      image: images/   # 이미지 저장 경로
+      audio: audios/   # 음성 저장 경로
