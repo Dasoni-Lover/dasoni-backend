@@ -1,10 +1,15 @@
 package dasoni_backend.domain.hall.controller;
 
+import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
+import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.annotation.AuthUser;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,4 +40,10 @@ public class HallController {
         return hallService.getSidebar(userId);
     }
 
+    // 본인 추모관 개설
+    @PostMapping("/me/create")
+    public ResponseEntity<HallCreateResponseDTO> createMyHall(@AuthUser User user) {
+        HallCreateResponseDTO response = hallService.createMyHall(user.getId());
+        return ResponseEntity.ok(response);
+    }
 }

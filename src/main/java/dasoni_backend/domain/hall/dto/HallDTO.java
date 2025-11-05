@@ -47,4 +47,12 @@ public class HallDTO {
 
         private Integer notiCount; // 알림 수, 추후에 연동
     }
+
+    // 3. 본인 추모관 개설
+    @Getter
+    @Builder
+    public static class HallCreateResponseDTO {
+
+        private Long hallId;
+    }
 }

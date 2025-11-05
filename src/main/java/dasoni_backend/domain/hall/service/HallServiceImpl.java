@@ -1,6 +1,7 @@
 package dasoni_backend.domain.hall.service;
 
 import dasoni_backend.domain.hall.converter.HallConverter;
+import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -68,4 +70,35 @@ public class HallServiceImpl implements HallService {
                 .build();
     }
 
+    // 본인 추모관 개설
+    @Transactional
+    @Override
+    public HallCreateResponseDTO createMyHall(Long userId) {
+
+        // 본인 추모관이 이미 존재하는지 확인
+        if(hallRepository.existsByAdminId(userId)) {
+            Long existingId = hallRepository.findByAdminId(userId)
+                    .map(Hall::getId).orElse(null);
+
+            return HallCreateResponseDTO.builder()
+                    .hallId(existingId)
+                    .build();
+            // return HallConverter.toHallCreateResponseDTO(existingId);
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        Hall hall = Hall.builder()
+                .admin(user)
+                .name(user.getName())
+                .profile(user.getMyProfile())
+                .createdAt(LocalDateTime.now())
+                .isOpened(true)
+                .userNum(1)
+                .build();
+
+        Hall saved = hallRepository.save(hall);
+        return HallConverter.toHallCreateResponseDTO(saved);
+    }
 }

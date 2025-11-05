@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface HallRepository extends JpaRepository<Hall, Long> {
 
@@ -16,4 +17,8 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
     // 네이티브 쿼리는 추후 변경
     @Query(value = "SELECT h.* FROM halls h JOIN hall_followers hf ON h.id = hf.hall_id WHERE hf.user_id = :userId ORDER BY h.created_at DESC", nativeQuery = true)
     List<Hall> findAllByFollowerUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
+
+    Optional<Hall> findByAdminId(Long userId);
+
+    boolean existsByAdminId(Long userId);
 }
