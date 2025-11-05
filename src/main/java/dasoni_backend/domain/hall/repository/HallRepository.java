@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface HallRepository extends JpaRepository<Hall, Long> {
 
@@ -16,4 +17,9 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
     // 네이티브 쿼리는 추후 변경
     @Query(value = "SELECT h.* FROM halls h JOIN hall_followers hf ON h.id = hf.hall_id WHERE hf.user_id = :userId ORDER BY h.created_at DESC", nativeQuery = true)
     List<Hall> findAllByFollowerUserIdOrderByCreatedAtDesc(@Param("userId") Long userId);
+
+    // Optional로 둔 이유는 본인 추모관의 생성 여부를 확인하기 위함
+    // existsByAdminId 같은 함수 따로 만들지 않아도 됨
+    // 이 경우는 단순히 Id로만 조회하는거라 user 객체를 넘길 필요 없음
+    Optional<Hall> findByAdminId(Long userId);
 }

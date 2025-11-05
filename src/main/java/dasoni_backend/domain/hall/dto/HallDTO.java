@@ -1,8 +1,17 @@
 package dasoni_backend.domain.hall.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import dasoni_backend.global.enums.Personality;
+import dasoni_backend.global.enums.RelationKind;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -46,5 +55,91 @@ public class HallDTO {
         private String myProfile;
 
         private Integer notiCount; // 알림 수, 추후에 연동
+    }
+
+    // 3. 본인/타인 추모관 개설 응답
+    @Getter
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HallCreateResponseDTO {
+
+        private Long hallId;
+    }
+
+    // 4. 타인 추모관 개설 요청
+    @Getter
+    @NoArgsConstructor
+    public static class HallCreateRequestDTO {
+
+        @NotBlank
+        private String name;
+
+        @NotNull
+        // FRIEND, LOVER, FAMILY
+        private RelationKind relation;
+
+        @NotNull
+        private LocalDateTime birthday;
+
+        @NotNull
+        private LocalDateTime deadday;
+
+        @NotNull
+        @Size(min = 3, max = 3)
+        // 3개 고정
+        // GOOD, BAD, INTROVERTED, GENEROUS, OPTIMISTIC
+        private List<Personality> natures;
+
+        @NotBlank
+        private String review;
+
+        private String profile;
+
+        private String place;
+
+        private String phone;
+
+        // 사망확인서
+        private String docs;
+    }
+
+    // 추모관 내용 조회
+    @Getter
+    @Builder
+    public static class HallDetailDataResponseDTO {
+
+        // follower, admin, me
+        private String role;
+
+        private HallDetailResponseDTO data;
+    }
+
+    @Getter
+    @Builder
+    @JsonInclude(Include.NON_NULL) // null인 필드는 숨기기
+    public static class HallDetailResponseDTO {
+
+        private String name;
+
+        private String profile;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        private LocalDateTime birthday;
+
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+        private LocalDateTime deadday;
+
+        private List<String> natures;
+
+        private String place;
+
+        private String phone;
+
+        private String review;
+
+        private String adminName;
+
+        private boolean isOpen;
     }
 }
