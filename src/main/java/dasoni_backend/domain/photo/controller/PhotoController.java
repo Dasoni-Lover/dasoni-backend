@@ -1,6 +1,13 @@
 package dasoni_backend.domain.photo.controller;
 
+import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoRequestDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUploadRequestDTO;
 import dasoni_backend.domain.photo.repository.PhotoRepository;
+import dasoni_backend.domain.photo.service.PhotoService;
+import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.annotation.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,17 +24,20 @@ import org.springframework.web.bind.annotation.RestController;
 public class PhotoController {
 
     private final PhotoRepository photoRepository;
+    private final PhotoService photoService;
 
     // 사진 확인
     @PostMapping
-    public ResponseEntity<?> createPhoto(@PathVariable Long hallId, @RequestBody Object request) {
-        // TODO: implement create logic
+    public ResponseEntity<PhotoListResponseDTO> viewPhotos(@PathVariable Long hallId,
+                                                           @RequestBody PhotoRequestDTO request,
+                                                           @AuthUser User user) {
+        PhotoListResponseDTO photos = photoService.getPhotoList(hallId,request,user);
         return ResponseEntity.ok().build();
     }
 
     // 사진 업로드
     @PatchMapping("/upload")
-    public ResponseEntity<?> uploadPhoto(@PathVariable Long hallId, @RequestBody Object request) {
+    public ResponseEntity<?> uploadPhoto(@PathVariable Long hallId, @RequestBody PhotoUploadRequestDTO request) {
         // TODO: implement upload logic
         return ResponseEntity.ok().build();
     }
@@ -37,7 +47,7 @@ public class PhotoController {
     public ResponseEntity<?> updatePhoto(
             @PathVariable Long hallId,
             @PathVariable Long photoId,
-            @RequestBody Object request) {
+            @RequestBody PhotoUpdateRequestDTO request) {
         // TODO: implement update logic
         return ResponseEntity.ok().build();
     }
