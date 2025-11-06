@@ -63,7 +63,6 @@ public class HallDTO {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class HallCreateResponseDTO {
-
         private Long hallId;
     }
 
