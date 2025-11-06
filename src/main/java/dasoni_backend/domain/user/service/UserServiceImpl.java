@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService{
     @Override
     @Transactional
     public checkResponseDTO checkAvailable(String logId) {
-        return checkResponseDTO.builder().isAvailable(userRepository.existsByLogId(logId)).build();
+        return checkResponseDTO.builder().isAvailable(!userRepository.existsByLogId(logId)).build();
     }
 
     @Override
