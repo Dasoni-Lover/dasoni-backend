@@ -3,8 +3,10 @@ package dasoni_backend.domain.photo.service;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.photo.converter.PhotoConverter;
+import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationApiResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationResponseDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.ImageInputDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
@@ -13,15 +15,28 @@ import dasoni_backend.domain.photo.entity.Photo;
 import dasoni_backend.domain.photo.repository.PhotoRepository;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.S3.service.FileUploadService;
+import dasoni_backend.global.fastApi.FastApiClient;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,6 +49,8 @@ public class PhotoServiceImpl implements PhotoService {
     private final PhotoRepository photoRepository;
     private final HallRepository hallRepository;
     private final FileUploadService fileUploadService;
+    private final FastApiClient fastApiClient;
+
 
     @Override
     public PhotoListResponseDTO getPhotoList(Long hallId, PhotoRequestDTO request, User user) {
@@ -186,9 +203,71 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public ImageGenerationResponseDTO generateImage(Long hallId, ImageGenerationRequestDTO imageGenerationRequestDTO, User user){
+    public ImageGenerationResponseDTO generateImage(MultipartFile image1,
+                                                    MultipartFile image2,
+                                                    MultipartFile image3,
+                                                    String prompt) {
+        try {
+            // 1. 이미지 리스트 생성 (순서 보장)
+            List<MultipartFile> images = new ArrayList<>();
+            images.add(image1);
 
+            if (image2 != null && !image2.isEmpty()) {
+                images.add(image2);
+            }
 
-        return null;
+            if (image3 != null && !image3.isEmpty()) {
+                images.add(image3);
+            }
+
+            log.info("이미지 생성 요청 - 이미지 개수: {}, 프롬프트: {}", images.size(), prompt);
+
+            // 2. 이미지들을 Base64로 인코딩
+            List<ImageInputDTO> imageInputs = new ArrayList<>();
+            for (int i = 0; i < images.size(); i++) {
+                MultipartFile image = images.get(i);
+                String base64 = Base64.getEncoder().encodeToString(image.getBytes());
+
+                ImageInputDTO input = ImageInputDTO.builder()
+                        .order(i + 1)
+                        .base64Data(base64)
+                        .build();
+
+                imageInputs.add(input);
+                log.info("이미지 {}번 인코딩 완료 ({}bytes)", i + 1, image.getSize());
+            }
+
+            // 3. FastAPI로 요청 전송
+            ImageGenerationRequestDTO request = ImageGenerationRequestDTO.builder()
+                    .images(imageInputs)
+                    .prompt(prompt)
+                    .build();
+
+            log.info("FastAPI로 이미지 생성 요청 전송...");
+            ImageGenerationApiResponseDTO apiResponse = fastApiClient.generateImage(request);
+
+            if (apiResponse.getGeneratedImage() == null) {
+                throw new RuntimeException("생성된 이미지가 없습니다");
+            }
+
+            log.info("이미지 생성 완료");
+
+            // 4. 성공 응답 반환
+            return ImageGenerationResponseDTO.builder()
+                    .success(true)
+                    .generatedImageBase64(apiResponse.getGeneratedImage())
+                    .message("이미지 생성 완료")
+                    .build();
+
+        } catch (Exception e) {
+            log.error("이미지 생성 실패: {}", e.getMessage(), e);
+
+            // 5. 실패 응답 반환
+            return ImageGenerationResponseDTO.builder()
+                    .success(false)
+                    .generatedImageBase64(null)
+                    .message("이미지 생성 실패: " + e.getMessage())
+                    .build();
+        }
     }
 }

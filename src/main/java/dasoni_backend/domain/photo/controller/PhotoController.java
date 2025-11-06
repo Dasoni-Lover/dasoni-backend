@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/halls/{hallId}/photos")
@@ -66,7 +68,10 @@ public class PhotoController {
 
     // AI 이미지 생성
     @PostMapping("/ai")
-    public ResponseEntity<ImageGenerationResponseDTO> generateImage(@PathVariable Long hallId, @RequestBody ImageGenerationRequestDTO imageGenerationRequestDTO,  @AuthUser User user) {
-        return ResponseEntity.ok(photoService.generateImage(hallId,imageGenerationRequestDTO,user));
+    public ResponseEntity<ImageGenerationResponseDTO> generateImage(@RequestParam("image1") MultipartFile image1,
+                                                                    @RequestParam(value = "image2", required = false) MultipartFile image2,
+                                                                    @RequestParam(value = "image3", required = false) MultipartFile image3,
+                                                                    @RequestParam("prompt") String prompt) {
+        return ResponseEntity.ok(photoService.generateImage(image1,image2,image3,prompt));
     }
 }

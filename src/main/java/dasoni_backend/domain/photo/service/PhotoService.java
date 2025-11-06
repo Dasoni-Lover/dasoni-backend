@@ -9,9 +9,13 @@ import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUploadRequestDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface PhotoService {
-    ImageGenerationResponseDTO generateImage(Long hallId, ImageGenerationRequestDTO imageGenerationRequestDTO, User user);
+    ImageGenerationResponseDTO generateImage(MultipartFile image1,
+                                             MultipartFile image2,
+                                             MultipartFile image3,
+                                             String prompt);
     PhotoListResponseDTO getPhotoList(Long hallId, PhotoRequestDTO request, User user);
     void uploadPhoto(Long hallId,PhotoUploadRequestDTO request,User user);
     void deletePhoto(Long hallId, Long photoId, User user);
