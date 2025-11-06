@@ -1,11 +1,11 @@
 package dasoni_backend.domain.photo.controller;
 
-import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationResponse;
+import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationRequestDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUploadRequestDTO;
-import dasoni_backend.domain.photo.repository.PhotoRepository;
 import dasoni_backend.domain.photo.service.PhotoService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
@@ -57,15 +57,16 @@ public class PhotoController {
 
     // 사진 삭제
     @DeleteMapping("/{photoId}/delete")
-    public ResponseEntity<?> deletePhoto(@PathVariable Long hallId,
+    public ResponseEntity<Void> deletePhoto(@PathVariable Long hallId,
                                          @PathVariable Long photoId,
                                          @AuthUser User user) {
         photoService.deletePhoto(hallId,photoId,user);
         return ResponseEntity.noContent().build();
     }
 
-    // AI 이미지 생
+    // AI 이미지 생성
     @PostMapping("/ai")
-    public ResponseEntity<ImageGenerationResponse> generateImage
-
+    public ResponseEntity<ImageGenerationResponseDTO> generateImage(@PathVariable Long hallId, @RequestBody ImageGenerationRequestDTO imageGenerationRequestDTO,  @AuthUser User user) {
+        return ResponseEntity.ok(photoService.generateImage(hallId,imageGenerationRequestDTO,user));
+    }
 }
