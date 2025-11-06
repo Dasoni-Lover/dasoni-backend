@@ -6,6 +6,7 @@ import dasoni_backend.domain.user.dto.UserDTO.LoginRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.LoginResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RefreshTokenRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RegisterRequestDTO;
+import dasoni_backend.domain.user.dto.UserDTO.checkResponseDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.repository.UserRepository;
 import dasoni_backend.global.auth.JwtTokenProvider;
@@ -32,8 +33,8 @@ public class UserServiceImpl implements UserService{
     }
     @Override
     @Transactional
-    public boolean checkAvailable(String logId) {
-        return !(userRepository.existsByLogId(logId));
+    public checkResponseDTO checkAvailable(String logId) {
+        return checkResponseDTO.builder().isAvailable(userRepository.existsByLogId(logId)).build();
     }
 
     @Override
