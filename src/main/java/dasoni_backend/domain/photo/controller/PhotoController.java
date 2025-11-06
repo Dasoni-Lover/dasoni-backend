@@ -1,5 +1,6 @@
 package dasoni_backend.domain.photo.controller;
 
+import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationResponse;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
@@ -23,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class PhotoController {
 
-    private final PhotoRepository photoRepository;
     private final PhotoService photoService;
 
     // 사진 확인
@@ -64,5 +64,8 @@ public class PhotoController {
         return ResponseEntity.noContent().build();
     }
 
+    // AI 이미지 생
+    @PostMapping("/ai")
+    public ResponseEntity<ImageGenerationResponse> generateImage
 
 }
