@@ -29,23 +29,25 @@ public class SecurityConfig {
             .sessionManagement(session ->
                     session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             // 권한 설정
+            .cors(c -> {})
             .authorizeHttpRequests(auth -> auth
-                    // 회원가입 관련
-                    .requestMatchers("/api/users/register").permitAll()
-                    .requestMatchers("/api/users/register/check").permitAll()
-                    // 로그인/토큰 관련
-                    .requestMatchers("/api/users/login").permitAll()
-                    .requestMatchers("/api/users/refresh").permitAll()
-                    // 나머지는 인증 필요
-                    .anyRequest().authenticated()
+                // 회원가입 관련
+                .requestMatchers("/api/users/register").permitAll()
+                .requestMatchers("/api/users/register/check").permitAll()
+                // 로그인/토큰 관련
+                .requestMatchers("/api/users/login").permitAll()
+                .requestMatchers("/api/users/refresh").permitAll()
+                .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll()
+                // 나머지는 인증 필요
+                .anyRequest().authenticated()
             )
-
             // JWT 필터 추가
             .addFilterBefore(jwtAuthenticationFilter,
                     UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {

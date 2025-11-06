@@ -1,6 +1,8 @@
 package dasoni_backend.domain.photo.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -49,4 +51,35 @@ public class PhotoDTO {
         private List<PhotoInfoDTO> photos;
     }
 
+    // 입력 이미지 정보
+    @Data
+    @Builder
+    public static class ImageInputDTO {
+        private int order;          // 순서 (1, 2, 3)
+        private String base64Data;  // Base64 인코딩된 이미지
+    }
+
+    // FastAPI로 보낼 요청
+    @Data
+    @Builder
+    public static class ImageGenerationRequestDTO {
+        private List<ImageInputDTO> images;
+        private String prompt;
+    }
+
+    // FastAPI에서 받을 응답
+    @Data
+    @NoArgsConstructor
+    public static class ImageGenerationApiResponseDTO {
+        private String generatedImage;
+    }
+
+    // 클라이언트에게 반환할 최종 응답
+    @Data
+    @Builder
+    public static class ImageGenerationResponseDTO {
+        private boolean success;
+        private String generatedImageBase64;
+        private String message;
+    }
 }
