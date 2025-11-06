@@ -4,10 +4,12 @@ import dasoni_backend.domain.hall.entity.Hall;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface HallRepository extends JpaRepository<Hall, Long> {
 
     // 관리하는 추모관을 최신순으로 조회
