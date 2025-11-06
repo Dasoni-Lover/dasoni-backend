@@ -54,7 +54,7 @@ public class UserDTO {
 
     @Getter
     @Builder
-    public static class checkResponseDTO {
+    public static class CheckResponseDTO {
         private Boolean isAvailable;
     }
 }

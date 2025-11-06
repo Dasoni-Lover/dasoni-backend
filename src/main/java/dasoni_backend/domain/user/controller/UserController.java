@@ -1,11 +1,11 @@
 package dasoni_backend.domain.user.controller;
 
+import dasoni_backend.domain.user.dto.UserDTO.CheckResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RefreshTokenRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.AccessTokenResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.LoginRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.LoginResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RegisterRequestDTO;
-import dasoni_backend.domain.user.dto.UserDTO.checkResponseDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.service.UserService;
 import dasoni_backend.global.annotation.AuthUser;
@@ -36,7 +36,7 @@ public class UserController {
 
     // 회원가입 중복 확인 (아이디 체크)
     @GetMapping("/register/check")
-    public ResponseEntity<checkResponseDTO> checkAvailable(@RequestParam("logid") String logId) {
+    public ResponseEntity<CheckResponseDTO> checkAvailable(@RequestParam("logid") String logId) {
         return ResponseEntity.ok(userService.checkAvailable(logId));
     }
 

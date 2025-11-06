@@ -2,11 +2,11 @@ package dasoni_backend.domain.user.service;
 
 import dasoni_backend.domain.user.converter.UserConverter;
 import dasoni_backend.domain.user.dto.UserDTO.AccessTokenResponseDTO;
+import dasoni_backend.domain.user.dto.UserDTO.CheckResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.LoginRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.LoginResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RefreshTokenRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RegisterRequestDTO;
-import dasoni_backend.domain.user.dto.UserDTO.checkResponseDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.repository.UserRepository;
 import dasoni_backend.global.auth.JwtTokenProvider;
@@ -33,8 +33,8 @@ public class UserServiceImpl implements UserService{
     }
     @Override
     @Transactional
-    public checkResponseDTO checkAvailable(String logId) {
-        return checkResponseDTO.builder().isAvailable(!userRepository.existsByLogId(logId)).build();
+    public CheckResponseDTO checkAvailable(String logId) {
+        return CheckResponseDTO.builder().isAvailable(!userRepository.existsByLogId(logId)).build();
     }
 
     @Override
