@@ -11,11 +11,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.cglib.core.Local;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "photos")
 public class Photo {
 
@@ -47,5 +56,17 @@ public class Photo {
     private LocalDateTime uploadedAt;
 
     @Column(name = "occurred_at")
-    private LocalDateTime occurredAt;
+    private LocalDate occurredAt;
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
+
+    public void updateOccurredAt(LocalDate occurredAt) {
+        this.occurredAt = occurredAt;
+    }
+
+    public void updateIsPrivate(Boolean isPrivate) {
+        this.isPrivate = isPrivate;
+    }
 }
