@@ -1,10 +1,21 @@
 package dasoni_backend.domain.hall.controller;
 
+import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
+import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.annotation.AuthUser;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -35,4 +46,26 @@ public class HallController {
         return hallService.getSidebar(userId);
     }
 
+    // 본인 추모관 개설
+    @PostMapping("/me/create")
+    public ResponseEntity<HallCreateResponseDTO> createMyHall(@AuthUser User user) {
+        HallCreateResponseDTO response = hallService.createMyHall(user);
+        return ResponseEntity.ok(response);
+    }
+
+    // 타인 추모관 개설
+    @PostMapping("/other/create")
+    public ResponseEntity<HallCreateResponseDTO> createOtherHall(
+            @AuthUser User admin,
+            // @Valid를 통해 DTO에서 설정한 유효성 애너테이션 검증 가능
+            @Valid @RequestBody HallCreateRequestDTO request) {
+        HallCreateResponseDTO response = hallService.createOtherHall(admin, request);
+        return ResponseEntity.ok(response);
+    }
+
+    // 추모관 내용 조회
+    @GetMapping("/{hall_id}")
+    public ResponseEntity<HallDetailDataResponseDTO> getHallDetail(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
+        return ResponseEntity.ok(hallService.getHallDetail(hallId, user));
+    }
 }

@@ -51,4 +51,10 @@ public class UserDTO {
     public static class AccessTokenResponseDTO {
         private String accessToken;
     }
+
+    @Getter
+    @Builder
+    public static class checkResponseDTO {
+        private Boolean isAvailable;
+    }
 }

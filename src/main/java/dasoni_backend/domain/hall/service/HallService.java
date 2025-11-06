@@ -1,7 +1,12 @@
 package dasoni_backend.domain.hall.service;
 
+import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
+import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.annotation.AuthUser;
 
 public interface HallService {
 
@@ -13,5 +18,14 @@ public interface HallService {
 
     // 사이드바
     SidebarResponseDTO getSidebar(Long userId);
+
+    // 본인 추모관 개설
+    HallCreateResponseDTO createMyHall(User user);
+
+    // 타인 추모관 개설
+    HallCreateResponseDTO createOtherHall(User admin, HallCreateRequestDTO request);
+
+    // 추모관 내용 조회
+    HallDetailDataResponseDTO getHallDetail(Long hallId, User user);
 }
 

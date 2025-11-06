@@ -2,12 +2,11 @@ package dasoni_backend.domain.hall.repository;
 
 
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface HallQueryRepository extends Repository<Object, Long> {
+public interface HallQueryRepository extends HallRepository {
 
     @Query(value = """
         SELECT rn.nature
