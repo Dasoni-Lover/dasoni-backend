@@ -80,7 +80,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     private boolean AIFilter(Photo photo, Boolean isAI) {
-        if (isAI == null) return true;
+        if (isAI == null || !isAI) return true;
         return photo.getIsAi().equals(isAI);
     }
 
