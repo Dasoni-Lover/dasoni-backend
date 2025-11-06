@@ -3,6 +3,8 @@ package dasoni_backend.domain.photo.service;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.photo.converter.PhotoConverter;
+import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationRequestDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
@@ -181,5 +183,12 @@ public class PhotoServiceImpl implements PhotoService {
         }
         // DB에서 삭제
         photoRepository.delete(photo);
+    }
+
+    @Override
+    public ImageGenerationResponseDTO generateImage(Long hallId, ImageGenerationRequestDTO imageGenerationRequestDTO, User user){
+
+
+        return null;
     }
 }
