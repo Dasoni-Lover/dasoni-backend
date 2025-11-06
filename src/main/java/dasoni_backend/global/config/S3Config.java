@@ -1,4 +1,4 @@
-package dasoni_backend.global.S3;
+package dasoni_backend.global.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

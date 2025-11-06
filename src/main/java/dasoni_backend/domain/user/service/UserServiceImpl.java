@@ -31,6 +31,7 @@ public class UserServiceImpl implements UserService{
         User user = userConverter.RegisterToUser(request);
         userRepository.save(user);
     }
+
     @Override
     @Transactional
     public CheckResponseDTO checkAvailable(String logId) {
