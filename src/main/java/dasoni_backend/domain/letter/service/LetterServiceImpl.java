@@ -37,13 +37,13 @@ public class LetterServiceImpl implements LetterService{
     // 1. 보낸 편지함 목록 조회
     @Transactional(readOnly = true)
     @Override
-    public SentLetterListResponseDTO getSentLetterList(Long hallId, Long userId) {
+    public SentLetterListResponseDTO getSentLetterList(Long hallId, User user) {
         // 해당 추모관이 없거나 로그인하지 않았을 경우, 빈 리스트 반환(수정 불가능)
-        if(hallId == null || userId == null) {
+        if(hallId == null) {
             return LetterConverter.toSentLetterListResponseDTO(List.of());
         }
 
-        List<Letter> letters = letterRepository.findAllByHall_IdAndUser_IdAndIsCompletedTrueOrderByCompletedAtDesc(hallId, userId);
+        List<Letter> letters = letterRepository.findAllByHall_IdAndUser_IdAndIsCompletedTrueOrderByCompletedAtDesc(hallId, user.getId());
 
         return LetterConverter.toSentLetterListResponseDTO(letters);
     }
@@ -51,9 +51,9 @@ public class LetterServiceImpl implements LetterService{
     // 2. 보낸 편지함 달력 조회
     @Transactional(readOnly = true)
     @Override
-    public SentLetterCalenderListResponseDTO getSentLetterCalenderList(Long hallId, Long userId, int year, int month) {
+    public SentLetterCalenderListResponseDTO getSentLetterCalenderList(Long hallId, User user, int year, int month) {
         // 로그인하지 않았을 경우, 빈 리스트 반환(수정 불가능)
-        if(hallId == null || userId == null) {
+        if(hallId == null) {
             return LetterConverter.toSentLetterCalenderListResponseDTO(List.of());
         }
 
@@ -64,7 +64,7 @@ public class LetterServiceImpl implements LetterService{
         var end = ym.plusMonths(1).atDay(1).atStartOfDay();
 
         List<Letter> days =  letterRepository.findAllByHall_IdAndUser_IdAndIsCompletedTrueAndCompletedAtGreaterThanEqualAndCompletedAtLessThanOrderByCompletedAtAsc(
-                hallId, userId, start, end);
+                hallId, user.getId(), start, end);
 
         return LetterConverter.toSentLetterCalenderListResponseDTO(days);
     }
@@ -83,7 +83,7 @@ public class LetterServiceImpl implements LetterService{
     // 4. 편지 보내기 버튼 눌렀을 경우
     @Transactional(readOnly = true)
     @Override
-    public LetterPreCheckResponseDTO getLetterPreCheck(Long hallId, Long userId) {
+    public LetterPreCheckResponseDTO getLetterPreCheck(Long hallId, User user) {
 
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -110,17 +110,15 @@ public class LetterServiceImpl implements LetterService{
     // 5. 추모관에 편지 쓰기 / 임시저장
     @Transactional
     @Override
-    public void saveLetter(Long hallId, Long userId, LetterSaveRequestDTO request) {
+    public void saveLetter(Long hallId, User user, LetterSaveRequestDTO request) {
 
         Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         // isCompleted=true면 오늘 이미 보냈는지 검사
         if (request.isCompleted()
                 && letterRepository.existsByHall_IdAndUser_IdAndIsCompletedTrueAndCompletedAtBetween(
-                hallId, userId, LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay()
+                hallId, user.getId(), LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay()
         )) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 편지를 보냈어요");
         }

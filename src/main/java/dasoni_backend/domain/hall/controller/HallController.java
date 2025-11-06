@@ -30,20 +30,20 @@ public class HallController {
 
     // @AuthenticationPrincipal 사용으로 추후 변경
     @GetMapping("/home")
-    public HallListResponseDTO getHomeHallList(@RequestParam(name = "userId") Long userId) {
-        return hallService.getHomeHallList(userId);
+    public HallListResponseDTO getHomeHallList(@AuthUser User user) {
+        return hallService.getHomeHallList(user);
     }
 
     // @AuthenticationPrincipal 사용으로 추후 변경
     @GetMapping("/home/manage")
-    public HallListResponseDTO getManageHallList(@RequestParam(name = "adminId") Long adminId) {
-        return hallService.getManageHallList(adminId);
+    public HallListResponseDTO getManageHallList(@AuthUser User admin) {
+        return hallService.getManageHallList(admin);
     }
 
     // 사이드바 정보(임시 notiCount 0)
     @GetMapping("/sidebar")
-    public SidebarResponseDTO getSidebar(@RequestParam(name = "userId") Long userId) {
-        return hallService.getSidebar(userId);
+    public SidebarResponseDTO getSidebar(@AuthUser User user) {
+        return hallService.getSidebar(user);
     }
 
     // 본인 추모관 개설

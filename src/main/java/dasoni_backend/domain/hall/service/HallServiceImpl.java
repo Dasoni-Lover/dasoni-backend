@@ -31,43 +31,29 @@ public class HallServiceImpl implements HallService {
 
     @Transactional(readOnly = true)
     @Override
-    public HallListResponseDTO getHomeHallList(Long userId) {
+    public HallListResponseDTO getHomeHallList(User user) {
         // 로그인하지 않았을 경우, 빈 리스트 반환(수정 불가능)
-        if (userId == null)
+        if (user == null)
             return HallConverter.toHallListResponseDTO(List.of());
 
-        List<Hall> halls = hallRepository.findAllByFollowerUserIdOrderByCreatedAtDesc(userId);
+        List<Hall> halls = hallRepository.findAllByFollowerUserIdOrderByCreatedAtDesc(user.getId());
         return HallConverter.toHallListResponseDTO(halls);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public HallListResponseDTO getManageHallList(Long adminId) {
+    public HallListResponseDTO getManageHallList(User admin) {
         // 관리자 ID가 없을 경우(로그인 x), 빈 리스트 반환(수정 불가능)
-        if (adminId == null)
+        if (admin.getId() == null)
             return HallConverter.toHallListResponseDTO(List.of());
 
-        List<Hall> halls = hallRepository.findAllByAdminIdOrderByCreatedAtDesc(adminId);
+        List<Hall> halls = hallRepository.findAllByAdminIdOrderByCreatedAtDesc(admin.getId());
         return HallConverter.toHallListResponseDTO(halls);
     }
 
     @Transactional(readOnly = true)
     @Override
-    public SidebarResponseDTO getSidebar(Long userId) {
-        // 로그인하지 않았을 경우
-        if (userId == null) {
-            return SidebarResponseDTO.builder().name(null).myProfile(null).notiCount(0).build();
-        }
-
-        // NPE 발생 방지
-        Optional<User> opt = userRepository.findById(userId);
-        // DB에 사용자 정보가 없는 경우
-        if (opt.isEmpty()) {
-            return SidebarResponseDTO.builder().name(null).myProfile(null).notiCount(0).build();
-        }
-
-        // Optional 안에 실제 User 엔티티를 꺼냄
-        User user = opt.get();
+    public SidebarResponseDTO getSidebar(User user) {
         // notiCount는 추후 알림 연동 예정 : 임시로 0으로 반환
         return SidebarResponseDTO.builder()
                 .name(user.getName())

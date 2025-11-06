@@ -11,13 +11,13 @@ import dasoni_backend.global.annotation.AuthUser;
 public interface HallService {
 
     // 입장한 추모관 조회
-    HallListResponseDTO getHomeHallList(Long userId);
+    HallListResponseDTO getHomeHallList(User user);
 
     // 관리하는 추모관 조회
-    HallListResponseDTO getManageHallList(Long adminId);
+    HallListResponseDTO getManageHallList(User admin);
 
     // 사이드바
-    SidebarResponseDTO getSidebar(Long userId);
+    SidebarResponseDTO getSidebar(User user);
 
     // 본인 추모관 개설
     HallCreateResponseDTO createMyHall(User user);
