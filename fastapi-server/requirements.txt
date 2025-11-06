@@ -1,0 +1,13 @@
+# FastAPI 관련
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# Google Gemini API
+google-genai
+
+# 이미지 처리
+pillow==10.1.0
+
+# 유틸리티
+python-multipart==0.0.6

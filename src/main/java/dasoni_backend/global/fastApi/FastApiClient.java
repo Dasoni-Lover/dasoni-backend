@@ -12,8 +12,8 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.time.Duration;
 
-@Component
 @Slf4j
+@Component
 public class FastApiClient {
 
     private final WebClient webClient;
