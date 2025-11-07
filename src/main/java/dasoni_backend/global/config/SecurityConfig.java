@@ -29,27 +29,24 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            // CSRF 비활성화 (JWT 사용 시)
-            .csrf(AbstractHttpConfigurer::disable)
-            // 세션 사용 안 함
-            .sessionManagement(session ->
-                    session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // 권한 설정
-            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(AbstractHttpConfigurer::disable)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                    // OPTIONS 요청 먼저
-                    .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // OPTIONS 요청
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        // 회원가입 및 인증
+                        .requestMatchers("/api/users/register", "/api/users/register/**").permitAll()
+                        .requestMatchers("/api/users/login", "/api/users/login/**").permitAll()
+                        .requestMatchers("/api/users/refresh", "/api/users/refresh/**").permitAll()
+                        .requestMatchers("/api/files/images/presigned-url").permitAll()
+                        .requestMatchers("/api/files/audios/presigned-url").permitAll()
 
-                    // 회원가입 - 명시적으로 모든 하위 경로 포함
-                    .requestMatchers("/api/users/register", "/api/users/register/**").permitAll()
-                    .requestMatchers("/api/users/login", "/api/users/login/**").permitAll()
-                    .requestMatchers("/api/users/refresh", "/api/users/refresh/**").permitAll()
-
-                    .anyRequest().authenticated()
+                        .anyRequest().authenticated()
                 )
-            // JWT 필터 추가
-            .addFilterBefore(jwtAuthenticationFilter,
-                    UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthenticationFilter,
+                        UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
