@@ -41,13 +41,13 @@ public class Letter {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Column(name = "to_name", length = 50, nullable = false)
+    @Column(name = "to_name", length = 100, nullable = false)
     private String toName;
 
-    @Column(name = "from_name", length = 50, nullable = false)
+    @Column(name = "from_name", length = 100, nullable = false)
     private String fromName;
 
-    @Column(name = "content", length = 500, nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String content;
 
     @Column(name = "created_at")

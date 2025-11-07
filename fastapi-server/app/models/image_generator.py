@@ -18,7 +18,7 @@ class ImageGenerator:
         genai.configure(api_key=api_key)
 
         # Gemini 2.0 Flash 모델 사용 (이미지 생성 지원)
-        self.model = genai.GenerativeModel('gemini-2.5-flash')
+        self.model = genai.GenerativeModel('gemini-2.5-flash-image')
 
     def decode_base64_to_image(self, base64_str: str) -> Image.Image:
         """Base64 문자열을 PIL Image로 변환"""
