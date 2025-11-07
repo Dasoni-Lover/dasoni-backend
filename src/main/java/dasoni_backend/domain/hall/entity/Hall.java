@@ -79,7 +79,7 @@ public class Hall {
     @ElementCollection(targetClass = Personality.class, fetch = FetchType.EAGER)
     @CollectionTable(name = "hall_target_natures", joinColumns = @JoinColumn(name = "hall_id"))
     @Enumerated(EnumType.STRING)
-    @Column(name = "target_nature", length = 32)
+    @Column(name = "target_nature", length = 100)
     @Builder.Default
     private List<Personality> targetNatures = new ArrayList<>();
 
