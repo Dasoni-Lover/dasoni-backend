@@ -69,6 +69,13 @@ public class HallDTO {
         private Long hallId;
     }
 
+    @Getter
+    @Builder
+    public static class MyHallResponseDTO {
+        private boolean myHallExists;
+        private Long hallId;
+    }
+
     // 4. 타인 추모관 개설 요청
     @Getter
     @NoArgsConstructor

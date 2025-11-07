@@ -30,4 +30,7 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
     // existsByAdminId 같은 함수 따로 만들지 않아도 됨
     // 이 경우는 단순히 Id로만 조회하는거라 user 객체를 넘길 필요 없음
     Optional<Hall> findByAdminId(Long userId);
+
+    // 본인 추모관인지 확인하기 위한
+    Optional<Hall> findBySubjectId(Long subjectId);
 }

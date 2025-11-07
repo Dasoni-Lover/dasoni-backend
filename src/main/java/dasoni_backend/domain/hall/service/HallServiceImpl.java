@@ -5,6 +5,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallQueryRepository;
@@ -26,7 +27,6 @@ import java.util.Optional;
 public class HallServiceImpl implements HallService {
 
     private final HallRepository hallRepository;
-    private final UserRepository userRepository;
     private final HallQueryRepository hallQueryRepository;
 
     @Transactional(readOnly = true)
@@ -122,5 +122,11 @@ public class HallServiceImpl implements HallService {
 
         // 변환(me일때는 필요없는 null처리 & 응답에서 숨김처리)
         return HallConverter.toHallDetailResponse(hall, role, adminReview, top4Natures);
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public MyHallResponseDTO getMyHall(User user){
+        Hall hall = hallRepository.findBySubjectId(user.getId()).orElse(null);
+        return HallConverter.toMyHallResponse(hall);
     }
 }

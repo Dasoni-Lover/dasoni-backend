@@ -6,6 +6,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.user.entity.User;
 
@@ -13,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class HallConverter {
@@ -113,6 +115,19 @@ public class HallConverter {
         return HallDetailDataResponseDTO.builder()
                 .role(role)
                 .data(data.build())
+                .build();
+    }
+
+    public static MyHallResponseDTO toMyHallResponse(Hall hall) {
+        if (hall == null) {
+            return MyHallResponseDTO.builder()
+                    .myHallExists(false)
+                    .hallId(null)
+                    .build();
+        }
+        return MyHallResponseDTO.builder()
+                .myHallExists(true)
+                .hallId(hall.getId())
                 .build();
     }
 

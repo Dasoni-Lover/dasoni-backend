@@ -4,6 +4,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
 import dasoni_backend.domain.user.entity.User;
@@ -51,6 +52,11 @@ public class HallController {
     public ResponseEntity<HallCreateResponseDTO> createMyHall(@AuthUser User user) {
         HallCreateResponseDTO response = hallService.createMyHall(user);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/mine")
+    public ResponseEntity<MyHallResponseDTO> getMyHall(@AuthUser User user) {
+        return ResponseEntity.ok(hallService.getMyHall(user));
     }
 
     // 타인 추모관 개설
