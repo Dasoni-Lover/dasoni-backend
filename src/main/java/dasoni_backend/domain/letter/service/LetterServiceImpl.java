@@ -93,7 +93,7 @@ public class LetterServiceImpl implements LetterService{
         boolean isOpen = true;
 
         // 일단 false로 해놓고 수요일날 수정
-        boolean isSet = hasAiInfoTemp(hall);
+        boolean isSet = true;
 
         return LetterPreCheckResponseDTO.builder()
                 .isOpen(isOpen)
@@ -115,13 +115,14 @@ public class LetterServiceImpl implements LetterService{
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        // isCompleted=true면 오늘 이미 보냈는지 검사
-        if (request.isCompleted()
-                && letterRepository.existsByHall_IdAndUser_IdAndIsCompletedTrueAndCompletedAtBetween(
-                hallId, user.getId(), LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay()
-        )) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 편지를 보냈어요");
-        }
+        // :TODO 일단 테스트를 위해서
+//        // isCompleted=true면 오늘 이미 보냈는지 검사
+//        if (request.isCompleted()
+//                && letterRepository.existsByHall_IdAndUser_IdAndIsCompletedTrueAndCompletedAtBetween(
+//                hallId, user.getId(), LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay()
+//        )) {
+//            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 편지를 보냈어요");
+//        }
 
         LocalDateTime now = LocalDateTime.now();
 
