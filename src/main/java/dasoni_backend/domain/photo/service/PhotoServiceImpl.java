@@ -1,5 +1,6 @@
 package dasoni_backend.domain.photo.service;
 
+import org.springframework.security.access.AccessDeniedException;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.photo.converter.PhotoConverter;
@@ -7,6 +8,7 @@ import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationApiResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageInputDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoDetailResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
@@ -18,20 +20,10 @@ import dasoni_backend.global.S3.service.FileUploadService;
 import dasoni_backend.global.fastApi.FastApiClient;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
-
-import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -163,6 +155,37 @@ public class PhotoServiceImpl implements PhotoService {
 
         // 저장
         photoRepository.save(photo);
+    }
+
+    @Transactional
+    @Override
+    public PhotoDetailResponseDTO getPhotoDetail(Long hallId, Long photoId, User user) {
+        Photo photo = photoRepository.findByIdAndHallId(photoId, hallId)
+                .orElseThrow(() -> new EntityNotFoundException("사진을 찾을 수 없습니다."));
+
+        Hall hall = photo.getHall();
+
+        boolean isMine  = user.getId().equals(photo.getUser().getId());
+        boolean isAdmin = user.getId().equals(hall.getAdmin().getId());
+
+        // 비공개 사진일 경우의 접근 제한(관리자 or 본인만 접근 가능)
+        if (Boolean.TRUE.equals(photo.getIsPrivate()) && !(isMine || isAdmin)) {
+            throw new AccessDeniedException("비공개 사진입니다."); // 403
+        }
+
+        // 사진 올린 사람 이름
+        String uploaderName = photo.getUser().getName();
+
+        // 사용자 프로필 URL
+        String myProfileUrl = user.getMyProfile();
+
+        return PhotoConverter.toPhotoDetailResponseDTO(
+                photo,
+                uploaderName,
+                myProfileUrl,
+                isMine,
+                isAdmin
+        );
     }
 
     // "yyyy.MM.dd" -> LocalDate 형식으로

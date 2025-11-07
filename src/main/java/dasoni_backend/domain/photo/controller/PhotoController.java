@@ -1,7 +1,7 @@
 package dasoni_backend.domain.photo.controller;
 
-import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationResponseDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoDetailResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
@@ -12,6 +12,7 @@ import dasoni_backend.global.annotation.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,5 +74,12 @@ public class PhotoController {
                                                                     @RequestParam(value = "image3", required = false) MultipartFile image3,
                                                                     @RequestParam("prompt") String prompt) {
         return ResponseEntity.ok(photoService.generateImage(image1,image2,image3,prompt));
+    }
+    @GetMapping("/{photoId}")
+    public ResponseEntity<PhotoDetailResponseDTO> getPhotoDetail(@PathVariable Long hallId,
+                                                                 @PathVariable Long photoId,
+                                                                 @AuthUser User user) {
+        PhotoDetailResponseDTO response = photoService.getPhotoDetail(hallId, photoId, user);
+        return ResponseEntity.ok(response);
     }
 }
