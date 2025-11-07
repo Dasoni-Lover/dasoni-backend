@@ -1,20 +1,19 @@
 spring:
-  config:
-    import: optional:classpath:application-secrets.yml
   application:
     name: dasoni-backend
 
-  # Redis 설정
+  # Redis 설정 - Docker 컨테이너 이름 사용
   data:
     redis:
-      host: ${REDIS_HOST:localhost}  # 환경변수 또는 기본값
+      host: ${REDIS_HOST:redis}  # Docker 네트워크에서는 'redis'
       port: ${REDIS_PORT:6379}
 
-  # 데이터베이스 설정
+  # 데이터베이스 설정 - Docker 컨테이너 이름 사용
   datasource:
-    url: ${DB_URL}  # secrets에서 가져옴
+    url: ${DB_URL:jdbc:mysql://mysql:3306/dasoni?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
 
   # JPA 설정
   jpa:
@@ -24,15 +23,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.MySQL8Dialect
     open-in-view: false
-
 
 # JWT 설정
 jwt:
-  secret: ${JWT_SECRET}  # secrets에서 가져옴
-  access-token-validity: 3000000  # 5분
-  refresh-token-validity: 604800000  # 7일
+  secret: ${JWT_SECRET}
+  access-token-validity: 3000000
+  refresh-token-validity: 604800000
 
 # 서버 설정
 server:
@@ -44,20 +41,19 @@ logging:
     root: INFO
     com.dasoni: DEBUG
     org.springframework.security: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
+# FastAPI URL - Docker 네트워크에서는 컨테이너 이름 사용
 fastapi:
-  url: http://localhost:8000
+  url: ${FASTAPI_URL:http://python-fastapi:8000}
 
+# AWS S3 설정
 aws:
   s3:
-    bucket-name: ${S3_BUCKET_NAME}  # S3 버킷 이름
-    region: ap-northeast-2          # AWS 리전
-    access-key: ${S3_ACCESS_KEY}     # AWS Access Key
-    secret-key: ${S3_SECRET_KEY}     # AWS Secret Key
-    presigned-url-expiration: 15    # URL 만료 시간 (분)
-
+    bucket-name: ${S3_BUCKET_NAME}
+    region: ap-northeast-2
+    access-key: ${S3_ACCESS_KEY}
+    secret-key: ${S3_SECRET_KEY}
+    presigned-url-expiration: 15
     paths:
-      image: images/   # 이미지 저장 경로
-      audio: audios/   # 음성 저장 경로
+      image: images/
+      audio: audios/

@@ -49,12 +49,8 @@ async def root():
     }
 
 @app.get("/health")
-async def health_check():
-    """헬스 체크 엔드포인트"""
-    return {
-        "status": "healthy",
-        "generator_ready": generator is not None
-    }
+def health():
+    return {"status": "ok"}
 
 @app.post("/image/generate", response_model=ImageGenerationApiResponseDTO)
 async def generate_image(request: ImageGenerationRequestDTO):
