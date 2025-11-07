@@ -43,7 +43,7 @@ services:
     restart: unless-stopped
 
   # FastAPI Python 서버
-  fastapi:
+  python-fastapi:
     build:
       context: ./fastapi-server
       dockerfile: Dockerfile
