@@ -10,4 +10,6 @@ google-genai
 pillow==10.1.0
 
 # 유틸리티
+google-generativeai==0.3.1
+pillow==10.1.0
 python-multipart==0.0.6
