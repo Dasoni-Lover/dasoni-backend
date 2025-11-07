@@ -9,8 +9,7 @@ import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO; 
 import dasoni_backend.domain.hall.entity.Hall;                        
 import dasoni_backend.domain.user.entity.User;                         
-import java.time.LocalDateTime;   
-import org.springframework.util.StringUtils; 
+import java.time.LocalDateTime;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,7 +84,7 @@ public class LetterConverter {
                 .completedAt(letter.getCompletedAt())
                 .build();
     }
-    public static Letter fromSaveRequest(LetterSaveRequestDTO request, Hall hall, User user) {
+    public static Letter RequestToLetter(LetterSaveRequestDTO request, Hall hall, User user) {
         return Letter.builder()
                 .hall(hall)
                 .user(user)

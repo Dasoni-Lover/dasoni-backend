@@ -6,10 +6,8 @@ import dasoni_backend.domain.letter.converter.LetterConverter;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterPreCheckResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
-import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
-import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
 import dasoni_backend.domain.user.entity.User;
@@ -21,10 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -123,7 +118,7 @@ public class LetterServiceImpl implements LetterService{
 //        )) {
 //            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 편지를 보냈어요");
 //        }
-        Letter letter = LetterConverter.fromSaveRequest(request, hall, user);
+        Letter letter = LetterConverter.RequestToLetter(request, hall, user);
         letterRepository.save(letter);
     }
 }

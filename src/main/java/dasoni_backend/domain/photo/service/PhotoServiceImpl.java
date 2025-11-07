@@ -51,8 +51,8 @@ public class PhotoServiceImpl implements PhotoService {
 
         // 필터링
         List<Photo> filteredPhotos = photos.stream()
-                .filter(photo -> PrivateFilter(photo, request.getIsPrivate(), user))
-                .filter(photo -> AIFilter(photo, request.getIsAI()))
+                .filter(photo -> myPhotoFilter(photo, request.getIsPrivate(), user))
+                .filter(photo -> aiFilter(photo, request.getIsAI()))
                 .collect(Collectors.toList());
 
         // 정렬
@@ -82,17 +82,22 @@ public class PhotoServiceImpl implements PhotoService {
         return PhotoConverter.toPhotoListResponseDTO(filteredPhotos);
     }
 
-    private boolean PrivateFilter(Photo photo, Boolean isPrivate, User user) {
-        if (isPrivate == null || !isPrivate) {
-            // 필터 없음 or false: hall에 있는 모든 사진
-            return true;
+    private boolean myPhotoFilter(Photo photo, Boolean isMine, User user) {
+        if (Boolean.TRUE.equals(isMine)) {
+            if (photo.getUser() == null || user == null) return false;
+            return photo.getUser().getId().equals(user.getId());
         }
-        else return photo.getUser().getId().equals(user.getId());
+        // isMine == false or null → 전체
+        return true;
     }
 
-    private boolean AIFilter(Photo photo, Boolean isAI) {
-        if (isAI == null || !isAI) return true;
-        return photo.getIsAi().equals(isAI);
+    private boolean aiFilter(Photo photo, Boolean isAI) {
+        if (Boolean.TRUE.equals(isAI)) {
+            // isAI=true일 때: AI 사진만
+            return Boolean.TRUE.equals(photo.getIsAi());
+        }
+        // isAI=null 또는 false: 전체 (AI+일반)
+        return true;
     }
 
     @Override

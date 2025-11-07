@@ -132,9 +132,6 @@ public class HallServiceImpl implements HallService {
             role = "follower";
         }
 
-        // 관리자 리뷰만 추모관에 전시
-        String adminReview = hall.getReview();
-
         // 상위 4개 natures 전시
         List<String> top4Natures = hallQueryRepository.findTop4NatureNames(hallId);
 
@@ -142,7 +139,7 @@ public class HallServiceImpl implements HallService {
                 .map(e -> Personality.valueOf(e).getValue()) // getValue() = 한글 문자열
                 .toList();
         // 변환(me일때는 필요없는 null처리 & 응답에서 숨김처리)
-        return HallConverter.toHallDetailResponse(hall, role, adminReview, result);
+        return HallConverter.toHallDetailResponse(hall, role, result);
     }
     @Override
     @Transactional(readOnly = true)

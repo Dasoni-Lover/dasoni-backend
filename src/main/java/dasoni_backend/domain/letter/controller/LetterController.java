@@ -19,36 +19,35 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/halls/")
+@RequestMapping("/api/halls")
 public class LetterController {
 
     private final LetterService letterService;
 
-    @GetMapping("{hall_id}/letters/list")
+    @GetMapping("/{hall_id}/letters/list")
     public ResponseEntity<SentLetterListResponseDTO> getSentLetterList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
         return ResponseEntity.ok(letterService.getSentLetterList(hallId, user));
     }
 
-    @GetMapping("{hall_id}/letters/{letter_id}")
+    @GetMapping("/{hall_id}/letters/{letter_id}")
     public ResponseEntity<SentLetterDetailResponseDTO> getSentLetterDetail(@PathVariable("hall_id") Long hallId, @PathVariable("letter_id") Long letterId) {
         return ResponseEntity.ok(letterService.getSentLetterDetail(hallId, letterId));
     }
 
-    @GetMapping("{hall_id}/letters/calendar")
+    @GetMapping("/{hall_id}/letters/calendar")
     public ResponseEntity<SentLetterCalenderListResponseDTO> getSentLetterCalenderList(@PathVariable("hall_id") Long hallId, @AuthUser User user
             , @RequestParam int year, @RequestParam int month) {
         return ResponseEntity.ok(letterService.getSentLetterCalenderList(hallId, user, year, month));
     }
 
-    @GetMapping("{hall_id}/letters")
+    @GetMapping("/{hall_id}/letters")
     public LetterPreCheckResponseDTO getLetterPreCheck(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
         return letterService.getLetterPreCheck(hallId, user);
     }
 
-    @PostMapping("{hall_id}/letters/send")
+    @PostMapping("/{hall_id}/letters/send")
     public ResponseEntity<Void> saveLetter(@PathVariable("hall_id") Long hallId, @AuthUser User user, @RequestParam LetterSaveRequestDTO request) {
         letterService.saveLetter(hallId, user, request);
-        // 성공시 200 OK, 바디 없음
         return ResponseEntity.ok().build();
     }
 }
