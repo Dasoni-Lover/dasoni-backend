@@ -9,7 +9,9 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.user.entity.User;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,13 +67,13 @@ public class HallConverter {
 
     // 타인 추모관 필드 채우기
     public static Hall fromSaveRequestForOther(User admin, HallCreateRequestDTO request) {
-        Hall hall = Hall.builder()
+        return Hall.builder()
                 .admin(admin)
                 .name(request.getName())
                 .targetNatures(request.getNatures())
                 .review(request.getReview())
-                .birthday(request.getBirthday())
-                .deadday(request.getDeadday())
+                .birthday(parseDate(request.getBirthday()))
+                .deadday(parseDate(request.getDeadday()))
                 .profile(request.getProfile())
                 .place(request.getPlace())
                 .phone(request.getPhone())
@@ -80,7 +82,6 @@ public class HallConverter {
                 .isOpened(true)
                 .userNum(1)
                 .build();
-        return hall;
     }
 
     // 추모관 내용 조회
@@ -89,8 +90,8 @@ public class HallConverter {
         HallDetailResponseDTO.HallDetailResponseDTOBuilder data = HallDetailResponseDTO.builder()
                 .name(hall.getName())
                 .profile(hall.getProfile())
-                .birthday(hall.getBirthday())
-                .deadday(hall.getDeadday())
+                .birthday(formatLocalDate(hall.getBirthday()))
+                .deadday(formatLocalDate(hall.getDeadday()))
                 .natures(top4Natures)
                 .place(hall.getPlace())
                 .phone(hall.getPhone())
@@ -112,7 +113,16 @@ public class HallConverter {
                 .role(role)
                 .data(data.build())
                 .build();
+    }
 
-
+    //
+    private static LocalDate parseDate(String dateStr) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        return LocalDate.parse(dateStr, formatter);
+    }
+    // LocalDate -> "yyyy.MM.dd" 로 변경
+    private static String formatLocalDate(LocalDate date) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
+        return date.format(formatter);
     }
 }

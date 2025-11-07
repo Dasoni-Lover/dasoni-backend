@@ -13,6 +13,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,10 +36,10 @@ public class HallDTO {
         private String name;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-        private LocalDateTime birthday;
+        private LocalDate birthday;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
-        private LocalDateTime deadday;
+        private LocalDate deadday;
 
         private String adminName;
     }
@@ -79,10 +80,10 @@ public class HallDTO {
         private RelationKind relation;
 
         @NotNull
-        private LocalDateTime birthday;
+        private String birthday;
 
         @NotNull
-        private LocalDateTime deadday;
+        private String deadday;
 
         @NotNull
         @Size(min = 3, max = 3)
@@ -123,11 +124,11 @@ public class HallDTO {
 
         private String profile;
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        private LocalDateTime birthday;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+        private String birthday;
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-        private LocalDateTime deadday;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+        private String deadday;
 
         private List<String> natures;
 

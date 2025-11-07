@@ -23,6 +23,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,10 +66,10 @@ public class Hall {
     private String name;
 
     @Column(name = "birthday")
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     @Column(name = "deadday")
-    private LocalDateTime deadday;
+    private LocalDate deadday;
 
     @Column(name = "profile", columnDefinition = "TEXT")
     private String profile;

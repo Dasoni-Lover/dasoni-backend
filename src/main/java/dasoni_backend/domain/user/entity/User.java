@@ -12,6 +12,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import static lombok.AccessLevel.PROTECTED;
 
@@ -34,7 +35,7 @@ public class User {
     // true: 여자, false : 남자
 
     @Column(nullable = false)
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     @Column(name = "log_id", length = 100, nullable = false, unique = true)
     private String logId;
