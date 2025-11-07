@@ -1,6 +1,9 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from .schemas.image_schemas import ImageGenerationRequestDTO, ImageGenerationApiResponseDTO
+from .schemas.image_schemas import (
+    ImageGenerationRequestDTO,
+    ImageGenerationApiResponseDTO
+)
 from .models.image_generator import ImageGenerator
 import logging
 
@@ -10,20 +13,20 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="Dasoni Image Generation API",
-    description="Google Gemini 기반 AI 이미지 생성 서비스",
-    version="1.0.0"
+    description="Google Gemini 기반 AI 이미지 생성 서비스 (순서 지원)",
+    version="2.0.0"
 )
 
-# CORS 설정 (Spring Boot에서 접근 가능하도록)
+# CORS 설정
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 프로덕션에서는 특정 도메인만 허용
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 이미지 생성기 초기화 (앱 시작 시 한 번만)
+# 이미지 생성기 초기화
 generator = None
 
 @app.on_event("startup")
@@ -44,26 +47,30 @@ async def root():
     return {
         "message": "Dasoni Image Generation API",
         "status": "running",
-        "version": "1.0.0",
-        "api": "Google Gemini"
+        "version": "2.0.0",
+        "api": "Google Gemini",
+        "features": ["ordered_images", "role_based_generation"]
     }
 
 @app.get("/health")
 def health():
+    """헬스체크"""
     return {"status": "ok"}
 
 @app.post("/image/generate", response_model=ImageGenerationApiResponseDTO)
 async def generate_image(request: ImageGenerationRequestDTO):
     """
-    이미지 생성 엔드포인트 (Spring Boot 연동)
+    순서가 있는 이미지 생성 엔드포인트
 
-    Args:
-        request: 이미지 생성 요청
-            - images: 입력 이미지 리스트 (1~3개, Base64)
-            - prompt: 이미지 생성 프롬프트
+    - order 1: 고인의 사진
+    - order 2: 본인의 사진
+    - order 3: 배경 이미지
 
-    Returns:
-        ImageGenerationApiResponseDTO: 생성된 이미지 (Base64)
+    프론트엔드 응답 형식:
+    {
+      "generatedImage": "base64...",  // 순수 base64
+      "format": "png"                 // 'png' | 'jpeg' | 'webp'
+    }
     """
     try:
         logger.info(f"이미지 생성 요청 수신 - 입력 이미지: {len(request.images)}개")
@@ -74,33 +81,15 @@ async def generate_image(request: ImageGenerationRequestDTO):
                 detail="이미지 생성기가 아직 초기화되지 않았습니다"
             )
 
-        # 입력 검증
-        if not request.images or len(request.images) == 0:
-            raise HTTPException(
-                status_code=400,
-                detail="최소 1개의 이미지가 필요합니다"
-            )
-
-        if len(request.images) > 3:
-            raise HTTPException(
-                status_code=400,
-                detail="최대 3개의 이미지만 처리 가능합니다"
-            )
-
-        if not request.prompt or len(request.prompt.strip()) == 0:
-            raise HTTPException(
-                status_code=400,
-                detail="프롬프트가 필요합니다"
-            )
-
         # 이미지 생성
         logger.info("이미지 생성 시작...")
-        generated_image_base64 = await generator.generate(request)
+        result = await generator.generate(request)
 
-        logger.info("이미지 생성 완료!")
+        logger.info(f"이미지 생성 완료! 포맷: {result['format']}")
 
         return ImageGenerationApiResponseDTO(
-            generatedImage=generated_image_base64
+            generatedImage=result["generatedImage"],
+            format=result["format"]
         )
 
     except HTTPException:

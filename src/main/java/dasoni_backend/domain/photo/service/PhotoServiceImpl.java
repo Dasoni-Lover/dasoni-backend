@@ -231,68 +231,35 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public ImageGenerationResponseDTO generateImage(MultipartFile image1,
-                                                    MultipartFile image2,
-                                                    MultipartFile image3,
-                                                    String prompt) {
+    public ImageGenerationResponseDTO generateImage(ImageGenerationRequestDTO request) {
         try {
-            // 1. 이미지 리스트 생성 (순서 보장)
-            List<MultipartFile> images = new ArrayList<>();
-            images.add(image1);
+            log.info("이미지 생성 요청 - 이미지 개수: {}, 프롬프트: {}",
+                    request.getImages().size(), request.getPrompt());
 
-            if (image2 != null && !image2.isEmpty()) {
-                images.add(image2);
-            }
-
-            if (image3 != null && !image3.isEmpty()) {
-                images.add(image3);
-            }
-
-            log.info("이미지 생성 요청 - 이미지 개수: {}, 프롬프트: {}", images.size(), prompt);
-
-            // 2. 이미지들을 Base64로 인코딩
-            List<ImageInputDTO> imageInputs = new ArrayList<>();
-            for (int i = 0; i < images.size(); i++) {
-                MultipartFile image = images.get(i);
-                String base64 = Base64.getEncoder().encodeToString(image.getBytes());
-
-                ImageInputDTO input = ImageInputDTO.builder()
-                        .order(i + 1)
-                        .base64Data(base64)
-                        .build();
-
-                imageInputs.add(input);
-                log.info("이미지 {}번 인코딩 완료 ({}bytes)", i + 1, image.getSize());
-            }
-
-            // 3. FastAPI로 요청 전송
-            ImageGenerationRequestDTO request = ImageGenerationRequestDTO.builder()
-                    .images(imageInputs)
-                    .prompt(prompt)
-                    .build();
-
-            log.info("FastAPI로 이미지 생성 요청 전송...");
+            // 3. FastAPI 호출
             ImageGenerationApiResponseDTO apiResponse = fastApiClient.generateImage(request);
 
-            if (apiResponse.getGeneratedImage() == null) {
-                throw new RuntimeException("생성된 이미지가 없습니다");
-            }
-
-            log.info("이미지 생성 완료");
-
-            // 4. 성공 응답 반환
+            // 4. 성공 응답 생성 (프론트엔드 형식)
             return ImageGenerationResponseDTO.builder()
-                    .success(true)
-                    .generatedImageBase64(apiResponse.getGeneratedImage())
+                    .message("이미지 생성 성공")
+                    .generatedImage(apiResponse.getGeneratedImage())  // 순수 base64
+                    .format(apiResponse.getFormat())  // png, jpeg, webp
+                    .build();
+
+        } catch (IllegalArgumentException e) {
+            log.warn("입력 검증 실패: {}", e.getMessage());
+            return ImageGenerationResponseDTO.builder()
+                    .message(e.getMessage())
+                    .generatedImage(null)
+                    .format("png")
                     .build();
 
         } catch (Exception e) {
             log.error("이미지 생성 실패: {}", e.getMessage(), e);
-
-            // 5. 실패 응답 반환
             return ImageGenerationResponseDTO.builder()
-                    .success(false)
-                    .generatedImageBase64(null)
+                    .message("이미지 생성에 실패하였습니다: " + e.getMessage())
+                    .generatedImage(null)
+                    .format("png")
                     .build();
         }
     }

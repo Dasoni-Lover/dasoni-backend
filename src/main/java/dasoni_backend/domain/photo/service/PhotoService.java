@@ -13,10 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PhotoService {
-    ImageGenerationResponseDTO generateImage(MultipartFile image1,
-                                             MultipartFile image2,
-                                             MultipartFile image3,
-                                             String prompt);
+    ImageGenerationResponseDTO generateImage(ImageGenerationRequestDTO request);
     PhotoListResponseDTO getPhotoList(Long hallId, PhotoRequestDTO request, User user);
     void uploadPhoto(Long hallId,PhotoUploadRequestDTO request,User user);
     void deletePhoto(Long hallId, Long photoId, User user);

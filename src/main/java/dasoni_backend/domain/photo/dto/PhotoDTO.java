@@ -54,32 +54,42 @@ public class PhotoDTO {
     // 입력 이미지 정보
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ImageInputDTO {
         private int order;          // 순서 (1:고인, 2:본인, 3:배경)
-        private String base64Data;  // Base64 인코딩된 이미지
+        private String base64Data;  // Base64 인코딩된 이미지 (순수 base64)
     }
 
     // FastAPI로 보낼 요청
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ImageGenerationRequestDTO {
-        private List<ImageInputDTO> images;
-        private String prompt;
+        private List<ImageInputDTO> images;  // 순서가 있는 이미지 리스트
+        private String prompt;               // 생성 프롬프트
     }
 
     // FastAPI에서 받을 응답
     @Data
+    @Builder
     @NoArgsConstructor
+    @AllArgsConstructor
     public static class ImageGenerationApiResponseDTO {
-        private String generatedImage;
+        private String generatedImage;  // Base64 (순수)
+        private String format;          // 'png' | 'jpeg' | 'webp'
     }
 
-    // 클라이언트에게 반환할 최종 응답
+    // 클라이언트에게 반환할 최종 응답 (프론트엔드 형식 맞춤)
     @Data
     @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class ImageGenerationResponseDTO {
-        private boolean success;
-        private String generatedImageBase64;
+        private String message;          // 응답 메시지
+        private String generatedImage;   // Base64 only (순수 base64, 프리픽스 없음)
+        private String format;           // 'png' | 'jpeg' | 'webp'
     }
 
     // 타인 추모관 게시물 상세 조회

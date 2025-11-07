@@ -1,5 +1,6 @@
 package dasoni_backend.domain.photo.controller;
 
+import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoDetailResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
@@ -69,12 +70,16 @@ public class PhotoController {
 
     // AI 이미지 생성
     @PostMapping("/ai")
-    public ResponseEntity<ImageGenerationResponseDTO> generateImage(@RequestParam("image1") MultipartFile image1,
-                                                                    @RequestParam(value = "image2", required = false) MultipartFile image2,
-                                                                    @RequestParam(value = "image3", required = false) MultipartFile image3,
-                                                                    @RequestParam("prompt") String prompt) {
-        return ResponseEntity.ok(photoService.generateImage(image1,image2,image3,prompt));
+    public ResponseEntity<ImageGenerationResponseDTO> generateImage(ImageGenerationRequestDTO request) {
+        ImageGenerationResponseDTO response = photoService.generateImage(request);
+        // 실패 시 400 에러 반환
+        if (response.getGeneratedImage() == null) {
+            return ResponseEntity.badRequest().body(response);
+        }
+        return ResponseEntity.ok(response);
     }
+
+    // 사진 상세 조회
     @GetMapping("/{photoId}")
     public ResponseEntity<PhotoDetailResponseDTO> getPhotoDetail(@PathVariable Long hallId,
                                                                  @PathVariable Long photoId,
