@@ -31,7 +31,7 @@ spring:
 # JWT 설정
 jwt:
   secret: ${JWT_SECRET}  # secrets에서 가져옴
-  access-token-validity: 300000  # 5분
+  access-token-validity: 3000000  # 5분
   refresh-token-validity: 604800000  # 7일
 
 # 서버 설정
