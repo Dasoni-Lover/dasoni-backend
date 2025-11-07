@@ -1,0 +1,104 @@
+version: '3.8'
+
+services:
+  # Spring Boot 백엔드
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: dasoni-backend
+    ports:
+      - "8080:8080"
+    environment:
+      # 프로필
+      SPRING_PROFILES_ACTIVE: prod
+
+      # FastAPI 내부 주소 (동일 네트워크)
+      FASTAPI_URL: http://fastapi:8000
+
+      # ===== MySQL 연결 정보 =====
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      # JPA 옵션(원하면)
+      # SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQL8Dialect
+
+      # ===== Redis 연결 정보 =====
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+
+      # 타임존 (로그 맞춤)
+      TZ: Asia/Seoul
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+      fastapi:
+        condition: service_started
+    networks:
+      - dasoni-network
+    restart: unless-stopped
+
+  # FastAPI 이미지 생성 서버
+  fastapi:
+    build:
+      context: ./fastapi-server
+      dockerfile: Dockerfile
+    container_name: dasoni-fastapi
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./fastapi-server/models:/app/models  # AI 모델 캐시 저장
+    environment:
+      PYTHONUNBUFFERED: "1"
+      TZ: Asia/Seoul
+    networks:
+      - dasoni-network
+    restart: unless-stopped
+
+  # MySQL (8.x)
+  mysql:
+    image: mysql:8.4
+    container_name: dasoni-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      TZ: Asia/Seoul
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u${DB_USER}", "-p${DB_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - dasoni-network
+    restart: unless-stopped
+
+  # Redis
+  redis:
+    image: redis:7.4
+    container_name: dasoni-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    networks:
+      - dasoni-network
+    restart: unless-stopped
+
+networks:
+  dasoni-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:

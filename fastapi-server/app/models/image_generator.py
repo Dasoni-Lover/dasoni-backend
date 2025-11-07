@@ -21,6 +21,7 @@ API_KEY = os.getenv("GEMINI_API_KEY")
 class ImageGenerator:
     # 시도할 모델 우선순위
     MODEL_CANDIDATES = [
+        "models/gemini-2.5-flash-image"
         "models/gemini-2.5-flash-image-preview",
         "models/gemini-2.0-flash-exp-image-generation",
         "models/gemini-2.0-flash-preview-image-generation",
