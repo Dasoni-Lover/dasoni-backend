@@ -46,8 +46,7 @@ public class LetterController {
     }
 
     @PostMapping("{hall_id}/letters/send")
-    public ResponseEntity<?> saveLetter(@PathVariable("hall_id") Long hallId, @AuthUser User user, @RequestParam LetterSaveRequestDTO request) {
-
+    public ResponseEntity<Void> saveLetter(@PathVariable("hall_id") Long hallId, @AuthUser User user, @RequestParam LetterSaveRequestDTO request) {
         letterService.saveLetter(hallId, user, request);
         // 성공시 200 OK, 바디 없음
         return ResponseEntity.ok().build();

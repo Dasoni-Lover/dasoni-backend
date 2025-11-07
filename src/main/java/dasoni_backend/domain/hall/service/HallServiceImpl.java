@@ -17,6 +17,7 @@ import dasoni_backend.domain.relationship.repository.relationshipNatureRepositor
 import dasoni_backend.domain.relationship.repository.relationshipRepository;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.repository.UserRepository;
+import dasoni_backend.global.enums.Personality;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -137,8 +138,11 @@ public class HallServiceImpl implements HallService {
         // 상위 4개 natures 전시
         List<String> top4Natures = hallQueryRepository.findTop4NatureNames(hallId);
 
+        List<String> result = top4Natures.stream()
+                .map(e -> Personality.valueOf(e).getValue()) // getValue() = 한글 문자열
+                .toList();
         // 변환(me일때는 필요없는 null처리 & 응답에서 숨김처리)
-        return HallConverter.toHallDetailResponse(hall, role, adminReview, top4Natures);
+        return HallConverter.toHallDetailResponse(hall, role, adminReview, result);
     }
     @Override
     @Transactional(readOnly = true)
