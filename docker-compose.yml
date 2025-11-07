@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # MySQL 데이터베이스
   mysql:
@@ -45,9 +43,9 @@ services:
     restart: unless-stopped
 
   # FastAPI Python 서버
-  python-fastapi:
+  fastapi:
     build:
-      context: ./python-fastapi
+      context: ./fastapi-server
       dockerfile: Dockerfile
     container_name: dasoni-fastapi
     environment:
