@@ -31,6 +31,8 @@ public class HallDTO {
     @Builder
     public static class HallResponseDTO {
 
+        private Long hallId;
+
         private String profile;
 
         private String name;

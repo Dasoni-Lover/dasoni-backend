@@ -12,8 +12,14 @@ import java.util.Optional;
 @Repository
 public interface HallRepository extends JpaRepository<Hall, Long> {
 
-    // 관리하는 추모관을 최신순으로 조회
-    List<Hall> findAllByAdminIdOrderByCreatedAtDesc(Long adminId);
+    @Query("""
+            select h 
+            from Hall h 
+            where h.admin.id = :adminId 
+            and (h.subjectId is null or h.subjectId <> :adminId)
+            order by h.createdAt desc
+            """)
+    List<Hall> findAllManagedHallsExceptSelf(@Param("adminId") Long adminId);
 
     // 사용자가 입장(팔로우)한 추모관을 최신순으로 조회
     // 네이티브 쿼리는 추후 변경

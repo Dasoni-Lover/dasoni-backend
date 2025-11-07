@@ -47,7 +47,7 @@ public class HallServiceImpl implements HallService {
         if (admin.getId() == null)
             return HallConverter.toHallListResponseDTO(List.of());
 
-        List<Hall> halls = hallRepository.findAllByAdminIdOrderByCreatedAtDesc(admin.getId());
+        List<Hall> halls = hallRepository.findAllManagedHallsExceptSelf(admin.getId());
         return HallConverter.toHallListResponseDTO(halls);
     }
 

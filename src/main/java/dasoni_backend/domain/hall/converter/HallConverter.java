@@ -21,6 +21,7 @@ public class HallConverter {
         if(hall == null) return null;
 
         return HallResponseDTO.builder()
+                .hallId(hall.getId())
                 .profile(hall.getProfile())
                 .name(hall.getName())
                 .birthday(hall.getBirthday())
