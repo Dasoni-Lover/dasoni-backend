@@ -72,7 +72,7 @@ services:
   # Spring Boot 백엔드
   spring-backend:
     build:
-      context: ./spring-backend
+      context: .
       dockerfile: Dockerfile
     container_name: dasoni-spring
     environment:
