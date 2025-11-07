@@ -138,6 +138,12 @@ public class HallServiceImpl implements HallService {
         List<String> result = top4Natures.stream()
                 .map(e -> Personality.valueOf(e).getValue()) // getValue() = 한글 문자열
                 .toList();
+
+        log.info("getHallDetail hallId={}, userId={}, adminId={}, subjectId={}",
+                hallId, user.getId(),
+                hall.getAdmin() != null ? hall.getAdmin().getId() : null,
+                hall.getSubjectId());
+
         // 변환(me일때는 필요없는 null처리 & 응답에서 숨김처리)
         return HallConverter.toHallDetailResponse(hall, role, result);
     }
