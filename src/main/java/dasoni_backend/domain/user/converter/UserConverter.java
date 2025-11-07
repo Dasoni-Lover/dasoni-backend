@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -19,7 +20,7 @@ public class UserConverter {
         return User.builder()
                 .name(dto.getName())
                 .gender(dto.getGender())
-                .birthday(parseBirthday(dto.getBirthday()))  // String -> LocalDateTime
+                .birthday(parseDate(dto.getBirthday()))  // String -> LocalDateTime
                 .logId(dto.getLogId())
                 .password(passwordEncoder.encode(dto.getPassword()))  // 비밀번호 암호화
                 .myProfile(dto.getMyProfile())
@@ -27,10 +28,9 @@ public class UserConverter {
     }
 
     // "2002.04.08" 형태의 문자열을 LocalDateTime으로 변환
-    private LocalDateTime parseBirthday(String birthday) {
-        String formattedDate = birthday.replace(".", "-");
-        // "2002-04-08" -> LocalDateTime (시간은 00:00:00)
+    private LocalDate parseDate(String birthday) {
+        String formattedDate = birthday.replace(".", "-");  // "2002-04-08"
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return java.time.LocalDate.parse(formattedDate, formatter).atStartOfDay();
+        return LocalDate.parse(formattedDate, formatter);
     }
 }
