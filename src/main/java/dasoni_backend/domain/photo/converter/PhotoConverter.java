@@ -1,6 +1,5 @@
 package dasoni_backend.domain.photo.converter;
 
-import dasoni_backend.domain.photo.dto.PhotoDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoDetailResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoInfoDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
@@ -12,7 +11,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static java.util.Calendar.DATE;
 
 public class PhotoConverter {
 

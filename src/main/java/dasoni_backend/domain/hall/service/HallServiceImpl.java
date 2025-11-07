@@ -10,6 +10,11 @@ import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallQueryRepository;
 import dasoni_backend.domain.hall.repository.HallRepository;
+import dasoni_backend.domain.relationship.converter.RelationshipConverter;
+import dasoni_backend.domain.relationship.entity.Relationship;
+import dasoni_backend.domain.relationship.entity.RelationshipNature;
+import dasoni_backend.domain.relationship.repository.relationshipNatureRepository;
+import dasoni_backend.domain.relationship.repository.relationshipRepository;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.management.relation.Relation;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +34,8 @@ public class HallServiceImpl implements HallService {
 
     private final HallRepository hallRepository;
     private final HallQueryRepository hallQueryRepository;
+    private final relationshipRepository relationshipRepository;
+    private final relationshipNatureRepository relationshipNatureRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -88,7 +96,16 @@ public class HallServiceImpl implements HallService {
     public HallCreateResponseDTO createOtherHall(User admin, HallCreateRequestDTO request) {
         // 타인 추모관 개설
         Hall hall = hallRepository.save(HallConverter.fromSaveRequestForOther(admin, request));
+        Relationship relationship = relationshipRepository.save(RelationshipConverter.fromRequestToRelationship(admin, hall, request));
 
+        List<RelationshipNature> rows = request.getNatures().stream()
+                .map(p -> RelationshipNature.builder()
+                        .relationship(relationship)
+                        .nature(p)
+                        .build())
+                .toList();
+
+        relationshipNatureRepository.saveAll(rows);
         return HallConverter.toHallCreateResponseDTO(hall);
     }
 
