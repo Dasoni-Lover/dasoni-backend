@@ -43,3 +43,5 @@ fastapi-server/.coverage
 fastapi-server/models/cache/
 
 #Dockeer
+/mysql-data
+/redis-data
