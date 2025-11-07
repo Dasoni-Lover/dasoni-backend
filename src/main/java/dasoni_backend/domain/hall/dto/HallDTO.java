@@ -97,7 +97,6 @@ public class HallDTO {
         @NotNull
         @Size(min = 3, max = 3)
         // 3개 고정
-        // GOOD, BAD, INTROVERTED, GENEROUS, OPTIMISTIC
         private List<Personality> natures;
 
         @NotBlank
@@ -117,10 +116,8 @@ public class HallDTO {
     @Getter
     @Builder
     public static class HallDetailDataResponseDTO {
-
         // follower, admin, me
         private String role;
-
         private HallDetailResponseDTO data;
     }
 

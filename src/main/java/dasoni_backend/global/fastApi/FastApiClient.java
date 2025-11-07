@@ -24,12 +24,12 @@ public class FastApiClient {
                          @Value("${fastapi.url}") String fastApiUrl) {
         this.fastApiUrl = fastApiUrl;
         this.webClient = webClientBuilder
-                .baseUrl(fastApiUrl)
-                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                .codecs(configurer -> configurer
-                        .defaultCodecs()
-                        .maxInMemorySize(50 * 1024 * 1024))
-                .build();
+            .baseUrl(fastApiUrl)
+            .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+            .codecs(configurer -> configurer
+                    .defaultCodecs()
+                    .maxInMemorySize(50 * 1024 * 1024))
+            .build();
     }
 
     // FastAPI 서버에 이미지 생성 요청을 전송
@@ -39,12 +39,12 @@ public class FastApiClient {
 
             // POST 요청으로 이미지 생성 요청 전송
             return webClient.post()
-                    .uri("/image/generate")
-                    .bodyValue(request)
-                    .retrieve()
-                    .bodyToMono(ImageGenerationApiResponseDTO.class)
-                    .timeout(Duration.ofMinutes(3))
-                    .block();  // 동기 방식으로 결과 대기
+                .uri("/image/generate")
+                .bodyValue(request)
+                .retrieve()
+                .bodyToMono(ImageGenerationApiResponseDTO.class)
+                .timeout(Duration.ofMinutes(3))
+                .block();  // 동기 방식으로 결과 대기
 
         } catch (WebClientResponseException e) {
             log.error("FastAPI 호출 실패: {} - {}", e.getStatusCode(), e.getResponseBodyAsString());

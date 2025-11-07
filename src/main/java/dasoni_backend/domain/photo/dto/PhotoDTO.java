@@ -55,7 +55,7 @@ public class PhotoDTO {
     @Data
     @Builder
     public static class ImageInputDTO {
-        private int order;          // 순서 (1, 2, 3)
+        private int order;          // 순서 (1:고인, 2:본인, 3:배경)
         private String base64Data;  // Base64 인코딩된 이미지
     }
 
@@ -80,7 +80,6 @@ public class PhotoDTO {
     public static class ImageGenerationResponseDTO {
         private boolean success;
         private String generatedImageBase64;
-        private String message;
     }
 
     // 타인 추모관 게시물 상세 조회

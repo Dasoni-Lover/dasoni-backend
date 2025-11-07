@@ -52,9 +52,8 @@ public class HallConverter {
 
     // 본인 추모관 필드 채우기
     public static Hall fromSaveRequest(User user) {
-
         // 따로 요청 없이, User의 정보를 바탕으로 엔티티 생성
-        Hall hall = Hall.builder()
+        return Hall.builder()
                 .admin(user)
                 .subjectId(user.getId())
                 .name(user.getName())
@@ -64,8 +63,6 @@ public class HallConverter {
                 .isOpened(true)
                 .userNum(1)
                 .build();
-
-        return hall;
     }
 
     // 타인 추모관 필드 채우기

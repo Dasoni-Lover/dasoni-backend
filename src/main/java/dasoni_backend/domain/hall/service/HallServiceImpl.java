@@ -66,21 +66,20 @@ public class HallServiceImpl implements HallService {
     @Transactional
     @Override
     public HallCreateResponseDTO createMyHall(User user) {
-
         // 본인 추모관 존재 O -> 중복 생성 방지
         // 본인 추모관 존재 X -> 생성 후, hallId 반환
-        return hallRepository.findByAdminId(user.getId())
-                // O
-                .map(existing -> HallCreateResponseDTO.builder()
-                        .hallId(existing.getId())
-                        .build())
-                // X
-                .orElseGet(() -> {
-                    Hall hall = hallRepository.save(HallConverter.fromSaveRequest(user));
-                    return HallCreateResponseDTO.builder()
-                            .hallId(hall.getId())
-                            .build();
-                });
+        return hallRepository.findBySubjectId(user.getId())
+            // O
+            .map(existing -> HallCreateResponseDTO.builder()
+                    .hallId(existing.getId())
+                    .build())
+            // X
+            .orElseGet(() -> {
+                Hall hall = hallRepository.save(HallConverter.fromSaveRequest(user));
+                return HallCreateResponseDTO.builder()
+                        .hallId(hall.getId())
+                        .build();
+            });
     }
 
     // 타인 추모관 개설
