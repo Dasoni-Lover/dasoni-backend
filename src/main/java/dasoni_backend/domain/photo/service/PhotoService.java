@@ -2,6 +2,7 @@ package dasoni_backend.domain.photo.service;
 
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationResponseDTO;
+import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoDetailResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoUpdateRequestDTO;
@@ -20,4 +21,5 @@ public interface PhotoService {
     void uploadPhoto(Long hallId,PhotoUploadRequestDTO request,User user);
     void deletePhoto(Long hallId, Long photoId, User user);
     void updatePhoto(Long hallId, Long photoId, PhotoUpdateRequestDTO request, User user);
+    PhotoDetailResponseDTO getPhotoDetail(Long hallId, Long photoId, User user);
 }
