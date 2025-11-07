@@ -87,13 +87,9 @@ public class LetterDTO {
     @Getter
     @NoArgsConstructor
     public static class LetterSaveRequestDTO {
-
         private String toName;
-
         private String fromName;
-
         private String content;
-
         private boolean isCompleted;
     }
 }

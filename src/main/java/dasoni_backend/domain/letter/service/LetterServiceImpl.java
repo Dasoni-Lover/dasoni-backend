@@ -123,11 +123,7 @@ public class LetterServiceImpl implements LetterService{
 //        )) {
 //            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 편지를 보냈어요");
 //        }
-
-        LocalDateTime now = LocalDateTime.now();
-
-        Letter letter = LetterConverter.fromSaveRequest(request, hall, user, now);
-
+        Letter letter = LetterConverter.fromSaveRequest(request, hall, user);
         letterRepository.save(letter);
     }
 }

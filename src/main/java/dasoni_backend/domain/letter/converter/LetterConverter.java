@@ -85,22 +85,15 @@ public class LetterConverter {
                 .completedAt(letter.getCompletedAt())
                 .build();
     }
-    public static Letter fromSaveRequest(LetterSaveRequestDTO req, Hall hall, User user, LocalDateTime now) {
-        if (req == null) return null;
-        if (!StringUtils.hasText(req.getContent())) {
-            throw new IllegalArgumentException("content는 비어있을 수 없습니다.");
-        }
-
-        Letter letter = new Letter();
-        letter.setHall(hall);
-        letter.setUser(user);
-        letter.setToName(req.getToName());
-        letter.setFromName(req.getFromName());
-        letter.setContent(req.getContent());
-        letter.setIsCompleted(req.isCompleted());
-        letter.setCreatedAt(now);
-        letter.setCompletedAt(req.isCompleted() ? now : null);
-
-        return letter;
+    public static Letter fromSaveRequest(LetterSaveRequestDTO request, Hall hall, User user {
+        return Letter.builder()
+                .hall(hall)
+                .user(user)
+                .toName(request.getToName())
+                .fromName(request.getFromName())
+                .content(request.getContent())
+                .isCompleted(request.isCompleted())
+                .createdAt(LocalDateTime.now())
+                .completedAt(request.isCompleted() ? LocalDateTime.now() : null).build();
     }
 }
