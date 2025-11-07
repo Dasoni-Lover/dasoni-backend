@@ -41,3 +41,5 @@ fastapi-server/venv/
 fastapi-server/.pytest_cache/
 fastapi-server/.coverage
 fastapi-server/models/cache/
+
+#Dockeer
