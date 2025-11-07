@@ -85,7 +85,7 @@ public class LetterConverter {
                 .completedAt(letter.getCompletedAt())
                 .build();
     }
-    public static Letter fromSaveRequest(LetterSaveRequestDTO request, Hall hall, User user {
+    public static Letter fromSaveRequest(LetterSaveRequestDTO request, Hall hall, User user) {
         return Letter.builder()
                 .hall(hall)
                 .user(user)
