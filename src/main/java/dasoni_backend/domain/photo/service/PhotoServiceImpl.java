@@ -279,7 +279,6 @@ public class PhotoServiceImpl implements PhotoService {
             return ImageGenerationResponseDTO.builder()
                     .success(true)
                     .generatedImageBase64(apiResponse.getGeneratedImage())
-                    .message("이미지 생성 완료")
                     .build();
 
         } catch (Exception e) {
@@ -289,7 +288,6 @@ public class PhotoServiceImpl implements PhotoService {
             return ImageGenerationResponseDTO.builder()
                     .success(false)
                     .generatedImageBase64(null)
-                    .message("이미지 생성 실패: " + e.getMessage())
                     .build();
         }
     }
