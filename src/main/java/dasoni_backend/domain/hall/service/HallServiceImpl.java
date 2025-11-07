@@ -26,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.management.relation.Relation;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -123,12 +124,11 @@ public class HallServiceImpl implements HallService {
 
         // role 나누기
         String role;
-        if (userId.equals(subjectId)) {
+        if (Objects.equals(userId, subjectId)) {
             role = "me";
-        } else if (userId.equals(adminId)) {
+        } else if (Objects.equals(userId, adminId)) {
             role = "admin";
         } else {
-            // 베타데모데이 이후로 승인된 사용자면 follower가 될 수 있게 로직 변경
             role = "follower";
         }
 
