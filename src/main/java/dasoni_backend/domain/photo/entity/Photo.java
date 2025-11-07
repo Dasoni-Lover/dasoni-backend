@@ -47,10 +47,10 @@ public class Photo {
     private String url;
 
     @Column(name = "is_private", nullable = false)
-    private Boolean isPrivate = false;
+    private Boolean isPrivate;
 
     @Column(name = "is_ai", nullable = false)
-    private Boolean isAi = false;
+    private Boolean isAi;
 
     @Column(name = "uploaded_at")
     private LocalDateTime uploadedAt;

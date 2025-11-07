@@ -30,3 +30,14 @@ application-*.properties
 !gradlew
 !gradlew.bat
 !gradle/wrapper/gradle-wrapper.jar
+
+# FastAPI / Python
+fastapi-server/__pycache__/
+fastapi-server/*.py[cod]
+fastapi-server/*$py.class
+fastapi-server/.venv/
+fastapi-server/.env
+fastapi-server/venv/
+fastapi-server/.pytest_cache/
+fastapi-server/.coverage
+fastapi-server/models/cache/
