@@ -1,6 +1,7 @@
 package dasoni_backend.domain.letter.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -90,6 +91,7 @@ public class LetterDTO {
         private String toName;
         private String fromName;
         private String content;
+        @JsonProperty("isCompleted")
         private boolean isCompleted;
     }
 }

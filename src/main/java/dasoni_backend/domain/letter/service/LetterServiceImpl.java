@@ -110,6 +110,8 @@ public class LetterServiceImpl implements LetterService{
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        System.out.println("✅ request.isCompleted = " + request.isCompleted());
+
         // :TODO 일단 테스트를 위해서
 //        // isCompleted=true면 오늘 이미 보냈는지 검사
 //        if (request.isCompleted()
