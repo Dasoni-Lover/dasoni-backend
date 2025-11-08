@@ -1,11 +1,7 @@
-from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from .schemas.image_schemas import (
-    ImageGenerationRequestDTO,
-    ImageGenerationApiResponseDTO
-)
-from .models.image_generator import ImageGenerator
-import logging
+from fastapi import FastAPI, HTTPException, Path
+from app.schemas.image_gen import ImageGenRequest, ImageGenResponse
+from app.services.gemini import generate_image_base64
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
@@ -26,77 +22,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# 이미지 생성기 초기화
-generator = None
-
-@app.on_event("startup")
-async def startup_event():
-    """서버 시작 시 모델 초기화"""
-    global generator
-    logger.info("Google Gemini API 클라이언트 초기화 중...")
-    try:
-        generator = ImageGenerator()
-        logger.info("초기화 완료!")
-    except Exception as e:
-        logger.error(f"초기화 실패: {str(e)}")
-        raise
-
-@app.get("/")
-async def root():
-    """루트 엔드포인트"""
-    return {
-        "message": "Dasoni Image Generation API",
-        "status": "running",
-        "version": "2.0.0",
-        "api": "Google Gemini",
-        "features": ["ordered_images", "role_based_generation"]
-    }
-
 @app.get("/health")
 def health():
     """헬스체크"""
     return {"status": "ok"}
 
-@app.post("/image/generate", response_model=ImageGenerationApiResponseDTO)
-async def generate_image(request: ImageGenerationRequestDTO):
-    """
-    순서가 있는 이미지 생성 엔드포인트
 
-    - order 1: 고인의 사진
-    - order 2: 본인의 사진
-    - order 3: 배경 이미지
-
-    프론트엔드 응답 형식:
-    {
-      "generatedImage": "base64...",  // 순수 base64
-      "format": "png"                 // 'png' | 'jpeg' | 'webp'
-    }
-    """
+@app.post("/ai/generate/{hall_id}", response_model=ImageGenResponse)
+def generate_ai_image(hall_id: int = Path(..., ge=1), req: ImageGenRequest = ...):
     try:
-        logger.info(f"이미지 생성 요청 수신 - 입력 이미지: {len(request.images)}개")
-
-        if generator is None:
-            raise HTTPException(
-                status_code=503,
-                detail="이미지 생성기가 아직 초기화되지 않았습니다"
-            )
-
-        # 이미지 생성
-        logger.info("이미지 생성 시작...")
-        result = await generator.generate(request)
-
-        logger.info(f"이미지 생성 완료! 포맷: {result['format']}")
-
-        return ImageGenerationApiResponseDTO(
-            generatedImage=result["generatedImage"],
-            format=result["format"]
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"이미지 생성 실패: {str(e)}", exc_info=True)
-        raise HTTPException(
-            status_code=500,
-            detail=f"이미지 생성 중 오류가 발생했습니다: {str(e)}"
-        )
+        refs_sorted = sorted(req.images or [], key=lambda x: x.order)
+        ref_list = [x.base64Data for x in refs_sorted]
+        result_b64 = generate_image_base64(prompt=req.prompt, ref_images_b64=ref_list)
+        return ImageGenResponse(generatedImage=result_b64)
+    except Exception:
+        raise HTTPException(status_code=500, detail="Failed to generate image")

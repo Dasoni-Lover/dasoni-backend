@@ -70,10 +70,10 @@ public class PhotoController {
 
     // AI 이미지 생성
     @PostMapping("/ai")
-    public ResponseEntity<ImageGenerationResponseDTO> generateImage(ImageGenerationRequestDTO request) {
-        ImageGenerationResponseDTO response = photoService.generateImage(request);
+    public ResponseEntity<ImageGenerationResponseDTO> generateImage(@PathVariable Long hallId, ImageGenerationRequestDTO request) {
+        ImageGenerationResponseDTO response = photoService.generateImage(hallId, request);
         // 실패 시 400 에러 반환
-        if (response.getGeneratedImage() == null) {
+        if (response == null || response.getGeneratedImage() == null) {
             return ResponseEntity.badRequest().body(response);
         }
         return ResponseEntity.ok(response);

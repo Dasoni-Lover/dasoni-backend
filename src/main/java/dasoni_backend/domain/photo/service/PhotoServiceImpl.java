@@ -1,10 +1,10 @@
 package dasoni_backend.domain.photo.service;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.photo.converter.PhotoConverter;
-import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationApiResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationRequestDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageGenerationResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.ImageInputDTO;
@@ -17,13 +17,13 @@ import dasoni_backend.domain.photo.entity.Photo;
 import dasoni_backend.domain.photo.repository.PhotoRepository;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.S3.service.FileUploadService;
-import dasoni_backend.global.fastApi.FastApiClient;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -41,7 +41,7 @@ public class PhotoServiceImpl implements PhotoService {
     private final PhotoRepository photoRepository;
     private final HallRepository hallRepository;
     private final FileUploadService fileUploadService;
-    private final FastApiClient fastApiClient;
+    private final WebClient fastApiWebClient;
 
 
     @Override
@@ -231,36 +231,45 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
-    public ImageGenerationResponseDTO generateImage(ImageGenerationRequestDTO request) {
+    public ImageGenerationResponseDTO generateImage(Long hallId, ImageGenerationRequestDTO request) {
+        var sorted = request.getImages() == null ? null :
+                request.getImages().stream()
+                        .sorted(Comparator.comparing(ImageInputDTO::getOrder))
+                        .collect(Collectors.toList());
+
+        // 🔧 백엔드에서 살짝 덧붙일 프롬프트(필요 시 규칙/스타일/안전문구 등)
+        String finalPrompt = buildPrompt(request.getPrompt());
+
+        var forwarded = ImageGenerationRequestDTO.builder()
+                .images(sorted)
+                .prompt(finalPrompt)
+                .build();
+
         try {
-            log.info("이미지 생성 요청 - 이미지 개수: {}, 프롬프트: {}",
-                    request.getImages().size(), request.getPrompt());
-
-            // 3. FastAPI 호출
-            ImageGenerationApiResponseDTO apiResponse = fastApiClient.generateImage(request);
-
-            // 4. 성공 응답 생성 (프론트엔드 형식)
-            return ImageGenerationResponseDTO.builder()
-                    .message("이미지 생성 성공")
-                    .generatedImage(apiResponse.getGeneratedImage())  // 순수 base64
-                    .format(apiResponse.getFormat())  // png, jpeg, webp
-                    .build();
-
-        } catch (IllegalArgumentException e) {
-            log.warn("입력 검증 실패: {}", e.getMessage());
-            return ImageGenerationResponseDTO.builder()
-                    .message(e.getMessage())
-                    .generatedImage(null)
-                    .format("png")
-                    .build();
-
+            return fastApiWebClient.post()
+                    .uri("/ai/generate/{hallId}", hallId)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .bodyValue(forwarded)
+                    .retrieve()
+                    .bodyToMono(ImageGenerationResponseDTO.class)
+                    .block();
         } catch (Exception e) {
-            log.error("이미지 생성 실패: {}", e.getMessage(), e);
-            return ImageGenerationResponseDTO.builder()
-                    .message("이미지 생성에 실패하였습니다: " + e.getMessage())
-                    .generatedImage(null)
-                    .format("png")
-                    .build();
+            log.error("FastAPI image generate error", e);
+            return ImageGenerationResponseDTO.builder().generatedImage(null).build();
         }
+    }
+
+    private String buildPrompt(String userPrompt) {
+        String base = (userPrompt == null ? "" : userPrompt.trim());
+        // 예시: 일관된 톤/해상도/아트팩터 방지 등 내부 가이드 덧붙이기
+        String suffix = """
+                
+                -- Constraints --
+                • photorealistic consistency, natural lighting, clean background
+                • respect provided reference faces; preserve identity and proportions
+                • upscale to high quality; avoid artifacts, extra limbs, text overlays
+                """;
+        return base + suffix;
     }
 }
