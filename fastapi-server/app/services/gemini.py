@@ -7,8 +7,9 @@ from google.genai.errors import ClientError
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-# 네가 요청한 상위 2개 모델만 시도
 MODEL_CANDIDATES = [
+    "gemini-2.5-flash-image",
+    "models/gemini-2.5-flash-image",
     "models/gemini-2.5-flash-image-preview",
     "models/gemini-2.0-flash-exp-image-generation",
 ]
@@ -31,7 +32,7 @@ def generate_image_base64(prompt: str, ref_images_b64: List[str]) -> str:
         raise RuntimeError("Missing GEMINI_API_KEY")
     client = genai.Client(api_key=GEMINI_API_KEY)
     contents = _build_contents(prompt, ref_images_b64)
-    cfg = types.GenerateContentConfig(response_modalities=["IMAGE"])
+    cfg = types.GenerateContentConfig(response_modalities=["Image"])
 
     last_err = None
     for model in MODEL_CANDIDATES:
