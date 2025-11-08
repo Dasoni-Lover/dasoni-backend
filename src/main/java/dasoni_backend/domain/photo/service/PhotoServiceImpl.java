@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,6 +46,7 @@ public class PhotoServiceImpl implements PhotoService {
 
 
     @Override
+    @Transactional
     public PhotoListResponseDTO getPhotoList(Long hallId, PhotoRequestDTO request, User user) {
 
         Hall hall = hallRepository.findById(hallId)
@@ -222,6 +224,7 @@ public class PhotoServiceImpl implements PhotoService {
     }
 
     @Override
+    @Transactional
     public void deletePhoto(Long hallId, Long photoId, User user) {
         Photo photo = photoRepository.findById(photoId)
                 .orElseThrow(() -> new IllegalArgumentException("사진을 찾을 수 없습니다."));
@@ -229,14 +232,15 @@ public class PhotoServiceImpl implements PhotoService {
         if (!photo.getHall().getId().equals(hallId)) {
             throw new IllegalArgumentException("해당 홀의 사진이 아닙니다.");
         }
-
         // 본인도 아니고 관리자도 아니면 안됨
         // NPE 방지
         boolean isOwner = photo.getUser() != null && user != null
                 && photo.getUser().getId().equals(user.getId());
+
         boolean isAdmin = photo.getHall() != null
                 && photo.getHall().getAdmin() != null
                 && photo.getHall().getAdmin().getId().equals(user.getId());
+
         if (!isOwner && !isAdmin) {
             // throw new IllegalArgumentException("본인이 올린 사진이거나 홀 관리자만 삭제할 수 있습니다.");
             // 403 뜨게
@@ -261,11 +265,10 @@ public class PhotoServiceImpl implements PhotoService {
                         .sorted(Comparator.comparing(ImageInputDTO::getOrder))
                         .collect(Collectors.toList());
 
-        // 🔧 백엔드에서 살짝 덧붙일 프롬프트(필요 시 규칙/스타일/안전문구 등)
         String finalPrompt = buildPrompt(request.getPrompt());
 
         var forwarded = ImageGenerationRequestDTO.builder()
-                .images(sorted)
+                .images(sorted)   // null이면 직렬화 생략
                 .prompt(finalPrompt)
                 .build();
 
@@ -278,6 +281,10 @@ public class PhotoServiceImpl implements PhotoService {
                     .retrieve()
                     .bodyToMono(ImageGenerationResponseDTO.class)
                     .block();
+        } catch (WebClientResponseException e) {
+            // 4xx/5xx 상세 로깅
+            log.error("FastAPI {} error: {}", e.getRawStatusCode(), e.getResponseBodyAsString(), e);
+            return ImageGenerationResponseDTO.builder().generatedImage(null).build();
         } catch (Exception e) {
             log.error("FastAPI image generate error", e);
             return ImageGenerationResponseDTO.builder().generatedImage(null).build();

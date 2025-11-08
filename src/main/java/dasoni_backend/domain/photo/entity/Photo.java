@@ -48,11 +48,11 @@ public class Photo {
 
     @Builder.Default
     @Column(name = "is_private", nullable = false)
-    private Boolean isPrivate;
+    private Boolean isPrivate = false;
 
     @Builder.Default
     @Column(name = "is_ai", nullable = false)
-    private Boolean isAi;
+    private Boolean isAi = false;
 
     @Column(name = "uploaded_at")
     private LocalDateTime uploadedAt;
