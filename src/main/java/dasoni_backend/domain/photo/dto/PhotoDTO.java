@@ -12,6 +12,7 @@ import java.util.List;
 public class PhotoDTO {
 
     @Getter
+    @Setter
     @NoArgsConstructor
     public static class PhotoRequestDTO {
         private Boolean isPrivate;
@@ -20,6 +21,7 @@ public class PhotoDTO {
     }
 
     @Getter
+    @Setter
     @NoArgsConstructor
     public static class PhotoUploadRequestDTO {
         private String url;
@@ -30,6 +32,7 @@ public class PhotoDTO {
     }
 
     @Getter
+    @Setter
     @NoArgsConstructor
     public static class PhotoUpdateRequestDTO {
         private String content;

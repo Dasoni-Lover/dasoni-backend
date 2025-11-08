@@ -122,8 +122,8 @@ public class PhotoServiceImpl implements PhotoService {
                 .user(user)
                 .content(request.getContent())
                 .url(request.getUrl())
-                .isPrivate(request.getIsPrivate())
-                .isAi(request.getIsAI())
+                .isPrivate(Boolean.TRUE.equals(request.getIsPrivate()))
+                .isAi(Boolean.TRUE.equals(request.getIsAI()))
                 .occurredAt(occurredAt)
                 .uploadedAt(LocalDateTime.now())
                 .build();

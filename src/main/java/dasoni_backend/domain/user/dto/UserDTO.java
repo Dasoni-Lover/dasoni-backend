@@ -5,10 +5,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 public class UserDTO {
 
     @Getter
+    @Setter
     @NoArgsConstructor
     public static class RegisterRequestDTO {
         @NotBlank
@@ -25,6 +27,7 @@ public class UserDTO {
     }
 
     @Getter
+    @Setter
     @NoArgsConstructor
     public static class LoginRequestDTO{
         @NotBlank
@@ -34,12 +37,14 @@ public class UserDTO {
     }
 
     @Getter
+    @Setter
     @Builder
     public static class LoginResponseDTO {
         private String accessToken;
         private String refreshToken;
     }
     @Getter
+    @Setter
     @NoArgsConstructor
     public static class RefreshTokenRequestDTO {
         @NotBlank(message = "리프레시 토큰은 필수입니다.")
@@ -47,12 +52,14 @@ public class UserDTO {
     }
 
     @Getter
+    @Setter
     @Builder
     public static class AccessTokenResponseDTO {
         private String accessToken;
     }
 
     @Getter
+    @Setter
     @Builder
     public static class CheckResponseDTO {
         private Boolean isAvailable;
