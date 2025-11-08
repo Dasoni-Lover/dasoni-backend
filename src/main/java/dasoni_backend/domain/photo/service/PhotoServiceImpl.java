@@ -51,71 +51,72 @@ public class PhotoServiceImpl implements PhotoService {
 
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("홀을 찾을 수 없습니다.")); // [FIX]
+
         boolean isAdmin = hall.getAdmin() != null && hall.getAdmin().getId().equals(user.getId()); // [FIX]
         boolean isMe    = hall.getSubjectId() != null && hall.getSubjectId().equals(user.getId()); // [FIX]
 
         // hallId로 Photo 조회
         List<Photo> photos;
-        if (Boolean.TRUE.equals(request.getIsMine())) {
-            photos = photoRepository.findMyPhotos(hallId, user.getId());     // [FIX] 내 앨범
+        if (Boolean.TRUE.equals(request.getIsPrivate())) {
+            photos = photoRepository.findMyPhotos(hallId, user.getId());
+            // 내꺼 다 가져오기 + AI, 정렬
+
+            List<Photo> filteredPhotos = photos.stream()
+                    .filter(photo -> aiFilter(photo, request.getIsAI()))
+                    .collect(Collectors.toList());
+            // 정렬
+            if (Boolean.TRUE.equals(request.getIsBydate())) {
+                // 날짜순 (occurredAt)
+                filteredPhotos.sort(Comparator.comparing(
+                                        Photo::getOccurredAt,
+                                        Comparator.nullsLast(Comparator.naturalOrder())
+                                )
+                                .reversed()
+                                .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
+                );
+            } else {
+                // 업로드순 (uploadedAt)
+                filteredPhotos.sort(Comparator.comparing(
+                                        Photo::getUploadedAt,
+                                        Comparator.nullsLast(Comparator.naturalOrder())
+                                )
+                                .reversed()
+                                .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
+                );
+            }
+            return PhotoConverter.toPhotoListResponseDTO(filteredPhotos);
+
         } else {
-            photos = photoRepository.findAllByHall(hallId);                  // [FIX] 전체 앨범(정렬 포함)
+            photos = photoRepository.findAllByHall(hallId);
+            // 전부다 가져오기(private 이면 안가져옴 ) + AI , 정렬
+            // 필터링
+            List<Photo> filteredPhotos = photos.stream()
+                    .filter(photo -> !photo.getIsPrivate())
+                    .filter(photo -> aiFilter(photo, request.getIsAI()))
+                    .collect(Collectors.toList());
+            // 정렬
+            if (Boolean.TRUE.equals(request.getIsBydate())) {
+                // 날짜순 (occurredAt)
+                filteredPhotos.sort(Comparator.comparing(
+                                        Photo::getOccurredAt,
+                                        Comparator.nullsLast(Comparator.naturalOrder())
+                                )
+                                .reversed()
+                                .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
+                );
+            } else {
+                // 업로드순 (uploadedAt)
+                filteredPhotos.sort(Comparator.comparing(
+                                        Photo::getUploadedAt,
+                                        Comparator.nullsLast(Comparator.naturalOrder())
+                                )
+                                .reversed()
+                                .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
+                );
+            }
+            return PhotoConverter.toPhotoListResponseDTO(filteredPhotos);
         }
-
-        // 필터링
-        List<Photo> filteredPhotos = photos.stream()
-                .filter(photo -> myPhotoFilter(photo, request.getIsMine(), user))
-                .filter(photo -> {
-                    if(!Boolean.TRUE.equals(request.getIsMine()) && !(isAdmin || isMe)) {
-                        return Boolean.FALSE.equals(photo.getIsPrivate());
-                    }
-                    return true;
-                })
-                .filter(photo -> aiFilter(photo, request.getIsAI()))
-                .collect(Collectors.toList());
-
-        // 정렬
-        if (Boolean.TRUE.equals(request.getIsBydate())) {
-            // 날짜순 (occurredAt)
-            filteredPhotos.sort(Comparator.comparing(
-                    Photo::getOccurredAt,
-                    Comparator.nullsLast(Comparator.naturalOrder())
-                            )
-                            .reversed()
-                            .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
-            );
-        } else {
-            // 업로드순 (uploadedAt)
-            filteredPhotos.sort(Comparator.comparing(
-                    Photo::getUploadedAt,
-                    Comparator.nullsLast(Comparator.naturalOrder())
-                            )
-                            .reversed()
-                            .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
-            );
-        }
-        // 로그
-        log.info("[PhotoList] hallId={}, userId={}, filters => isPrivate: {}, isAI: {}, sortBy: {}",
-                hallId,
-                user.getId(),
-                request.getIsPrivate(),
-                request.getIsAI(),
-                Boolean.TRUE.equals(request.getIsBydate()) ? "occurredAt(date)" : "uploadedAt(uploadTime)"
-        );
-
-        // 4. DTO 변환
-        return PhotoConverter.toPhotoListResponseDTO(filteredPhotos);
     }
-
-    private boolean myPhotoFilter(Photo photo, Boolean isMine, User user) {
-        if (Boolean.TRUE.equals(isMine)) {
-            if (photo.getUser() == null || user == null) return false;
-            return photo.getUser().getId().equals(user.getId());
-        }
-        // isMine == false or null → 전체
-        return true;
-    }
-
     private boolean aiFilter(Photo photo, Boolean isAI) {
         if (Boolean.TRUE.equals(isAI)) {
             // isAI=true일 때: AI 사진만
