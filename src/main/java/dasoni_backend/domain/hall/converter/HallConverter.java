@@ -86,31 +86,41 @@ public class HallConverter {
     // 추모관 내용 조회
     public static HallDetailDataResponseDTO toHallDetailResponse(Hall hall, String role, List<String> top4Natures) {
 
-        HallDetailResponseDTO.HallDetailResponseDTOBuilder data = HallDetailResponseDTO.builder()
-                .name(hall.getName())
-                .profile(hall.getProfile())
-                .birthday(formatLocalDate(hall.getBirthday()))
-                .deadday(formatLocalDate(hall.getDeadday()))
-                .nature(top4Natures)
-                .place(hall.getPlace())
-                .phone(hall.getPhone())
-                .review(hall.getReview())
-                .adminName(hall.getAdmin() != null ? hall.getAdmin().getName() : null)
-                .isOpen(Boolean.TRUE.equals(hall.getIsOpened()));
+        String birthday = hall.getBirthday() != null ? formatLocalDate(hall.getBirthday()) : null;
+        String deadday = hall.getDeadday() != null ? formatLocalDate(hall.getDeadday()) : null;
+        List<String> nature = top4Natures;
+        String place = hall.getPlace();
+        String phone = hall.getPhone();
+        String review = hall.getReview();
+        String adminName = hall.getAdmin() != null ? hall.getAdmin().getName() : null;
+
 
         // role = me인 경우, 필요없는 필드들 null 처리
-        if("me".equals(role)) {
-            data.deadday(null)
-                .nature(null)
-                .place(null)
-                .phone(null)
-                .review(null)
-                .adminName(null);
+        if ("me".equals(role)) {
+            deadday = null;
+            nature = null;
+            place = null;
+            phone = null;
+            review = null;
+            adminName = null;
         }
+
+        HallDetailResponseDTO data = HallDetailResponseDTO.builder()
+                .name(hall.getName())
+                .profile(hall.getProfile())
+                .birthday(birthday)
+                .deadday(deadday)
+                .nature(nature)
+                .place(place)
+                .phone(phone)
+                .review(review)
+                .adminName(adminName)
+                .isOpen(Boolean.TRUE.equals(hall.getIsOpened()))
+                .build();
 
         return HallDetailDataResponseDTO.builder()
                 .role(role)
-                .data(data.build())
+                .data(data)
                 .build();
     }
 
