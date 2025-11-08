@@ -231,11 +231,17 @@ public class PhotoServiceImpl implements PhotoService {
         }
 
         // 본인도 아니고 관리자도 아니면 안됨
-        boolean isOwner = photo.getUser().getId().equals(user.getId());
-        boolean isAdmin = photo.getHall().getAdmin().getId().equals(user.getId());
-
+        // NPE 방지
+        boolean isOwner = photo.getUser() != null && user != null
+                && photo.getUser().getId().equals(user.getId());
+        boolean isAdmin = photo.getHall() != null
+                && photo.getHall().getAdmin() != null
+                && photo.getHall().getAdmin().getId().equals(user.getId());
         if (!isOwner && !isAdmin) {
-            throw new IllegalArgumentException("본인이 올린 사진이거나 홀 관리자만 삭제할 수 있습니다.");
+            // throw new IllegalArgumentException("본인이 올린 사진이거나 홀 관리자만 삭제할 수 있습니다.");
+            // 403 뜨게
+            throw new AccessDeniedException("본인이 올린 사진이거나 홀 관리자만 삭제할 수 있습니다.");
+
         }
         // S3에서 파일 삭제
         try {
