@@ -46,12 +46,24 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Override
     public PhotoListResponseDTO getPhotoList(Long hallId, PhotoRequestDTO request, User user) {
+
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new IllegalArgumentException("홀을 찾을 수 없습니다.")); // [FIX]
+        boolean isAdmin = hall.getAdmin() != null && hall.getAdmin().getId().equals(user.getId()); // [FIX]
+        boolean isMe    = hall.getSubjectId() != null && hall.getSubjectId().equals(user.getId()); // [FIX]
+
         // hallId로 Photo 조회
         List<Photo> photos = photoRepository.findByHallId(hallId);
 
         // 필터링
         List<Photo> filteredPhotos = photos.stream()
-                .filter(photo -> myPhotoFilter(photo, request.getIsPrivate(), user))
+                .filter(photo -> myPhotoFilter(photo, request.getIsMine(), user))
+                .filter(photo -> {
+                    if(!Boolean.TRUE.equals(request.getIsMine()) && !(isAdmin || isMe)) {
+                        return Boolean.FALSE.equals(photo.getIsPrivate());
+                    }
+                    return true;
+                })
                 .filter(photo -> aiFilter(photo, request.getIsAI()))
                 .collect(Collectors.toList());
 
@@ -61,13 +73,19 @@ public class PhotoServiceImpl implements PhotoService {
             filteredPhotos.sort(Comparator.comparing(
                     Photo::getOccurredAt,
                     Comparator.nullsLast(Comparator.naturalOrder())
-            ));
+                            )
+                            .reversed()
+                            .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
+            );
         } else {
             // 업로드순 (uploadedAt)
             filteredPhotos.sort(Comparator.comparing(
                     Photo::getUploadedAt,
                     Comparator.nullsLast(Comparator.naturalOrder())
-            ));
+                            )
+                            .reversed()
+                            .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
+            );
         }
         // 로그
         log.info("[PhotoList] hallId={}, userId={}, filters => isPrivate: {}, isAI: {}, sortBy: {}",

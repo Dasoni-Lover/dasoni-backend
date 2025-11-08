@@ -18,6 +18,7 @@ public class PhotoDTO {
         private Boolean isPrivate;
         private Boolean isBydate;
         private Boolean isAI;
+        private Boolean isMine;
     }
 
     @Getter

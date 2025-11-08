@@ -46,9 +46,11 @@ public class Photo {
     @Column(name = "url", columnDefinition = "TEXT")
     private String url;
 
+    @Builder.Default
     @Column(name = "is_private", nullable = false)
     private Boolean isPrivate;
 
+    @Builder.Default
     @Column(name = "is_ai", nullable = false)
     private Boolean isAi;
 
