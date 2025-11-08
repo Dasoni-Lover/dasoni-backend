@@ -14,7 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class HallDTO {
@@ -130,13 +129,11 @@ public class HallDTO {
 
         private String profile;
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
         private String birthday;
 
-        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
         private String deadday;
 
-        private List<String> natures;
+        private List<String> nature;
 
         private String place;
 

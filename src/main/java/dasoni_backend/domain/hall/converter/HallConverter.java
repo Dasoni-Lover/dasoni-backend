@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class HallConverter {
@@ -92,7 +91,7 @@ public class HallConverter {
                 .profile(hall.getProfile())
                 .birthday(formatLocalDate(hall.getBirthday()))
                 .deadday(formatLocalDate(hall.getDeadday()))
-                .natures(top4Natures)
+                .nature(top4Natures)
                 .place(hall.getPlace())
                 .phone(hall.getPhone())
                 .review(hall.getReview())
@@ -102,7 +101,7 @@ public class HallConverter {
         // role = me인 경우, 필요없는 필드들 null 처리
         if("me".equals(role)) {
             data.deadday(null)
-                .natures(null)
+                .nature(null)
                 .place(null)
                 .phone(null)
                 .review(null)
@@ -128,12 +127,13 @@ public class HallConverter {
                 .build();
     }
 
-    //
+    // String → LocalDate
     private static LocalDate parseDate(String dateStr) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         return LocalDate.parse(dateStr, formatter);
     }
-    // LocalDate -> "yyyy.MM.dd" 로 변경
+
+    // LocalDate → String
     private static String formatLocalDate(LocalDate date) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
         return date.format(formatter);
