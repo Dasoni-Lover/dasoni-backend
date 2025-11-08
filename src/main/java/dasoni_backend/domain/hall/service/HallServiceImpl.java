@@ -144,7 +144,7 @@ public class HallServiceImpl implements HallService {
                 hall.getAdmin() != null ? hall.getAdmin().getId() : null,
                 hall.getSubjectId());
 
-        // 변환(me일때는 필요없는 null처리 & 응답에서 숨김처리)
+        // 변환(me일때는 필요없는 null처리 )
         return HallConverter.toHallDetailResponse(hall, role, result);
     }
     @Override

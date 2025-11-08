@@ -122,7 +122,6 @@ public class HallDTO {
 
     @Getter
     @Builder
-    @JsonInclude(Include.NON_NULL) // null인 필드는 숨기기
     public static class HallDetailResponseDTO {
 
         private String name;
