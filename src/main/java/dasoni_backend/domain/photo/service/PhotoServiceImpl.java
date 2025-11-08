@@ -55,7 +55,12 @@ public class PhotoServiceImpl implements PhotoService {
         boolean isMe    = hall.getSubjectId() != null && hall.getSubjectId().equals(user.getId()); // [FIX]
 
         // hallId로 Photo 조회
-        List<Photo> photos = photoRepository.findByHallId(hallId);
+        List<Photo> photos;
+        if (Boolean.TRUE.equals(request.getIsMine())) {
+            photos = photoRepository.findMyPhotos(hallId, user.getId());     // [FIX] 내 앨범
+        } else {
+            photos = photoRepository.findAllByHall(hallId);                  // [FIX] 전체 앨범(정렬 포함)
+        }
 
         // 필터링
         List<Photo> filteredPhotos = photos.stream()
