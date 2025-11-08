@@ -2,6 +2,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException, Path
 from app.schemas.image_gen import ImageGenRequest, ImageGenResponse
 from app.services.gemini import generate_image_base64
+import logging
 
 # 로깅 설정
 logging.basicConfig(level=logging.INFO)
