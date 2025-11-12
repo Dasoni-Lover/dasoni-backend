@@ -324,42 +324,44 @@ public class PhotoServiceImpl implements PhotoService {
     private String buildPrompt(String userPrompt, List<ImageInputDTO> sortedImages) {
         String base = (userPrompt == null ? "" : userPrompt.trim());
 
-        // ✅ 이미지 컨텍스트를 자연스럽게 추가
         StringBuilder prompt = new StringBuilder();
 
+        // ✅ 이미지 순서별 역할 명시
         if (sortedImages != null && !sortedImages.isEmpty()) {
-            prompt.append("Image composition:\n");
+            prompt.append("Reference images provided in order:\n");
             for (int i = 0; i < sortedImages.size(); i++) {
-                prompt.append("- Image ").append(i + 1).append(": ");
+                prompt.append("Image ").append(i + 1).append(": ");
 
                 switch (i) {
                     case 0:
-                        prompt.append("Main subject (preserve this person's identity and features)");
+                        prompt.append("Primary subject - Main person (preserve facial identity, features, and likeness)\n");
                         break;
                     case 1:
-                        prompt.append("Background scene reference (use this environment/setting)");
+                        prompt.append("Secondary subject - Additional person (preserve facial identity and features)\n");
                         break;
                     case 2:
-                        prompt.append("Additional person (include with preserved identity)");
+                        prompt.append("Background environment - Location/setting to use as the scene\n");
                         break;
                     default:
-                        prompt.append("Additional reference");
+                        prompt.append("Additional reference image\n");
                 }
-                prompt.append("\n");
             }
             prompt.append("\n");
         }
 
-        prompt.append("Task: ").append(base).append("\n");
+        // ✅ 사용자 입력 프롬프트
+        prompt.append("Task: ").append(base).append("\n\n");
 
+        // ✅ 생성 요구사항
         prompt.append("""
-            
-            Requirements:
-            • Maintain photorealistic quality with natural lighting
-            • Preserve facial identities and proportions from reference images
-            • Create clean composition without artifacts or distortions
-            • Ensure high resolution output
-            """);
+        Generation requirements:
+        • Create a photorealistic composite image combining all reference elements
+        • Preserve the exact facial identities, features, and likeness of both people
+        • Place the subjects naturally in the background environment
+        • Maintain natural lighting and perspective consistent with the background
+        • Ensure seamless blending without visible artifacts or distortions
+        • Generate high-quality output with proper composition and depth
+        """);
 
         return prompt.toString();
     }
