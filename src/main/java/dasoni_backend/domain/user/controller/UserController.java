@@ -9,7 +9,6 @@ import dasoni_backend.domain.user.dto.UserDTO.RegisterRequestDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.service.UserService;
 import dasoni_backend.global.annotation.AuthUser;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

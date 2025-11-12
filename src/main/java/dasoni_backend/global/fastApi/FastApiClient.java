@@ -22,9 +22,9 @@ public class FastApiClient {
         return WebClient.builder()
                 .baseUrl(fastapiBaseUrl)
                 .clientConnector(new ReactorClientHttpConnector(
-                        HttpClient.create().responseTimeout(Duration.ofSeconds(60))
+                        HttpClient.create().responseTimeout(Duration.ofSeconds(90))
                 ))
-                .codecs(c -> c.defaultCodecs().maxInMemorySize(10 * 1024 * 1024)) // 10MB
+                .codecs(c -> c.defaultCodecs().maxInMemorySize(100 * 1024 * 1024)) // 100MB
                 .build();
     }
 }

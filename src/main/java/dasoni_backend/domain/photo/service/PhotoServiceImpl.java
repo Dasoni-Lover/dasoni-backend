@@ -266,20 +266,28 @@ public class PhotoServiceImpl implements PhotoService {
 
     @Override
     public ImageGenerationResponseDTO generateImage(Long hallId, ImageGenerationRequestDTO request) {
+        log.info("이미지 생성 요청: hallId={}, prompt='{}...', images={}",
+                hallId,
+                request.getPrompt().substring(0, Math.min(50, request.getPrompt().length())),
+                request.getImages() == null ? 0 : request.getImages().size()
+        );
+
+        // 순서대로 정렬
         var sorted = request.getImages() == null ? null :
                 request.getImages().stream()
                         .sorted(Comparator.comparing(ImageInputDTO::getOrder))
                         .collect(Collectors.toList());
 
-        String finalPrompt = buildPrompt(request.getPrompt());
+        String finalPrompt = buildPrompt(request.getPrompt(), sorted);
 
         var forwarded = ImageGenerationRequestDTO.builder()
-                .images(sorted)   // null이면 직렬화 생략
+                .images(sorted)
                 .prompt(finalPrompt)
                 .build();
-
         try {
-            return fastApiWebClient.post()
+            log.info("FastAPI 호출 시작: hallId={}", hallId);
+
+            ImageGenerationResponseDTO response = fastApiWebClient.post()
                     .uri("/ai/generate/{hallId}", hallId)
                     .contentType(MediaType.APPLICATION_JSON)
                     .accept(MediaType.APPLICATION_JSON)
@@ -287,26 +295,72 @@ public class PhotoServiceImpl implements PhotoService {
                     .retrieve()
                     .bodyToMono(ImageGenerationResponseDTO.class)
                     .block();
+
+            if (response != null && response.getGeneratedImage() != null) {
+                log.info("이미지 생성 성공: imageSize={} chars", response.getGeneratedImage().length());
+            } else {
+                log.warn("FastAPI 응답 실패 (null 또는 빈 이미지): hallId={}", hallId);
+            }
+
+            return response;
+
         } catch (WebClientResponseException e) {
-            // 4xx/5xx 상세 로깅
-            log.error("FastAPI {} error: {}", e.getRawStatusCode(), e.getResponseBodyAsString(), e);
+            log.error("FastAPI HTTP 에러:status={}, body={}",
+                    e.getRawStatusCode(),
+                    e.getResponseBodyAsString(),
+                    e
+            );
             return ImageGenerationResponseDTO.builder().generatedImage(null).build();
+
         } catch (Exception e) {
-            log.error("FastAPI image generate error", e);
+            log.error("FastAPI 호출 실패:errorType={}",
+                    e.getClass().getSimpleName(),
+                    e
+            );
             return ImageGenerationResponseDTO.builder().generatedImage(null).build();
         }
     }
 
-    private String buildPrompt(String userPrompt) {
+    private String buildPrompt(String userPrompt, List<ImageInputDTO> sortedImages) {
         String base = (userPrompt == null ? "" : userPrompt.trim());
-        // 예시: 일관된 톤/해상도/아트팩터 방지 등 내부 가이드 덧붙이기
-        String suffix = """
-                
-                -- Constraints --
-                • photorealistic consistency, natural lighting, clean background
-                • respect provided reference faces; preserve identity and proportions
-                • upscale to high quality; avoid artifacts, extra limbs, text overlays
-                """;
-        return base + suffix;
+
+        // ✅ 이미지 컨텍스트를 자연스럽게 추가
+        StringBuilder prompt = new StringBuilder();
+
+        if (sortedImages != null && !sortedImages.isEmpty()) {
+            prompt.append("Image composition:\n");
+            for (int i = 0; i < sortedImages.size(); i++) {
+                prompt.append("- Image ").append(i + 1).append(": ");
+
+                switch (i) {
+                    case 0:
+                        prompt.append("Main subject (preserve this person's identity and features)");
+                        break;
+                    case 1:
+                        prompt.append("Background scene reference (use this environment/setting)");
+                        break;
+                    case 2:
+                        prompt.append("Additional person (include with preserved identity)");
+                        break;
+                    default:
+                        prompt.append("Additional reference");
+                }
+                prompt.append("\n");
+            }
+            prompt.append("\n");
+        }
+
+        prompt.append("Task: ").append(base).append("\n");
+
+        prompt.append("""
+            
+            Requirements:
+            • Maintain photorealistic quality with natural lighting
+            • Preserve facial identities and proportions from reference images
+            • Create clean composition without artifacts or distortions
+            • Ensure high resolution output
+            """);
+
+        return prompt.toString();
     }
 }

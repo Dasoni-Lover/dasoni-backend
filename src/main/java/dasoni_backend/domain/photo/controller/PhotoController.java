@@ -11,6 +11,7 @@ import dasoni_backend.domain.photo.service.PhotoService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +20,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/halls/{hallId}/photos")
 @RequiredArgsConstructor
@@ -70,10 +70,13 @@ public class PhotoController {
 
     // AI 이미지 생성
     @PostMapping("/ai")
-    public ResponseEntity<ImageGenerationResponseDTO> generateImage(@PathVariable Long hallId, ImageGenerationRequestDTO request) {
+    public ResponseEntity<ImageGenerationResponseDTO> generateImage(@PathVariable Long hallId,
+                                                                    @RequestBody ImageGenerationRequestDTO request) {
+        log.info("AI 이미지 생성 요청: hallId={}", hallId);
         ImageGenerationResponseDTO response = photoService.generateImage(hallId, request);
         // 실패 시 400 에러 반환
         if (response == null || response.getGeneratedImage() == null) {
+            log.warn("이미지 생성 실패: hallId={}", hallId);
             return ResponseEntity.badRequest().body(response);
         }
         return ResponseEntity.ok(response);
