@@ -94,4 +94,40 @@ public class LetterDTO {
         @JsonProperty("isCompleted")
         private boolean isCompleted;
     }
+
+    // 6. 임시보관함 조회
+    @Getter
+    @Builder
+    public static class TempLetterListResponseDTO {
+
+        private int count;
+
+        private List<TempLetterResponseDTO> letters;
+    }
+
+    @Getter
+    @Builder
+    public static class TempLetterResponseDTO {
+
+        private Long letterId;
+
+        // createdAt
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+        private LocalDateTime date;
+
+        private String toName;
+
+        private String content;
+    }
+
+    @Getter
+    @Builder
+    public static class TempLetterDetailResponseDTO {
+
+        private String toName;
+
+        private String fromName;
+
+        private String content;
+    }
 }
