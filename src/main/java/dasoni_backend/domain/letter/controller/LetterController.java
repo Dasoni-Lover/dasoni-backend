@@ -5,6 +5,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.service.LetterService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
@@ -50,5 +51,11 @@ public class LetterController {
     public ResponseEntity<Void> saveLetter(@PathVariable("hall_id") Long hallId, @AuthUser User user, @RequestBody LetterSaveRequestDTO request) {
         letterService.saveLetter(hallId, user, request);
         return ResponseEntity.ok().build();
+    }
+
+    // 임시보관함 조회
+    @GetMapping("/{hall_id}/letters/temp/list")
+    public ResponseEntity<TempLetterListResponseDTO> getTempLetterList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
+        return ResponseEntity.ok(letterService.getTempLetterList(hallId, user));
     }
 }

@@ -8,6 +8,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
 import dasoni_backend.domain.user.entity.User;
@@ -123,4 +124,16 @@ public class LetterServiceImpl implements LetterService{
         Letter letter = LetterConverter.RequestToLetter(request, hall, user);
         letterRepository.save(letter);
     }
+
+    // 임시보관함 조회
+    @Override
+    public TempLetterListResponseDTO getTempLetterList(Long hallId, User user) {
+        if(hallId == null)
+            return LetterConverter.toTempLetterListRespnoseDTO(List.of());
+
+        List<Letter> letters = letterRepository.findAllByHall_IdAndUser_IdAndIsCompletedFalseOrderByCreatedAtDesc(hallId, user.getId());
+
+        return LetterConverter.toTempLetterListRespnoseDTO(letters);
+    }
+
 }

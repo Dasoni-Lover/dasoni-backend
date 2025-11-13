@@ -5,6 +5,9 @@ import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListRespnoseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO; 
 import dasoni_backend.domain.hall.entity.Hall;                        
@@ -94,5 +97,39 @@ public class LetterConverter {
                 .isCompleted(request.isCompleted())
                 .createdAt(LocalDateTime.now())
                 .completedAt(request.isCompleted() ? LocalDateTime.now() : null).build();
+    }
+
+    // 임시보관함 조회
+    public static TempLetterResponseDTO toTempLetterResponseDTO(Letter letter) {
+        // letters가 존재하지 않을 경우
+        if(letter == null) return null;
+
+        return TempLetterResponseDTO.builder()
+                .letterId(letter.getId())
+                .date(letter.getCreatedAt())
+                .toName(letter.getToName())
+                .content(letter.getContent())
+                .build();
+    }
+
+    public static TempLetterListResponseDTO toTempLetterListRespnoseDTO(List<Letter> letters) {
+
+        // letters가 하나도 없을 경우
+        if(letters == null) {
+            return TempLetterListResponseDTO.builder()
+                    .count(0)
+                    .letters(List.of())
+                    .build();
+        }
+
+        // count 값 계산
+        var tempLetters = letters.stream()
+                .map(LetterConverter::toTempLetterResponseDTO)
+                .collect(Collectors.toList());
+
+        return TempLetterListResponseDTO.builder()
+                .count(tempLetters.size())
+                .letters(tempLetters)
+                .build();
     }
 }

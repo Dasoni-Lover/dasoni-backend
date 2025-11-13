@@ -19,4 +19,8 @@ public interface LetterRepository extends JpaRepository<Letter, Long> {
     boolean existsByHall_IdAndUser_IdAndIsCompletedTrueAndCompletedAtBetween(
             Long hallId, Long userId, LocalDateTime start, LocalDateTime end
     );
+
+    // 임시보관함 조회
+    List<Letter> findAllByHall_IdAndUser_IdAndIsCompletedFalseOrderByCreatedAtDesc(Long hallId, Long userId);
+
 }
