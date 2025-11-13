@@ -147,4 +147,19 @@ public class LetterServiceImpl implements LetterService{
         return LetterConverter.totempLetterDetailResponseDTO(letter);
     }
 
+    // 임시보과  편지 삭제
+    @Transactional
+    @Override
+    public void deleteTempLetter(Long hallId, Long letterId, User user) {
+
+        Letter letter = letterRepository.findById(letterId)
+                        .orElseThrow(()-> new IllegalArgumentException("편지를 찾을 수 없습니다."));
+
+        if(!letter.getHall().getId().equals(hallId)) {
+            throw new IllegalArgumentException("해당 홀의 편지가 아닙니다.");
+        }
+
+        letterRepository.delete(letter);
+    }
+
 }
