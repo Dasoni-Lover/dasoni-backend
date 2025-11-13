@@ -8,7 +8,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
 import dasoni_backend.domain.user.entity.User;
-import dasoni_backend.domain.voice.dto.VoiceDTO.VoiceUDTO;
+import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.global.annotation.AuthUser;
 import jakarta.validation.Valid;
 import jakarta.websocket.server.PathParam;
@@ -80,8 +80,15 @@ public class HallController {
 
     // 추모관 음성 등록
     @PostMapping("/{hall_id}/letters/voice/upload")
-    public ResponseEntity<Void> uploadVoice(@PathParam("hall_id") Long hallId, @RequestBody VoiceUDTO request , @AuthUser User user) {
+    public ResponseEntity<Void> uploadVoice(@PathParam("hall_id") Long hallId, @RequestBody VoiceDTO request , @AuthUser User user) {
         hallService.uploadVoice(hallId,request,user);
+        return ResponseEntity.ok().build();
+    }
+
+    // 추모관 음성 수정
+    @PostMapping("/{hall_id}/letters/voice/update")
+    public ResponseEntity<Void> updateVoice(@PathParam("hall_id") Long hallId, @RequestBody VoiceDTO request , @AuthUser User user){
+        hallService.updateVoice(hallId,request,user);
         return ResponseEntity.ok().build();
     }
 }

@@ -4,12 +4,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-public class VoiceDTO {
+public class VoiceDTOs {
 
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class VoiceUDTO {
+    public static class VoiceDTO {
         private String url;
     }
 }

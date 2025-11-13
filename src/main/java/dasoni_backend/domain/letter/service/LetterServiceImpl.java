@@ -13,7 +13,6 @@ import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
 import dasoni_backend.domain.user.entity.User;
-import dasoni_backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -29,7 +28,6 @@ public class LetterServiceImpl implements LetterService{
 
     private final LetterRepository letterRepository;
     private final HallRepository hallRepository;
-    private final UserRepository userRepository;
 
     // 1. 보낸 편지함 목록 조회
     @Transactional(readOnly = true)
