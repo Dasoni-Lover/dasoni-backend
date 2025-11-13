@@ -5,7 +5,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterResponseDTO;
-import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListRespnoseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
@@ -130,6 +130,18 @@ public class LetterConverter {
         return TempLetterListResponseDTO.builder()
                 .count(tempLetters.size())
                 .letters(tempLetters)
+                .build();
+    }
+
+    // 임시보관 편지 확인(내용)
+    public static TempLetterDetailResponseDTO totempLetterDetailResponseDTO (Letter letter) {
+
+        if(letter == null) return null;
+
+        return TempLetterDetailResponseDTO.builder()
+                .toName(letter.getToName())
+                .fromName(letter.getFromName())
+                .content(letter.getContent())
                 .build();
     }
 }

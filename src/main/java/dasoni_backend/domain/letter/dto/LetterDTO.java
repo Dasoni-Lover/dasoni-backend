@@ -119,4 +119,15 @@ public class LetterDTO {
 
         private String content;
     }
+
+    @Getter
+    @Builder
+    public static class TempLetterDetailResponseDTO {
+
+        private String toName;
+
+        private String fromName;
+
+        private String content;
+    }
 }

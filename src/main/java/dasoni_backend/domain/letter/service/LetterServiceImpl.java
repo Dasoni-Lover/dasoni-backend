@@ -8,6 +8,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
@@ -126,6 +127,7 @@ public class LetterServiceImpl implements LetterService{
     }
 
     // 임시보관함 조회
+    @Transactional
     @Override
     public TempLetterListResponseDTO getTempLetterList(Long hallId, User user) {
         if(hallId == null)
@@ -134,6 +136,15 @@ public class LetterServiceImpl implements LetterService{
         List<Letter> letters = letterRepository.findAllByHall_IdAndUser_IdAndIsCompletedFalseOrderByCreatedAtDesc(hallId, user.getId());
 
         return LetterConverter.toTempLetterListRespnoseDTO(letters);
+    }
+
+    // 임시보관 편지 내용 상세 확인
+    @Transactional
+    @Override
+    public TempLetterDetailResponseDTO getTempLetterDetail(Long hallId, Long letterId) {
+        Letter letter = letterRepository.findById(letterId)
+                .orElseThrow(() -> new RuntimeException("편지를 찾을 수 없습니다."));
+        return LetterConverter.totempLetterDetailResponseDTO(letter);
     }
 
 }

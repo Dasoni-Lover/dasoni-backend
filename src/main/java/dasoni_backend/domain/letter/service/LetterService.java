@@ -5,6 +5,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.user.entity.User;
 
@@ -27,4 +28,7 @@ public interface LetterService {
 
     // 임시보관함 조회
     TempLetterListResponseDTO getTempLetterList(Long hallId, User user);
+
+    // 임시보관 편지 내용 상세 조회
+    TempLetterDetailResponseDTO getTempLetterDetail(Long hallId, Long letterId);
 }
