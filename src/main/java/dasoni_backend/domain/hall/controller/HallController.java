@@ -11,6 +11,7 @@ import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,8 +27,10 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/halls")
 public class HallController {
 
-    //
     private final HallService hallService;
+
+    @GetMapping("/healthy")
+    public ResponseEntity<Void> healthy() { return ResponseEntity.ok().build();}
 
     // @AuthenticationPrincipal 사용으로 추후 변경
     @GetMapping("/home")
