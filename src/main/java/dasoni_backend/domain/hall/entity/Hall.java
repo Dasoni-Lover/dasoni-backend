@@ -98,5 +98,9 @@ public class Hall {
     // 추모관에 띄울 한줄 소개 추가
     @Column(name = "review", columnDefinition = "TEXT")
     private String review;
+
+    // 추모관 비공개 여부
+    @Column(name = "is_secret")
+    private boolean isSercret = true;
 }
 
