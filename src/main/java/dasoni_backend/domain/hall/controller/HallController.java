@@ -8,8 +8,10 @@ import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
 import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.domain.voice.dto.VoiceDTO.VoiceUploadRequestDTO;
 import dasoni_backend.global.annotation.AuthUser;
 import jakarta.validation.Valid;
+import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -54,6 +56,7 @@ public class HallController {
         return ResponseEntity.ok(response);
     }
 
+    // 본인 추모관 조회
     @GetMapping("/mine")
     public ResponseEntity<MyHallResponseDTO> getMyHall(@AuthUser User user) {
         return ResponseEntity.ok(hallService.getMyHall(user));
@@ -73,5 +76,12 @@ public class HallController {
     @GetMapping("/{hall_id}")
     public ResponseEntity<HallDetailDataResponseDTO> getHallDetail(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
         return ResponseEntity.ok(hallService.getHallDetail(hallId, user));
+    }
+
+    // 추모관 음성 등록
+    @PostMapping("/{hall_id}/letters/voice/upload")
+    public ResponseEntity<Void> uploadVoice(@PathParam("hall_id") Long hallId, @RequestBody VoiceUploadRequestDTO request , @AuthUser User user) {
+        hallService.uploadVoice(hallId,request,user);
+        return ResponseEntity.ok().build();
     }
 }

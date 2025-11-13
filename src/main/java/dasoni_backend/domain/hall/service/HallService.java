@@ -7,6 +7,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.domain.voice.dto.VoiceDTO.VoiceUploadRequestDTO;
 
 public interface HallService {
 
@@ -28,6 +29,10 @@ public interface HallService {
     // 추모관 내용 조회
     HallDetailDataResponseDTO getHallDetail(Long hallId, User user);
 
+    // 본인 추모관 조회
     MyHallResponseDTO getMyHall(User user);
+
+    // 추모관 음성파일 업로드
+    void uploadVoice(Long hallId, VoiceUploadRequestDTO request, User user);
 }
 

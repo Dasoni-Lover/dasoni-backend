@@ -16,17 +16,19 @@ import dasoni_backend.domain.relationship.entity.RelationshipNature;
 import dasoni_backend.domain.relationship.repository.relationshipNatureRepository;
 import dasoni_backend.domain.relationship.repository.relationshipRepository;
 import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.domain.voice.dto.VoiceDTO.VoiceUploadRequestDTO;
+import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.enums.Personality;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.management.relation.Relation;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -151,5 +153,25 @@ public class HallServiceImpl implements HallService {
     public MyHallResponseDTO getMyHall(User user){
         Hall hall = hallRepository.findBySubjectId(user.getId()).orElse(null);
         return HallConverter.toMyHallResponse(hall);
+    }
+
+    @Override
+    @Transactional
+    public void uploadVoice(Long hallId, VoiceUploadRequestDTO request, User user){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
+
+        if (!user.equals(hall.getAdmin())) {
+            throw new IllegalStateException("권한이 없습니다");
+        }
+
+        Voice voice = Voice.builder()
+                .url(request.getUrl())
+                .filename(request.getFilename())
+                .updateAt(LocalDateTime.now())
+                .build();
+
+        hall.setVoice(voice);
+        hallRepository.save(hall);  // 저장 필요
     }
 }

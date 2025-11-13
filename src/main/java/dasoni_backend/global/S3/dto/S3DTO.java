@@ -13,6 +13,7 @@ public class S3DTO {
         private String contentType;
         private Long fileSize;
     }
+
     @Getter
     @Builder
     public static class FileUploadResponse {
