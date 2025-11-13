@@ -53,7 +53,8 @@ public class SecurityConfig {
                                 "/api/users/register",
                                 "/api/users/register/**",
                                 "/api/users/login",
-                                "/api/users/login/**"
+                                "/api/users/login/**",
+                                "/api/halls/healthy"
                         ).permitAll()
 
                         // ✅ 파일 업로드용 presigned-url (공개 필요시)
