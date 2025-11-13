@@ -9,8 +9,7 @@ public class VoiceDTO {
     @Getter
     @Setter
     @NoArgsConstructor
-    public static class VoiceUploadRequestDTO {
-        private String filename;
+    public static class VoiceUDTO {
         private String url;
     }
 }

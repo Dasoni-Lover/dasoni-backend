@@ -16,7 +16,7 @@ import dasoni_backend.domain.relationship.entity.RelationshipNature;
 import dasoni_backend.domain.relationship.repository.relationshipNatureRepository;
 import dasoni_backend.domain.relationship.repository.relationshipRepository;
 import dasoni_backend.domain.user.entity.User;
-import dasoni_backend.domain.voice.dto.VoiceDTO.VoiceUploadRequestDTO;
+import dasoni_backend.domain.voice.dto.VoiceDTO.VoiceUDTO;
 import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.enums.Personality;
 import jakarta.persistence.EntityNotFoundException;
@@ -157,7 +157,7 @@ public class HallServiceImpl implements HallService {
 
     @Override
     @Transactional
-    public void uploadVoice(Long hallId, VoiceUploadRequestDTO request, User user){
+    public void uploadVoice(Long hallId, VoiceUDTO request, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
 
@@ -167,11 +167,12 @@ public class HallServiceImpl implements HallService {
 
         Voice voice = Voice.builder()
                 .url(request.getUrl())
-                .filename(request.getFilename())
                 .updateAt(LocalDateTime.now())
                 .build();
 
         hall.setVoice(voice);
         hallRepository.save(hall);  // 저장 필요
     }
+
+
 }

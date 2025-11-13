@@ -24,9 +24,6 @@ public class Voice {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
-    private String filename;
-
     @Column(columnDefinition = "TEXT")
     private String url;
 
