@@ -16,7 +16,6 @@ import dasoni_backend.domain.relationship.entity.RelationshipNature;
 import dasoni_backend.domain.relationship.repository.relationshipNatureRepository;
 import dasoni_backend.domain.relationship.repository.relationshipRepository;
 import dasoni_backend.domain.user.entity.User;
-import dasoni_backend.domain.user.repository.UserRepository;
 import dasoni_backend.global.enums.Personality;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

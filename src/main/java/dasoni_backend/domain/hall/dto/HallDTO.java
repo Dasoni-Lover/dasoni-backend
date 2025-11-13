@@ -1,8 +1,6 @@
 package dasoni_backend.domain.hall.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import dasoni_backend.global.enums.Personality;
 import dasoni_backend.global.enums.RelationKind;
 import jakarta.validation.constraints.NotBlank;

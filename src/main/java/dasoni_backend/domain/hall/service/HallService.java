@@ -7,7 +7,6 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.user.entity.User;
-import dasoni_backend.global.annotation.AuthUser;
 
 public interface HallService {
 
