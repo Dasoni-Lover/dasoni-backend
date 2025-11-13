@@ -18,4 +18,3 @@ public interface HallQueryRepository extends HallRepository {
         LIMIT 4
         """, nativeQuery = true)
     List<String> findTop4NatureNames(@Param("hallId") Long hallId);
-}

@@ -5,11 +5,14 @@ import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.service.LetterService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.parameters.P;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -50,5 +53,18 @@ public class LetterController {
     public ResponseEntity<Void> saveLetter(@PathVariable("hall_id") Long hallId, @AuthUser User user, @RequestBody LetterSaveRequestDTO request) {
         letterService.saveLetter(hallId, user, request);
         return ResponseEntity.ok().build();
+    }
+
+    // 임시보관함 조회
+    @GetMapping("/{hall_id}/letters/temp/list")
+    public ResponseEntity<TempLetterListResponseDTO> getTempLetterList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
+        return ResponseEntity.ok(letterService.getTempLetterList(hallId, user));
+    }
+
+    // 임시보관 편지 삭제
+    @DeleteMapping("/{hall_id}/letters/temp/{letter_id}/delete")
+    public ResponseEntity<Void> deleteTempLetter(@PathVariable("hall_id") Long hallId, @PathVariable("letter_id") Long letterId, @AuthUser User user) {
+        letterService.deleteTempLetter(hallId, letterId, user);
+        return ResponseEntity.noContent().build();
     }
 }

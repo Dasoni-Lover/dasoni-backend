@@ -8,6 +8,8 @@ import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterDetailResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
 import dasoni_backend.domain.user.entity.User;
@@ -123,4 +125,41 @@ public class LetterServiceImpl implements LetterService{
         Letter letter = LetterConverter.RequestToLetter(request, hall, user);
         letterRepository.save(letter);
     }
+
+    // 임시보관함 조회
+    @Transactional
+    @Override
+    public TempLetterListResponseDTO getTempLetterList(Long hallId, User user) {
+        if(hallId == null)
+            return LetterConverter.toTempLetterListRespnoseDTO(List.of());
+
+        List<Letter> letters = letterRepository.findAllByHall_IdAndUser_IdAndIsCompletedFalseOrderByCreatedAtDesc(hallId, user.getId());
+
+        return LetterConverter.toTempLetterListRespnoseDTO(letters);
+    }
+
+    // 임시보관 편지 내용 상세 확인
+    @Transactional
+    @Override
+    public TempLetterDetailResponseDTO getTempLetterDetail(Long hallId, Long letterId) {
+        Letter letter = letterRepository.findById(letterId)
+                .orElseThrow(() -> new RuntimeException("편지를 찾을 수 없습니다."));
+        return LetterConverter.totempLetterDetailResponseDTO(letter);
+    }
+
+    // 임시보과  편지 삭제
+    @Transactional
+    @Override
+    public void deleteTempLetter(Long hallId, Long letterId, User user) {
+
+        Letter letter = letterRepository.findById(letterId)
+                        .orElseThrow(()-> new IllegalArgumentException("편지를 찾을 수 없습니다."));
+
+        if(!letter.getHall().getId().equals(hallId)) {
+            throw new IllegalArgumentException("해당 홀의 편지가 아닙니다.");
+        }
+
+        letterRepository.delete(letter);
+    }
+
 }
