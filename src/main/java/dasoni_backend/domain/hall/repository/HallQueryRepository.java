@@ -9,7 +9,8 @@ import java.util.List;
 public interface HallQueryRepository extends HallRepository {
 
     @Query(value = """
-        SELECT rn.nature
+
+            SELECT rn.nature
         FROM relationship_natures rn
         JOIN relationships r ON rn.relationship_id = r.id
         WHERE r.hall_id = :hallId
@@ -18,3 +19,4 @@ public interface HallQueryRepository extends HallRepository {
         LIMIT 4
         """, nativeQuery = true)
     List<String> findTop4NatureNames(@Param("hallId") Long hallId);
+}
