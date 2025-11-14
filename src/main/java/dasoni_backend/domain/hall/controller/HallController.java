@@ -10,6 +10,8 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallUpdateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
+import dasoni_backend.domain.request.dto.RequestDTO.RequestAcceptDTO;
+import dasoni_backend.domain.request.dto.RequestDTO.RequestListResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO;
 import dasoni_backend.domain.user.dto.UserDTO.ProfileRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.VisitorListResponseDTO;
@@ -109,6 +111,29 @@ public class HallController {
                                            @RequestBody HallUpdateRequestDTO request,
                                            @AuthUser User user){
         hallService.updateHall(hallId,request, user);
+        return ResponseEntity.ok().build();
+    }
+
+    // 입장 요청 목록 조회
+    @GetMapping("/{hall_id}/requests")
+    public ResponseEntity<RequestListResponseDTO> getRequests(@PathVariable("hall_id") Long hallId, @AuthUser User user){
+        return ResponseEntity.ok(hallService.getRequests(hallId,user));
+    }
+
+    // 추모관 입장 or 거절
+    @PostMapping("/{hall_id}/request/accept")
+    public ResponseEntity<Void> acceptRequest(@PathVariable("hall_id") Long hallId,
+                                              @RequestBody RequestAcceptDTO request,
+                                              @AuthUser User user){
+        return ResponseEntity.ok().build();
+    }
+
+    // 타인 추모관 입장 요청
+    @PostMapping("/{hall_id}/join")
+    public ResponseEntity<Void> requestInHall(@PathVariable("hall_id") Long hallId,
+                                              @RequestBody
+                                              @AuthUser User user){
+
         return ResponseEntity.ok().build();
     }
 }
