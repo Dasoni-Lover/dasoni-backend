@@ -176,4 +176,17 @@ public class HallDTO {
     public static class HallSearchResponseListDTO {
         private List<HallSearchResponseDTO> halls;
     }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    @Builder
+    public static class HallUpdateRequestDTO {
+        private String profile;  // 프로필 사진 URL (선택)
+        private String name;
+        private String birthday;
+        private String deadday;
+        private String place;
+        private String phone;
+    }
 }

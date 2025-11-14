@@ -6,6 +6,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallUpdateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -98,6 +100,15 @@ public class HallController {
     @PatchMapping("/me/profile")
     public ResponseEntity<Void> updateProfile(@RequestBody ProfileRequestDTO request, @AuthUser User user) {
         hallService.updateProfile(request, user);
+        return ResponseEntity.ok().build();
+    }
+
+    // 관리자가 추모관 수정
+    @PatchMapping("/{hall_id}/profile/update")
+    public ResponseEntity<Void> updateHall(@PathVariable("hall_id") Long hallId,
+                                           @RequestBody HallUpdateRequestDTO request,
+                                           @AuthUser User user){
+        hallService.updateHall(hallId,request, user);
         return ResponseEntity.ok().build();
     }
 }

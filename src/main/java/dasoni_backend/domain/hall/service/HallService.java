@@ -6,6 +6,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallUpdateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.ProfileRequestDTO;
@@ -43,5 +44,8 @@ public interface HallService {
 
     // 프로필 사진 수정
     void updateProfile(ProfileRequestDTO request, User user);
+
+    // 관리자 추모관 수정
+    void updateHall(Long hallId, HallUpdateRequestDTO request, User user);
 }
 

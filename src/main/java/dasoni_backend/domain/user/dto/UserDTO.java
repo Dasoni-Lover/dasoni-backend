@@ -96,6 +96,6 @@ public class UserDTO {
     @Setter
     @NoArgsConstructor
     public static class ProfileRequestDTO {
-        private String url;
+        private String profile;
     }
 }
