@@ -1,5 +1,6 @@
 package dasoni_backend.domain.hall.entity;
 
+import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.enums.Personality;
@@ -15,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -74,6 +76,9 @@ public class Hall {
     @Column(name = "profile", columnDefinition = "TEXT")
     private String profile;
 
+    @OneToMany(mappedBy = "hall")
+    private List<Relationship> relationships;
+
     // ElementCollection 사용해 List로 변경
     // 3개로 고정
     @ElementCollection(targetClass = Personality.class, fetch = FetchType.EAGER)
@@ -101,6 +106,6 @@ public class Hall {
 
     // 추모관 비공개 여부
     @Column(name = "is_secret")
-    private boolean isSercret = true;
+    private boolean isSecret = false;
 }
 

@@ -4,6 +4,8 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
@@ -90,5 +92,11 @@ public class HallController {
     public ResponseEntity<Void> updateVoice(@PathParam("hall_id") Long hallId, @RequestBody VoiceDTO request , @AuthUser User user){
         hallService.updateVoice(hallId,request,user);
         return ResponseEntity.ok().build();
+    }
+
+    // 추모관 검색
+    @PostMapping("/search")
+    public ResponseEntity<HallSearchResponseListDTO> updateVoice(@RequestBody HallSearchRequestDTO request, @AuthUser User user){
+        return ResponseEntity.ok(hallService.searchHalls(request,user));
     }
 }

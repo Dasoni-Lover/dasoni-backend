@@ -5,6 +5,9 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
@@ -15,20 +18,31 @@ import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.entity.RelationshipNature;
 import dasoni_backend.domain.relationship.repository.relationshipNatureRepository;
 import dasoni_backend.domain.relationship.repository.relationshipRepository;
+import dasoni_backend.domain.request.entity.Request;
+import dasoni_backend.domain.request.repository.RequestRepository;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.S3.service.FileUploadService;
+import dasoni_backend.global.enums.HallStatus;
 import dasoni_backend.global.enums.Personality;
+import dasoni_backend.global.enums.RequestStatus;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static dasoni_backend.domain.hall.converter.HallConverter.toSearchResponseDTO;
+import static dasoni_backend.domain.hall.converter.HallConverter.toSearchResponseListDTO;
 
 @Slf4j
 @Service
@@ -40,6 +54,7 @@ public class HallServiceImpl implements HallService {
     private final relationshipRepository relationshipRepository;
     private final relationshipNatureRepository relationshipNatureRepository;
     private final FileUploadService fileUploadService;
+    private final RequestRepository requestRepository;
 
     @Transactional(readOnly = true)
     @Override
@@ -207,4 +222,53 @@ public class HallServiceImpl implements HallService {
         hallRepository.save(hall);
     }
 
+    @Override
+    @Transactional
+    public HallSearchResponseListDTO searchHalls(HallSearchRequestDTO requestDTO, User user) {
+
+        LocalDate birthday = parseDate(requestDTO.getBirthday());
+        LocalDate deadDay = parseDate(requestDTO.getDeadDay());
+
+        // Repository에서 검색 (isSecret=false 자동 필터링)
+        List<Hall> halls = hallRepository.searchHalls(
+                requestDTO.getName(),
+                birthday,
+                deadDay
+        );
+
+        // DTO 변환 및 status 설정
+        List<HallSearchResponseDTO> responseDTOs = halls.stream()
+                .map(hall -> {
+                    HallStatus status = determineHallStatus(hall,user);
+                    return toSearchResponseDTO(hall, status);
+                })
+                .collect(Collectors.toList());
+        return toSearchResponseListDTO(responseDTOs);
+    }
+
+    private HallStatus determineHallStatus(Hall hall, User user) {
+        // 1. Relationship 확인 - 이미 참여 중인가?
+        boolean hasRelationship = relationshipRepository.existsByHallAndUser(hall, user);
+
+        if (hasRelationship) {
+            return HallStatus.ENTERING;  // 관계가 있음 = 입장 중
+        }
+
+        // 2. Request 확인 - 요청을 보냈는가?
+        Optional<Request> pendingRequest = requestRepository
+                .findByHallAndUserAndStatus(hall, user, RequestStatus.PENDING);
+
+        if (pendingRequest.isPresent()) {
+            return HallStatus.WAITING;  // 요청 대기 중
+        }
+
+        // 3. 아무 관계도 없음
+        return HallStatus.NONE;
+    }
+
+    // 날짜 파싱 헬퍼 메서드
+    private LocalDate parseDate(String dateString) {
+        if (dateString == null || dateString.isEmpty()) { return null; }
+        return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    }
 }
