@@ -4,6 +4,8 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.user.entity.User;
@@ -38,6 +40,6 @@ public interface HallService {
     // 추모관 음성파일 수정
     void updateVoice(Long hallId, VoiceDTO request, User user);
 
-
+    HallSearchResponseListDTO searchHalls(HallSearchRequestDTO request, User user);
 }
 

@@ -1,6 +1,7 @@
 package dasoni_backend.domain.hall.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import dasoni_backend.global.enums.HallStatus;
 import dasoni_backend.global.enums.Personality;
 import dasoni_backend.global.enums.RelationKind;
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -141,5 +143,37 @@ public class HallDTO {
         private String adminName;
 
         private boolean isOpen;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HallSearchRequestDTO{
+        private String name;
+        private String birthday;
+        private String deadDay;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HallSearchResponseDTO {
+        private Long hallId;
+        private String profile;
+        private String name;
+        private String birthday;
+        private String deadDay;
+        private String adminName;
+        private HallStatus status;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class HallSearchResponseListDTO {
+        private List<HallSearchResponseDTO> halls;
     }
 }

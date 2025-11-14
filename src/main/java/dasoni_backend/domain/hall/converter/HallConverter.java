@@ -6,9 +6,12 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.enums.HallStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -136,6 +139,25 @@ public class HallConverter {
                 .hallId(hall.getId())
                 .build();
     }
+
+    public static HallSearchResponseDTO toSearchResponseDTO(Hall hall, HallStatus status) {
+        return HallSearchResponseDTO.builder()
+                .hallId(hall.getId())
+                .profile(hall.getProfile())
+                .name(hall.getName())
+                .birthday(hall.getBirthday() != null ? formatLocalDate(hall.getBirthday()) : null)
+                .deadDay(hall.getDeadday() != null ? formatLocalDate(hall.getDeadday()) : null)
+                .adminName(hall.getAdmin().getName())
+                .status(status)
+                .build();
+    }
+
+    public static HallSearchResponseListDTO toSearchResponseListDTO(List<HallSearchResponseDTO> halls) {
+        return HallSearchResponseListDTO.builder()
+                .halls(halls)
+                .build();
+    }
+
 
     // String → LocalDate
     private static LocalDate parseDate(String dateStr) {

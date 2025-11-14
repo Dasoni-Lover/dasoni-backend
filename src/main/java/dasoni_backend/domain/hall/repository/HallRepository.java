@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,4 +34,16 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
 
     // 본인 추모관인지 확인하기 위한
     Optional<Hall> findBySubjectId(Long subjectId);
+
+    // 추모관 검색
+    @Query("SELECT h FROM Hall h WHERE " +
+            "(:name IS NULL OR h.name LIKE %:name%) AND " +
+            "(:birthday IS NULL OR h.birthday = :birthday) AND " +
+            "(:deadDay IS NULL OR h.deadday = :deadDay) AND " +
+            "h.isSecret = false")
+    List<Hall> searchHalls(
+            @Param("name") String name,
+            @Param("birthday") LocalDate birthday,
+            @Param("deadDay") LocalDate deadDay
+    );
 }

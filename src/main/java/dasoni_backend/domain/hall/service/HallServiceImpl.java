@@ -5,6 +5,9 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
@@ -19,6 +22,7 @@ import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.S3.service.FileUploadService;
+import dasoni_backend.global.enums.HallStatus;
 import dasoni_backend.global.enums.Personality;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +30,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static dasoni_backend.domain.hall.converter.HallConverter.toSearchResponseDTO;
+import static dasoni_backend.domain.hall.converter.HallConverter.toSearchResponseListDTO;
 
 @Slf4j
 @Service
@@ -207,4 +217,47 @@ public class HallServiceImpl implements HallService {
         hallRepository.save(hall);
     }
 
+    @Override
+    @Transactional
+    public HallSearchResponseListDTO searchHalls(HallSearchRequestDTO requestDTO, User user) {
+        // 1. 날짜 문자열을 LocalDate로 변환
+        LocalDate birthday = parseDate(requestDTO.getBirthday());
+        LocalDate deadDay = parseDate(requestDTO.getDeadDay());
+
+        // 2. Repository에서 검색 (isSecret=false 자동 필터링)
+        List<Hall> halls = hallRepository.searchHalls(
+                requestDTO.getName(),
+                birthday,
+                deadDay
+        );
+
+        // 3. DTO 변환 및 status 설정
+        List<HallSearchResponseDTO> responseDTOs = halls.stream()
+                .map(hall -> {
+                    // 여기서 status 로직을 구현하세요
+                    HallStatus status = determineHallStatus(hall,user);
+                    return toSearchResponseDTO(hall, status);
+                })
+                .collect(Collectors.toList());
+
+        // 4. 최종 응답 DTO로 변환
+        return toSearchResponseListDTO(responseDTOs);
+    }
+
+    // 날짜 파싱 헬퍼 메서드
+    private LocalDate parseDate(String dateString) {
+        if (dateString == null || dateString.isEmpty()) { return null; }
+        return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    }
+
+    // TODO: 여기에 status 결정 로직을 구현하세요
+    private HallStatus determineHallStatus(Hall hall, User user) {
+        // 여기에 status 판단 로직을 작성하세요
+        // 예시:
+        // - ENTERING: 현재 입장 중인 상태
+        // - WAITING: 대기 중인 상태
+        // - NONE: 아무 상태도 아님
+
+        return HallStatus.NONE;
+    }
 }
