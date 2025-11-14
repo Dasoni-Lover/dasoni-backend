@@ -53,7 +53,6 @@ public class HallServiceImpl implements HallService {
     private final HallQueryRepository hallQueryRepository;
     private final relationshipRepository relationshipRepository;
     private final relationshipNatureRepository relationshipNatureRepository;
-    private final FileUploadService fileUploadService;
     private final RequestRepository requestRepository;
 
     @Transactional(readOnly = true)
@@ -169,57 +168,6 @@ public class HallServiceImpl implements HallService {
     public MyHallResponseDTO getMyHall(User user){
         Hall hall = hallRepository.findBySubjectId(user.getId()).orElse(null);
         return HallConverter.toMyHallResponse(hall);
-    }
-
-    @Override
-    @Transactional
-    public void uploadVoice(Long hallId, VoiceDTO request, User user){
-        Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
-
-        if (!user.equals(hall.getAdmin())) {
-            throw new IllegalStateException("권한이 없습니다");
-        }
-
-        Voice voice = Voice.builder()
-                .url(request.getUrl())
-                .updateAt(LocalDateTime.now())
-                .build();
-
-        hall.setVoice(voice);
-        hallRepository.save(hall);
-    }
-
-    @Override
-    @Transactional
-    public void updateVoice(Long hallId, VoiceDTO request, User user){
-        Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
-
-        if (!user.equals(hall.getAdmin())) {
-            throw new IllegalStateException("권한이 없습니다");
-        }
-
-        // 기존 voice 삭제
-        Voice oldVoice = hall.getVoice();
-        if (oldVoice != null && oldVoice.getUrl() != null) {
-            try {
-                String oldS3Key = fileUploadService.extractS3Key(oldVoice.getUrl());
-                fileUploadService.deleteFile(oldS3Key);
-                log.info("기존 음성 파일 삭제 완료: {}", oldS3Key);
-            } catch (Exception e) {
-                log.warn("기존 음성 파일 삭제 실패: {}", e.getMessage());
-            }
-        }
-
-        Voice voice = Voice.builder()
-                .url(request.getUrl())
-                .updateAt(LocalDateTime.now())
-                .build();
-
-        // 업데이트 후 저장
-        hall.setVoice(voice);
-        hallRepository.save(hall);
     }
 
     @Override

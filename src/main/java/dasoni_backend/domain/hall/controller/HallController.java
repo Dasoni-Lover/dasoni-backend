@@ -80,20 +80,6 @@ public class HallController {
         return ResponseEntity.ok(hallService.getHallDetail(hallId, user));
     }
 
-    // 추모관 음성 등록
-    @PostMapping("/{hall_id}/letters/voice/upload")
-    public ResponseEntity<Void> uploadVoice(@PathParam("hall_id") Long hallId, @RequestBody VoiceDTO request , @AuthUser User user) {
-        hallService.uploadVoice(hallId,request,user);
-        return ResponseEntity.ok().build();
-    }
-
-    // 추모관 음성 수정
-    @PostMapping("/{hall_id}/letters/voice/update")
-    public ResponseEntity<Void> updateVoice(@PathParam("hall_id") Long hallId, @RequestBody VoiceDTO request , @AuthUser User user){
-        hallService.updateVoice(hallId,request,user);
-        return ResponseEntity.ok().build();
-    }
-
     // 추모관 검색
     @PostMapping("/search")
     public ResponseEntity<HallSearchResponseListDTO> updateVoice(@RequestBody HallSearchRequestDTO request, @AuthUser User user){
