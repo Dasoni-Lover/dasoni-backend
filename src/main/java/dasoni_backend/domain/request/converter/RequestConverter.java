@@ -3,12 +3,14 @@ package dasoni_backend.domain.request.converter;
 import dasoni_backend.domain.request.dto.RequestDTO.RequestListResponseDTO;
 import dasoni_backend.domain.request.dto.RequestDTO.RequestResponseDTO;
 import dasoni_backend.domain.request.entity.Request;
-import dasoni_backend.global.enums.Personality;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
+@RequiredArgsConstructor
 public class RequestConverter {
 
     // Request -> RequestResponseDTO
@@ -16,8 +18,8 @@ public class RequestConverter {
         return RequestResponseDTO.builder()
                 .requestId(request.getId())
                 .name(request.getUser().getName())
-                .relation(request.getRelation().getValue())  // "친구", "가족", "연인"
-                .natures(getNatureValues(request.getNatures()))  // List<Personality>를 전달
+                .relation(request.getRelation())
+                .natures(request.getNatures())
                 .detail(request.getDetail())
                 .review(request.getReview())
                 .build();
@@ -33,12 +35,5 @@ public class RequestConverter {
                 .requestCount(requestList.size())
                 .requestList(requestList)
                 .build();
-    }
-
-    // List<Personality> -> List<String> 변환
-    private List<String> getNatureValues(List<Personality> personalities) {
-        return personalities.stream()
-                .map(Personality::getValue)  // enum을 한글 값으로 변환
-                .collect(Collectors.toList());
     }
 }
