@@ -227,7 +227,7 @@ public class HallServiceImpl implements HallService {
 
     @Override
     @Transactional
-    public void getProfile(ProfileRequestDTO request, User user){
+    public void updateProfile(ProfileRequestDTO request, User user){
         Hall hall = hallRepository.findBySubjectId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 없습니다."));
 

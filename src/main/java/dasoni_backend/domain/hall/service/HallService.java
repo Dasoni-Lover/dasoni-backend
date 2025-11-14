@@ -42,6 +42,6 @@ public interface HallService {
     VisitorListResponseDTO getVisitors(Long hallId, User user);
 
     // 프로필 사진 수정
-    void getProfile(ProfileRequestDTO request, User user);
+    void updateProfile(ProfileRequestDTO request, User user);
 }
 
