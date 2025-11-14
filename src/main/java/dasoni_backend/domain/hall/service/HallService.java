@@ -8,6 +8,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
+import dasoni_backend.domain.user.dto.UserDTO.VisitorListResponseDTO;
 import dasoni_backend.domain.user.entity.User;
 
 public interface HallService {
@@ -33,6 +34,10 @@ public interface HallService {
     // 본인 추모관 조회
     MyHallResponseDTO getMyHall(User user);
 
+    // 추모관 검색
     HallSearchResponseListDTO searchHalls(HallSearchRequestDTO request, User user);
+
+    // 추모관 방문자 조회
+    VisitorListResponseDTO getVisitors(Long hallId, User user);
 }
 

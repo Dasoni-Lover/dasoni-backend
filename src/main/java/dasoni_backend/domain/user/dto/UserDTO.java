@@ -3,9 +3,12 @@ package dasoni_backend.domain.user.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 public class UserDTO {
 
@@ -63,5 +66,28 @@ public class UserDTO {
     @Builder
     public static class CheckResponseDTO {
         private Boolean isAvailable;
+    }
+
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class VisitorListResponseDTO {
+        private Integer visitorCount;
+        private List<VisitorResponseDTO> visitors;
+    }
+
+    // 개별 방문자 DTO
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class VisitorResponseDTO {
+        private Long userId;
+        private String name;
+        private String relation;  // "가족", "친구", "연인"
+        private List<String> natures;  // ["따뜻한", "성실한", "착한"]
+        private String review;
+        private String detail;
     }
 }

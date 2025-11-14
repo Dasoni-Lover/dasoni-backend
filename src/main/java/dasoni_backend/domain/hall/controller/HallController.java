@@ -9,6 +9,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
+import dasoni_backend.domain.user.dto.UserDTO.VisitorListResponseDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.global.annotation.AuthUser;
@@ -78,6 +79,12 @@ public class HallController {
     @GetMapping("/{hall_id}")
     public ResponseEntity<HallDetailDataResponseDTO> getHallDetail(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
         return ResponseEntity.ok(hallService.getHallDetail(hallId, user));
+    }
+
+    // 방문자 목록 조회
+    @GetMapping("/{hall_id}/visitors")
+    public ResponseEntity<VisitorListResponseDTO>  getVisitorList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
+        return ResponseEntity.ok(hallService.getVisitors(hallId,user));
     }
 
     // 추모관 검색

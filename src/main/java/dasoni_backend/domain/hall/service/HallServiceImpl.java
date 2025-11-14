@@ -20,6 +20,8 @@ import dasoni_backend.domain.relationship.repository.relationshipNatureRepositor
 import dasoni_backend.domain.relationship.repository.relationshipRepository;
 import dasoni_backend.domain.request.entity.Request;
 import dasoni_backend.domain.request.repository.RequestRepository;
+import dasoni_backend.domain.user.converter.UserConverter;
+import dasoni_backend.domain.user.dto.UserDTO.VisitorListResponseDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.domain.voice.entity.Voice;
@@ -54,6 +56,8 @@ public class HallServiceImpl implements HallService {
     private final relationshipRepository relationshipRepository;
     private final relationshipNatureRepository relationshipNatureRepository;
     private final RequestRepository requestRepository;
+
+    private final UserConverter userConverter;
 
     @Transactional(readOnly = true)
     @Override
@@ -213,6 +217,15 @@ public class HallServiceImpl implements HallService {
         // 3. 아무 관계도 없음
         return HallStatus.NONE;
     }
+    @Override
+    @Transactional
+    public VisitorListResponseDTO getVisitors(Long hallId, User user){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
+        List<Relationship> relationships = hall.getRelationships();
+        return userConverter.toVisitorListResponseDTO(relationships);
+    }
+
 
     // 날짜 파싱 헬퍼 메서드
     private LocalDate parseDate(String dateString) {
