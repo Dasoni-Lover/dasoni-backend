@@ -76,9 +76,6 @@ public class Hall {
     @Column(name = "profile", columnDefinition = "TEXT")
     private String profile;
 
-    @OneToMany(mappedBy = "hall")
-    private List<Relationship> relationships;
-
     // ElementCollection 사용해 List로 변경
     // 3개로 고정
     @ElementCollection(targetClass = Personality.class, fetch = FetchType.EAGER)
@@ -106,6 +103,11 @@ public class Hall {
 
     // 추모관 비공개 여부
     @Column(name = "is_secret")
+    @Builder.Default
     private boolean isSecret = false;
+
+    public void incrementUserNum() {
+        this.userNum = (this.userNum == null ? 0 : this.userNum) + 1;
+    }
 }
 
