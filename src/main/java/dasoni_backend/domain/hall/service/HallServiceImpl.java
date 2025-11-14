@@ -8,6 +8,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallUpdateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.entity.Hall;
@@ -212,7 +213,6 @@ public class HallServiceImpl implements HallService {
         if (pendingRequest.isPresent()) {
             return HallStatus.WAITING;  // 요청 대기 중
         }
-
         // 3. 아무 관계도 없음
         return HallStatus.NONE;
     }
@@ -230,26 +230,40 @@ public class HallServiceImpl implements HallService {
     public void updateProfile(ProfileRequestDTO request, User user){
         Hall hall = hallRepository.findBySubjectId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 없습니다."));
+        updateProfile(hall, request.getProfile());
+    }
 
-        // 기존 프로필 사진이 있는 경우
+    @Override
+    @Transactional
+    public void updateHall(Long hallId, HallUpdateRequestDTO request, User user){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
+        updateProfile(hall,request.getProfile());
+
+        hall.setName(request.getName());
+        hall.setBirthday(parseDate(request.getBirthday()));
+        hall.setDeadday(parseDate(request.getDeadday()));
+        hall.setPlace(request.getPlace());
+        hall.setPhone(request.getPhone());
+    }
+
+    // 프로필 변경
+    private void updateProfile(Hall hall, String newProfileUrl) {
+        // 기존 프로필 삭제
         if (hall.getProfile() != null && !hall.getProfile().isEmpty()) {
             try {
-                // S3에서 기존 파일 삭제
                 String oldS3Key = fileUploadService.extractS3Key(hall.getProfile());
                 fileUploadService.deleteFile(oldS3Key);
                 log.info("기존 프로필 사진 삭제 완료: {}", oldS3Key);
             } catch (Exception e) {
                 log.warn("기존 프로필 사진 삭제 실패: {}", e.getMessage());
-                // 삭제 실패해도 계속 진행 (파일이 이미 없을 수 있음)
             }
         }
-        // 새 프로필 URL 저장
-        hall.setProfile(request.getUrl());
-        log.info("새 프로필 사진 설정 완료: {}", request.getUrl());
+        // 새 프로필 설정
+        hall.setProfile(newProfileUrl);
     }
 
-
-    // 날짜 파싱 헬퍼 메서드
+    // "yyyy.MM.dd" -> LocalDate
     private LocalDate parseDate(String dateString) {
         if (dateString == null || dateString.isEmpty()) { return null; }
         return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
