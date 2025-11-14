@@ -19,6 +19,8 @@ import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.entity.RelationshipNature;
 import dasoni_backend.domain.relationship.repository.relationshipNatureRepository;
 import dasoni_backend.domain.relationship.repository.relationshipRepository;
+import dasoni_backend.domain.request.converter.RequestConverter;
+import dasoni_backend.domain.request.dto.RequestDTO.RequestListResponseDTO;
 import dasoni_backend.domain.request.entity.Request;
 import dasoni_backend.domain.request.repository.RequestRepository;
 import dasoni_backend.domain.user.converter.UserConverter;
@@ -56,6 +58,7 @@ public class HallServiceImpl implements HallService {
     private final RequestRepository requestRepository;
 
     private final UserConverter userConverter;
+    private final RequestConverter requestConverter;
     private final FileUploadService fileUploadService;
 
 
@@ -261,6 +264,15 @@ public class HallServiceImpl implements HallService {
         }
         // 새 프로필 설정
         hall.setProfile(newProfileUrl);
+    }
+
+    @Override
+    @Transactional
+    public RequestListResponseDTO getRequests(Long hallId, User user){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
+        List<Request> requests =requestRepository.findByHallAndStatus(hall,RequestStatus.PENDING);
+        return requestConverter.toRequestListResponseDTO(requests);
     }
 
     // "yyyy.MM.dd" -> LocalDate
