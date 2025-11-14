@@ -1,8 +1,12 @@
 package dasoni_backend.domain.request.converter;
 
+import dasoni_backend.domain.hall.entity.Hall;
+import dasoni_backend.domain.request.dto.RequestDTO.JoinRequestDTO;
 import dasoni_backend.domain.request.dto.RequestDTO.RequestListResponseDTO;
 import dasoni_backend.domain.request.dto.RequestDTO.RequestResponseDTO;
 import dasoni_backend.domain.request.entity.Request;
+import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.enums.RequestStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +38,18 @@ public class RequestConverter {
         return RequestListResponseDTO.builder()
                 .requestCount(requestList.size())
                 .requestList(requestList)
+                .build();
+    }
+
+    public static Request toRequest(User user, Hall hall, JoinRequestDTO request) {
+        return Request.builder()
+                .user(user)
+                .hall(hall)
+                .relation(request.getRelation())
+                .detail(request.getDetail())
+                .natures(request.getNatures())  // List<Personality> 그대로 전달
+                .review(request.getReview())
+                .status(RequestStatus.PENDING)  // 대기 상태로 초기화
                 .build();
     }
 }

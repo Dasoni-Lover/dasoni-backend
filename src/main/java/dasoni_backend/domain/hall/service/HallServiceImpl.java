@@ -16,7 +16,7 @@ import dasoni_backend.domain.hall.repository.HallQueryRepository;
 import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.relationship.converter.RelationshipConverter;
 import dasoni_backend.domain.relationship.entity.Relationship;
-import dasoni_backend.domain.relationship.repository.relationshipRepository;
+import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.domain.request.converter.RequestConverter;
 import dasoni_backend.domain.request.dto.RequestDTO.RequestListResponseDTO;
 import dasoni_backend.domain.request.entity.Request;
@@ -51,7 +51,7 @@ public class HallServiceImpl implements HallService {
 
     private final HallRepository hallRepository;
     private final HallQueryRepository hallQueryRepository;
-    private final relationshipRepository relationshipRepository;
+    private final RelationshipRepository relationshipRepository;
     private final RequestRepository requestRepository;
 
     private final UserConverter userConverter;
@@ -215,7 +215,7 @@ public class HallServiceImpl implements HallService {
     public VisitorListResponseDTO getVisitors(Long hallId, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
-        List<Relationship> relationships = hall.getRelationships();
+        List<Relationship> relationships = relationshipRepository.findByHall(hall);
         return userConverter.toVisitorListResponseDTO(relationships);
     }
 
