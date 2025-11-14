@@ -46,6 +46,7 @@ public class UserDTO {
         private String accessToken;
         private String refreshToken;
     }
+
     @Getter
     @Setter
     @NoArgsConstructor
@@ -89,5 +90,12 @@ public class UserDTO {
         private List<String> natures;  // ["따뜻한", "성실한", "착한"]
         private String review;
         private String detail;
+    }
+
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    public static class ProfileRequestDTO {
+        private String url;
     }
 }

@@ -21,22 +21,19 @@ import dasoni_backend.domain.relationship.repository.relationshipRepository;
 import dasoni_backend.domain.request.entity.Request;
 import dasoni_backend.domain.request.repository.RequestRepository;
 import dasoni_backend.domain.user.converter.UserConverter;
+import dasoni_backend.domain.user.dto.UserDTO.ProfileRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.VisitorListResponseDTO;
 import dasoni_backend.domain.user.entity.User;
-import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
-import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.S3.service.FileUploadService;
 import dasoni_backend.global.enums.HallStatus;
 import dasoni_backend.global.enums.Personality;
 import dasoni_backend.global.enums.RequestStatus;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -58,6 +55,8 @@ public class HallServiceImpl implements HallService {
     private final RequestRepository requestRepository;
 
     private final UserConverter userConverter;
+    private final FileUploadService fileUploadService;
+
 
     @Transactional(readOnly = true)
     @Override
@@ -224,6 +223,29 @@ public class HallServiceImpl implements HallService {
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
         List<Relationship> relationships = hall.getRelationships();
         return userConverter.toVisitorListResponseDTO(relationships);
+    }
+
+    @Override
+    @Transactional
+    public void getProfile(ProfileRequestDTO request, User user){
+        Hall hall = hallRepository.findBySubjectId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 없습니다."));
+
+        // 기존 프로필 사진이 있는 경우
+        if (hall.getProfile() != null && !hall.getProfile().isEmpty()) {
+            try {
+                // S3에서 기존 파일 삭제
+                String oldS3Key = fileUploadService.extractS3Key(hall.getProfile());
+                fileUploadService.deleteFile(oldS3Key);
+                log.info("기존 프로필 사진 삭제 완료: {}", oldS3Key);
+            } catch (Exception e) {
+                log.warn("기존 프로필 사진 삭제 실패: {}", e.getMessage());
+                // 삭제 실패해도 계속 진행 (파일이 이미 없을 수 있음)
+            }
+        }
+        // 새 프로필 URL 저장
+        hall.setProfile(request.getUrl());
+        log.info("새 프로필 사진 설정 완료: {}", request.getUrl());
     }
 
 

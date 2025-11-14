@@ -9,6 +9,8 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
 import dasoni_backend.domain.hall.service.HallService;
+import dasoni_backend.domain.user.dto.UserDTO;
+import dasoni_backend.domain.user.dto.UserDTO.ProfileRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.VisitorListResponseDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
@@ -18,6 +20,7 @@ import jakarta.websocket.server.PathParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -25,7 +28,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequiredArgsConstructor // 롬복으로 자동 생성자 주입
+@RequiredArgsConstructor
 @RequestMapping("/api/halls")
 public class HallController {
 
@@ -34,13 +37,11 @@ public class HallController {
     @GetMapping("/healthy")
     public ResponseEntity<Void> healthy() { return ResponseEntity.ok().build();}
 
-    // @AuthenticationPrincipal 사용으로 추후 변경
     @GetMapping("/home")
     public HallListResponseDTO getHomeHallList(@AuthUser User user) {
         return hallService.getHomeHallList(user);
     }
 
-    // @AuthenticationPrincipal 사용으로 추후 변경
     @GetMapping("/home/manage")
     public HallListResponseDTO getManageHallList(@AuthUser User admin) {
         return hallService.getManageHallList(admin);
@@ -91,5 +92,12 @@ public class HallController {
     @PostMapping("/search")
     public ResponseEntity<HallSearchResponseListDTO> updateVoice(@RequestBody HallSearchRequestDTO request, @AuthUser User user){
         return ResponseEntity.ok(hallService.searchHalls(request,user));
+    }
+
+    // 본인 추모관 프로필 수정
+    @PatchMapping("/me/profile")
+    public ResponseEntity<Void> updateProfile(@RequestBody ProfileRequestDTO request, @AuthUser User user) {
+        hallService.updateProfile(request, user);
+        return ResponseEntity.ok().build();
     }
 }
