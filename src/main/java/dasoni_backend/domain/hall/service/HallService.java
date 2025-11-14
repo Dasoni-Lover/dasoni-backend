@@ -8,8 +8,9 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
+import dasoni_backend.domain.user.dto.UserDTO.ProfileRequestDTO;
+import dasoni_backend.domain.user.dto.UserDTO.VisitorListResponseDTO;
 import dasoni_backend.domain.user.entity.User;
-import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 
 public interface HallService {
 
@@ -34,12 +35,13 @@ public interface HallService {
     // 본인 추모관 조회
     MyHallResponseDTO getMyHall(User user);
 
-    // 추모관 음성파일 업로드
-    void uploadVoice(Long hallId, VoiceDTO request, User user);
-
-    // 추모관 음성파일 수정
-    void updateVoice(Long hallId, VoiceDTO request, User user);
-
+    // 추모관 검색
     HallSearchResponseListDTO searchHalls(HallSearchRequestDTO request, User user);
+
+    // 추모관 방문자 조회
+    VisitorListResponseDTO getVisitors(Long hallId, User user);
+
+    // 프로필 사진 수정
+    void updateProfile(ProfileRequestDTO request, User user);
 }
 

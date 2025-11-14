@@ -46,9 +46,13 @@ public class Relationship {
     @Column(name = "relation", length = 20)
     private RelationKind relation;
 
-    // 영상 편지 사진
-    @Column(name = "photo", columnDefinition = "TEXT")
-    private String photo;
+    // 자세한 관계 설명
+    @Column(name = "detail")
+    private String detail;
+
+    // 한줄평
+    @Column(name = "review")
+    private String review;
 
     // 말버릇
     @Column(name = "speak_habit")

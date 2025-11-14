@@ -20,21 +20,20 @@ import dasoni_backend.domain.relationship.repository.relationshipNatureRepositor
 import dasoni_backend.domain.relationship.repository.relationshipRepository;
 import dasoni_backend.domain.request.entity.Request;
 import dasoni_backend.domain.request.repository.RequestRepository;
+import dasoni_backend.domain.user.converter.UserConverter;
+import dasoni_backend.domain.user.dto.UserDTO.ProfileRequestDTO;
+import dasoni_backend.domain.user.dto.UserDTO.VisitorListResponseDTO;
 import dasoni_backend.domain.user.entity.User;
-import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
-import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.S3.service.FileUploadService;
 import dasoni_backend.global.enums.HallStatus;
 import dasoni_backend.global.enums.Personality;
 import dasoni_backend.global.enums.RequestStatus;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
@@ -53,8 +52,11 @@ public class HallServiceImpl implements HallService {
     private final HallQueryRepository hallQueryRepository;
     private final relationshipRepository relationshipRepository;
     private final relationshipNatureRepository relationshipNatureRepository;
-    private final FileUploadService fileUploadService;
     private final RequestRepository requestRepository;
+
+    private final UserConverter userConverter;
+    private final FileUploadService fileUploadService;
+
 
     @Transactional(readOnly = true)
     @Override
@@ -173,57 +175,6 @@ public class HallServiceImpl implements HallService {
 
     @Override
     @Transactional
-    public void uploadVoice(Long hallId, VoiceDTO request, User user){
-        Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
-
-        if (!user.equals(hall.getAdmin())) {
-            throw new IllegalStateException("권한이 없습니다");
-        }
-
-        Voice voice = Voice.builder()
-                .url(request.getUrl())
-                .updateAt(LocalDateTime.now())
-                .build();
-
-        hall.setVoice(voice);
-        hallRepository.save(hall);
-    }
-
-    @Override
-    @Transactional
-    public void updateVoice(Long hallId, VoiceDTO request, User user){
-        Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
-
-        if (!user.equals(hall.getAdmin())) {
-            throw new IllegalStateException("권한이 없습니다");
-        }
-
-        // 기존 voice 삭제
-        Voice oldVoice = hall.getVoice();
-        if (oldVoice != null && oldVoice.getUrl() != null) {
-            try {
-                String oldS3Key = fileUploadService.extractS3Key(oldVoice.getUrl());
-                fileUploadService.deleteFile(oldS3Key);
-                log.info("기존 음성 파일 삭제 완료: {}", oldS3Key);
-            } catch (Exception e) {
-                log.warn("기존 음성 파일 삭제 실패: {}", e.getMessage());
-            }
-        }
-
-        Voice voice = Voice.builder()
-                .url(request.getUrl())
-                .updateAt(LocalDateTime.now())
-                .build();
-
-        // 업데이트 후 저장
-        hall.setVoice(voice);
-        hallRepository.save(hall);
-    }
-
-    @Override
-    @Transactional
     public HallSearchResponseListDTO searchHalls(HallSearchRequestDTO requestDTO, User user) {
 
         LocalDate birthday = parseDate(requestDTO.getBirthday());
@@ -265,6 +216,38 @@ public class HallServiceImpl implements HallService {
         // 3. 아무 관계도 없음
         return HallStatus.NONE;
     }
+    @Override
+    @Transactional
+    public VisitorListResponseDTO getVisitors(Long hallId, User user){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
+        List<Relationship> relationships = hall.getRelationships();
+        return userConverter.toVisitorListResponseDTO(relationships);
+    }
+
+    @Override
+    @Transactional
+    public void updateProfile(ProfileRequestDTO request, User user){
+        Hall hall = hallRepository.findBySubjectId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 없습니다."));
+
+        // 기존 프로필 사진이 있는 경우
+        if (hall.getProfile() != null && !hall.getProfile().isEmpty()) {
+            try {
+                // S3에서 기존 파일 삭제
+                String oldS3Key = fileUploadService.extractS3Key(hall.getProfile());
+                fileUploadService.deleteFile(oldS3Key);
+                log.info("기존 프로필 사진 삭제 완료: {}", oldS3Key);
+            } catch (Exception e) {
+                log.warn("기존 프로필 사진 삭제 실패: {}", e.getMessage());
+                // 삭제 실패해도 계속 진행 (파일이 이미 없을 수 있음)
+            }
+        }
+        // 새 프로필 URL 저장
+        hall.setProfile(request.getUrl());
+        log.info("새 프로필 사진 설정 완료: {}", request.getUrl());
+    }
+
 
     // 날짜 파싱 헬퍼 메서드
     private LocalDate parseDate(String dateString) {
