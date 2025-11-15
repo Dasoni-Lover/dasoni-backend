@@ -13,6 +13,8 @@ import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
+import dasoni_backend.domain.relationship.entity.Relationship;
+import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -181,5 +183,12 @@ public class LetterServiceImpl implements LetterService{
     @Transactional
     public void sendMeLetter(Long letterId, myLetterRequestDTO request, User user){
 
+        Hall hall = hallRepository.findBySubjectId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 존재하지 않습니다."));
+
+        //:TODO 이미 오늘 편지를 보냈는지 확인
+
+        Letter letter = LetterConverter.toMyLetterEntity(request, hall, user);
+        letterRepository.save(letter);
     }
 }
