@@ -2,8 +2,11 @@ package dasoni_backend.domain.relationship.entity;
 
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.enums.Personality;
 import dasoni_backend.global.enums.RelationKind;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,6 +22,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "relationships")
@@ -45,6 +50,15 @@ public class Relationship {
     @Enumerated(EnumType.STRING)
     @Column(name = "relation", length = 20)
     private RelationKind relation;
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(
+            name = "relationship_natures",
+            joinColumns = @JoinColumn(name = "relationship_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "nature")
+    private List<Personality> natures;
 
     // 자세한 관계 설명
     @Column(name = "detail")

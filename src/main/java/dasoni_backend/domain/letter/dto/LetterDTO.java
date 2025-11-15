@@ -128,4 +128,12 @@ public class LetterDTO {
 
         private String content;
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class myLetterRequestDTO {
+        private String toName;
+        private String fromName;
+        private String content;
+    }
 }

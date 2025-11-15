@@ -16,9 +16,9 @@ import dasoni_backend.domain.hall.repository.HallQueryRepository;
 import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.relationship.converter.RelationshipConverter;
 import dasoni_backend.domain.relationship.entity.Relationship;
-import dasoni_backend.domain.relationship.entity.RelationshipNature;
-import dasoni_backend.domain.relationship.repository.relationshipNatureRepository;
-import dasoni_backend.domain.relationship.repository.relationshipRepository;
+import dasoni_backend.domain.relationship.repository.RelationshipRepository;
+import dasoni_backend.domain.request.converter.RequestConverter;
+import dasoni_backend.domain.request.dto.RequestDTO.RequestListResponseDTO;
 import dasoni_backend.domain.request.entity.Request;
 import dasoni_backend.domain.request.repository.RequestRepository;
 import dasoni_backend.domain.user.converter.UserConverter;
@@ -51,11 +51,11 @@ public class HallServiceImpl implements HallService {
 
     private final HallRepository hallRepository;
     private final HallQueryRepository hallQueryRepository;
-    private final relationshipRepository relationshipRepository;
-    private final relationshipNatureRepository relationshipNatureRepository;
+    private final RelationshipRepository relationshipRepository;
     private final RequestRepository requestRepository;
 
     private final UserConverter userConverter;
+    private final RequestConverter requestConverter;
     private final FileUploadService fileUploadService;
 
 
@@ -118,16 +118,10 @@ public class HallServiceImpl implements HallService {
     public HallCreateResponseDTO createOtherHall(User admin, HallCreateRequestDTO request) {
         // 타인 추모관 개설
         Hall hall = hallRepository.save(HallConverter.fromSaveRequestForOther(admin, request));
-        Relationship relationship = relationshipRepository.save(RelationshipConverter.fromRequestToRelationship(admin, hall, request));
 
-        List<RelationshipNature> rows = request.getNatures().stream()
-                .map(p -> RelationshipNature.builder()
-                        .relationship(relationship)
-                        .nature(p)
-                        .build())
-                .toList();
+        // Relationship 저장 시 natures도 함께 저장됨 (JPA가 자동 처리)
+        relationshipRepository.save(RelationshipConverter.fromRequestToRelationship(admin, hall, request));
 
-        relationshipNatureRepository.saveAll(rows);
         return HallConverter.toHallCreateResponseDTO(hall);
     }
 
@@ -221,7 +215,7 @@ public class HallServiceImpl implements HallService {
     public VisitorListResponseDTO getVisitors(Long hallId, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
-        List<Relationship> relationships = hall.getRelationships();
+        List<Relationship> relationships = relationshipRepository.findByHall(hall);
         return userConverter.toVisitorListResponseDTO(relationships);
     }
 
@@ -261,6 +255,15 @@ public class HallServiceImpl implements HallService {
         }
         // 새 프로필 설정
         hall.setProfile(newProfileUrl);
+    }
+
+    @Override
+    @Transactional
+    public RequestListResponseDTO getRequests(Long hallId, User user){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
+        List<Request> requests =requestRepository.findByHallAndStatus(hall,RequestStatus.PENDING);
+        return requestConverter.toRequestListResponseDTO(requests);
     }
 
     // "yyyy.MM.dd" -> LocalDate

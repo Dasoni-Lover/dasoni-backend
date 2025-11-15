@@ -8,6 +8,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO; 
 import dasoni_backend.domain.hall.entity.Hall;                        
@@ -144,4 +145,16 @@ public class LetterConverter {
                 .content(letter.getContent())
                 .build();
     }
+    public static Letter toMyLetterEntity(myLetterRequestDTO request, Hall hall, User user) {
+        return Letter.builder()
+                .hall(hall)
+                .user(user)
+                .toName(request.getToName())
+                .fromName(request.getFromName())
+                .content(request.getContent())
+                .createdAt(LocalDateTime.now())
+                .isCompleted(true)
+                .build();
+    }
+
 }
