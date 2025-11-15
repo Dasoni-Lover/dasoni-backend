@@ -36,8 +36,8 @@ public interface LetterService {
     // 임시보관 편지 삭제
     void deleteTempLetter(Long hallId, Long letterId, User user);
 
-    // 본인추모관 편지 삭제
-    void deleteMyLetter(Long letterId, User user);
+    // 보낸 편지 삭제
+    void deleteSendLetter(Long hallId,Long letterId, User user);
 
     // 본인추모관 편지 쓰기
     void sendMeLetter(Long letterId, myLetterRequestDTO request, User user);

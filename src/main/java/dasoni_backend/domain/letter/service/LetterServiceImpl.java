@@ -165,14 +165,28 @@ public class LetterServiceImpl implements LetterService{
 
     @Override
     @Transactional
-    public void deleteMyLetter(Long letterId, User user){
+    public void deleteSendLetter(Long hallId, Long letterId, User user){
+        // 홀 조회
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
+
         // 편지 조회
         Letter letter = letterRepository.findById(letterId)
                 .orElseThrow(() -> new IllegalArgumentException("편지를 찾을 수 없습니다."));
 
+        // 편지가 해당 홀에 속하는지 확인
+        if (!letter.getHall().getId().equals(hallId)) {
+            throw new IllegalArgumentException("해당 추모관의 편지가 아닙니다.");
+        }
+
         // 작성자 확인
         if (!letter.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("본인이 작성한 편지만 삭제할 수 있습니다.");
+        }
+
+        // 완료된 편지인지 확인
+        if (!letter.getIsCompleted()) {
+            throw new IllegalArgumentException("완료되지 않은 편지는 삭제할 수 없습니다.");
         }
 
         // 편지 삭제
