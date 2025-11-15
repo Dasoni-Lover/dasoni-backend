@@ -6,12 +6,12 @@ import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponse
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.letter.service.LetterService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,6 +49,7 @@ public class LetterController {
         return letterService.getLetterPreCheck(hallId, user);
     }
 
+    // 편지쓰기
     @PostMapping("/{hall_id}/letters/send")
     public ResponseEntity<Void> saveLetter(@PathVariable("hall_id") Long hallId, @AuthUser User user, @RequestBody LetterSaveRequestDTO request) {
         letterService.saveLetter(hallId, user, request);
@@ -66,5 +67,19 @@ public class LetterController {
     public ResponseEntity<Void> deleteTempLetter(@PathVariable("hall_id") Long hallId, @PathVariable("letter_id") Long letterId, @AuthUser User user) {
         letterService.deleteTempLetter(hallId, letterId, user);
         return ResponseEntity.noContent().build();
+    }
+
+    // 타인 추모관 편지 삭제
+    @PostMapping("/me/letters/{letter_id}/delete")
+    public ResponseEntity<Void> deleteLetter(@PathVariable("letter_id") Long letterId, @AuthUser User user) {
+        letterService.deleteLetter(letterId,user);
+        return ResponseEntity.ok().build();
+    }
+
+    // 본인추모관 편지 남기기
+    @DeleteMapping("/me/letters/send")
+    public ResponseEntity<Void> sendMeLetter(@PathVariable("letter_id") Long letterId, @RequestBody myLetterRequestDTO request, @AuthUser User user) {
+        letterService.sendMeLetter(letterId,request,user);
+        return ResponseEntity.ok().build();
     }
 }
