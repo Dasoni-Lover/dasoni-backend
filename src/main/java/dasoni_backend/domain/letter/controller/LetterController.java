@@ -69,7 +69,7 @@ public class LetterController {
         return ResponseEntity.noContent().build();
     }
 
-    // 본인 추모관 편지 삭제
+    // 본인추모관 편지 삭제
     @PostMapping("/me/letters/{letter_id}/delete")
     public ResponseEntity<Void> deleteLetter(@PathVariable("letter_id") Long letterId, @AuthUser User user) {
         letterService.deleteMyLetter(letterId,user);

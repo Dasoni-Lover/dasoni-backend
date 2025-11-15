@@ -10,6 +10,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
 import dasoni_backend.domain.user.entity.User;
@@ -158,6 +159,18 @@ public class LetterServiceImpl implements LetterService{
         }
 
         letterRepository.delete(letter);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMyLetter(Long hallId, User user){
+
+    }
+
+    @Override
+    @Transactional
+    public void sendMeLetter(Long letterId, myLetterRequestDTO request, User user){
+
     }
 
 }

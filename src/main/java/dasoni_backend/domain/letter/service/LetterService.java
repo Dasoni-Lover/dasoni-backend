@@ -7,6 +7,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.user.entity.User;
 
 public interface LetterService {
@@ -34,4 +35,10 @@ public interface LetterService {
 
     // 임시보관 편지 삭제
     void deleteTempLetter(Long hallId, Long letterId, User user);
+
+    // 본인추모관 편지 삭제
+    void deleteMyLetter(Long hallId, User user);
+
+    // 본인추모관 편지 쓰기
+    void sendMeLetter(Long letterId, myLetterRequestDTO request, User user);
 }
