@@ -10,11 +10,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -26,6 +28,10 @@ public class Voice {
 
     @Column(columnDefinition = "TEXT")
     private String url;
+
+    // elevenLabs 용 voiceId
+    @Column(name = "voice_id")
+    private String voiceId;
 
     @Column(name = "update_at")
     private LocalDateTime updateAt;

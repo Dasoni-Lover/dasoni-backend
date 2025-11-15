@@ -6,6 +6,7 @@ import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.S3.service.FileUploadService;
+import dasoni_backend.global.elevenlabs.ElevenLabsClient;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,7 @@ public class VoiceServiceImpl implements VoiceService {
 
     private final FileUploadService fileUploadService;
     private final HallRepository hallRepository;
+    private final ElevenLabsClient elevenLabsClient;
 
     @Override
     @Transactional
@@ -88,5 +90,30 @@ public class VoiceServiceImpl implements VoiceService {
         return VoiceDTO.builder()
                 .url(voice.getUrl())
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public void generateVoiceId(Long hallId, User user) {
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
+
+        if (!user.equals(hall.getAdmin())) {
+            throw new IllegalStateException("권한이 없습니다");
+        }
+
+        Voice voice = hall.getVoice();
+        if(voice == null || voice.getUrl() == null) {
+            throw new IllegalStateException("먼저 음성 파일을 업로드해야 합니다.");
+        }
+
+        String key = fileUploadService.extractS3Key(voice.getUrl());
+        byte[] audioBytes = fileUploadService.downloadFile(key);
+
+        String name = hall.getName() + "_voice";
+        String voiceId = elevenLabsClient.createIVCVoice(audioBytes, name);
+
+        voice.setVoiceId(voiceId);
+        voice.setUpdateAt(LocalDateTime.now());
     }
 }

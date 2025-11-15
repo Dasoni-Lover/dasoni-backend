@@ -6,4 +6,6 @@ public interface S3Service {
     boolean fileExist(String s3Key);
     void deleteFile(String s3Key);
     String getS3Url(String s3Key);
+    // elevenlabs 용
+    byte[] downloadFile(String s3Key);
 }

@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.ResponseBytes;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -118,5 +120,24 @@ public class S3ServiceImpl implements S3Service {
     @Override
     public String getS3Url(String s3Key) {
         return String.format("https://%s.s3.amazonaws.com/%s", bucketName, s3Key);
+    }
+
+    // elevenlabs 용
+    @Override
+    public byte[] downloadFile(String s3Key) {
+        try {
+            GetObjectRequest getObjectRequest = GetObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(s3Key)
+                    .build();
+
+            ResponseBytes<GetObjectResponse> objectBytes =
+                    s3Client.getObjectAsBytes(getObjectRequest);
+
+            return objectBytes.asByteArray();
+        } catch (Exception e) {
+            log.error("S3 파일 다운로드 실패 : {}", s3Key, e);
+            throw new RuntimeException("S3 파일 다운로드 실패", e);
+        }
     }
 }

@@ -12,4 +12,7 @@ public interface VoiceService {
     void updateVoice(Long hallId, VoiceDTO request, User user);
 
     VoiceDTO getVoice(Long hallId, User user);
+
+    // elevenlabs 용 : create IVC voice
+    void generateVoiceId(Long hallId, User user);
 }
