@@ -163,8 +163,18 @@ public class LetterServiceImpl implements LetterService{
 
     @Override
     @Transactional
-    public void deleteMyLetter(Long hallId, User user){
+    public void deleteMyLetter(Long letterId, User user){
+        // 편지 조회
+        Letter letter = letterRepository.findById(letterId)
+                .orElseThrow(() -> new IllegalArgumentException("편지를 찾을 수 없습니다."));
 
+        // 작성자 확인
+        if (!letter.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("본인이 작성한 편지만 삭제할 수 있습니다.");
+        }
+
+        // 편지 삭제
+        letterRepository.delete(letter);
     }
 
     @Override
@@ -172,5 +182,4 @@ public class LetterServiceImpl implements LetterService{
     public void sendMeLetter(Long letterId, myLetterRequestDTO request, User user){
 
     }
-
 }

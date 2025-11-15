@@ -37,7 +37,7 @@ public interface LetterService {
     void deleteTempLetter(Long hallId, Long letterId, User user);
 
     // 본인추모관 편지 삭제
-    void deleteMyLetter(Long hallId, User user);
+    void deleteMyLetter(Long letterId, User user);
 
     // 본인추모관 편지 쓰기
     void sendMeLetter(Long letterId, myLetterRequestDTO request, User user);
