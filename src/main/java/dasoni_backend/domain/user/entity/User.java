@@ -50,8 +50,6 @@ public class User {
     @Column(name = "my_profile", columnDefinition = "TEXT")
     private String myProfile;
 
-    @OneToMany(mappedBy = "user")
-    private List<Relationship> relationships;
 }
 
 
