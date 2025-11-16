@@ -94,6 +94,10 @@ services:
       # FastAPI URL
       FASTAPI_URL: http://python-fastapi:8000
 
+      # ElevenLabs 설정
+      ELEVENLABS_URL: ${ELEVENLABS_URL}
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY}
+
       # Spring Profile
       SPRING_PROFILES_ACTIVE: docker
     ports:

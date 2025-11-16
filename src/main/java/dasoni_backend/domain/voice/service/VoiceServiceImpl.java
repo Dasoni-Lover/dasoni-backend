@@ -5,6 +5,7 @@ import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.domain.voice.entity.Voice;
+import dasoni_backend.domain.voice.repository.VoiceRepository;
 import dasoni_backend.global.S3.service.FileUploadService;
 import dasoni_backend.global.elevenlabs.ElevenLabsClient;
 import jakarta.persistence.EntityNotFoundException;
@@ -23,6 +24,7 @@ public class VoiceServiceImpl implements VoiceService {
     private final FileUploadService fileUploadService;
     private final HallRepository hallRepository;
     private final ElevenLabsClient elevenLabsClient;
+    private final VoiceRepository voiceRepository;
 
     @Override
     @Transactional
@@ -30,7 +32,7 @@ public class VoiceServiceImpl implements VoiceService {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
 
-        if (!user.equals(hall.getAdmin())) {
+        if (!hall.getAdmin().getId().equals(user.getId())) {
             throw new IllegalStateException("권한이 없습니다");
         }
 
@@ -39,6 +41,7 @@ public class VoiceServiceImpl implements VoiceService {
                 .updateAt(LocalDateTime.now())
                 .build();
 
+        voiceRepository.save(voice);
         hall.setVoice(voice);
         hallRepository.save(hall);
     }
@@ -49,7 +52,7 @@ public class VoiceServiceImpl implements VoiceService {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
 
-        if (!user.equals(hall.getAdmin())) {
+        if (!hall.getAdmin().getId().equals(user.getId())) {
             throw new IllegalStateException("권한이 없습니다");
         }
 
@@ -71,6 +74,7 @@ public class VoiceServiceImpl implements VoiceService {
                 .build();
 
         // 업데이트 후 저장
+        voiceRepository.save(voice);
         hall.setVoice(voice);
         hallRepository.save(hall);
     }
@@ -81,7 +85,7 @@ public class VoiceServiceImpl implements VoiceService {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
 
-        if (!user.equals(hall.getAdmin())) {
+        if (!hall.getAdmin().getId().equals(user.getId())) {
             throw new IllegalStateException("권한이 없습니다");
         }
 
@@ -98,7 +102,7 @@ public class VoiceServiceImpl implements VoiceService {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
 
-        if (!user.equals(hall.getAdmin())) {
+        if (!hall.getAdmin().getId().equals(user.getId())) {
             throw new IllegalStateException("권한이 없습니다");
         }
 
