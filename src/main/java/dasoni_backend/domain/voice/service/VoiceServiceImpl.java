@@ -49,7 +49,7 @@ public class VoiceServiceImpl implements VoiceService {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
 
-        if (!user.equals(hall.getAdmin())) {
+        if (!hall.getAdmin().getId().equals(user.getId())) {
             throw new IllegalStateException("권한이 없습니다");
         }
 
@@ -81,7 +81,7 @@ public class VoiceServiceImpl implements VoiceService {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
 
-        if (!user.equals(hall.getAdmin())) {
+        if (!hall.getAdmin().getId().equals(user.getId())) {
             throw new IllegalStateException("권한이 없습니다");
         }
 
