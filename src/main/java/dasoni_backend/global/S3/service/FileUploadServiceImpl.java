@@ -62,6 +62,11 @@ public class FileUploadServiceImpl implements FileUploadService{
         return fileUrl.substring(fileUrl.indexOf(".com/") + 5);
     }
 
+    @Override
+    public byte[] downloadFile(String s3Key) {
+        return s3Service.downloadFile(s3Key);
+    }
+
     private String getExtension(String filename) {
         return filename.contains(".") ? filename.substring(filename.lastIndexOf(".")) : "";
     }
