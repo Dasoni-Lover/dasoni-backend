@@ -1,6 +1,7 @@
 package dasoni_backend.domain.reply.entity;
 
 import dasoni_backend.domain.hall.entity.Hall;
+import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -10,6 +11,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
@@ -44,4 +47,8 @@ public class Reply {
 
     @Column(name = "is_checked")
     private Boolean isChecked = false;
+
+    @OneToOne
+    @JoinColumn(name = "letter_id")
+    private Letter letter;
 }
