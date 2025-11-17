@@ -23,7 +23,7 @@ public class PhotoConverter {
         return PhotoInfoDTO.builder()
                 .id(photo.getId())
                 .url(photo.getUrl())
-                .isAI(photo.getIsAi())
+                .isAI(photo.getIsAI())
                 .build();
     }
 
@@ -57,7 +57,7 @@ public class PhotoConverter {
                 .name(uploaderName)
                 .myProfile(myProfileUrl)
                 .content(photo.getContent())
-                .isAI(photo.getIsAi())
+                .isAI(photo.getIsAI())
                 .uploadedAt(uploadedAt)
                 .occurredAt(occurredAt)
                 .isMine(isMine)
