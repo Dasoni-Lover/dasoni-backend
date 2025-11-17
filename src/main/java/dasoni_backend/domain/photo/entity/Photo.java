@@ -53,11 +53,11 @@ public class Photo {
     @Column(name = "is_ai", nullable = false)
     private Boolean isAI = false;
 
-    @Column(name = "uploaded_at")
-    private LocalDateTime uploadedAt;
-
     @Column(name = "occurred_at")
     private LocalDate occurredAt;
+
+    @Column(name = "uploaded_at")
+    private LocalDateTime uploadedAt;
 
     public void updateContent(String content) {
         this.content = content;
