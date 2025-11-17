@@ -1,7 +1,5 @@
 package dasoni_backend.global.annotation;
 
-import org.hibernate.annotations.Parameter;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

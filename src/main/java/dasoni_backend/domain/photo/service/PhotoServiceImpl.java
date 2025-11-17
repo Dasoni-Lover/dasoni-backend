@@ -28,8 +28,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,82 +46,27 @@ public class PhotoServiceImpl implements PhotoService {
     @Override
     @Transactional
     public PhotoListResponseDTO getPhotoList(Long hallId, PhotoRequestDTO request, User user) {
+        // 1. 사진 조회
+        List<Photo> photos = Boolean.TRUE.equals(request.getIsPrivate())
+                ? photoRepository.findMyPhotos(hallId, user.getId())
+                : photoRepository.findAllByHall(hallId);
 
-        Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new IllegalArgumentException("홀을 찾을 수 없습니다.")); // [FIX]
+        // 2. 필터링 및 정렬
+        Comparator<Photo> comparator = Boolean.TRUE.equals(request.getIsBydate())
+                ? Comparator.comparing(Photo::getOccurredAt, Comparator.nullsLast(Comparator.naturalOrder()))
+                .reversed()
+                .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
+                : Comparator.comparing(Photo::getUploadedAt, Comparator.nullsLast(Comparator.naturalOrder()))
+                .reversed()
+                .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()));
 
-        boolean isAdmin = hall.getAdmin() != null && hall.getAdmin().getId().equals(user.getId()); // [FIX]
-        boolean isMe    = hall.getSubjectId() != null && hall.getSubjectId().equals(user.getId()); // [FIX]
+        List<Photo> result = photos.stream()
+                .filter(photo -> Boolean.TRUE.equals(request.getIsPrivate()) || !photo.getIsPrivate())
+                .filter(photo -> Boolean.TRUE.equals(request.getIsAI()) || !photo.getIsAI())
+                .sorted(comparator)
+                .collect(Collectors.toList());
 
-        // hallId로 Photo 조회
-        List<Photo> photos;
-        if (Boolean.TRUE.equals(request.getIsPrivate())) {
-            photos = photoRepository.findMyPhotos(hallId, user.getId());
-            // 내꺼 다 가져오기 + AI, 정렬
-
-            List<Photo> filteredPhotos = photos.stream()
-                    .filter(photo -> aiFilter(photo, request.getIsAI()))
-                    .collect(Collectors.toList());
-            // 정렬
-            if (Boolean.TRUE.equals(request.getIsBydate())) {
-                // 날짜순 (occurredAt)
-                filteredPhotos.sort(Comparator.comparing(
-                                        Photo::getOccurredAt,
-                                        Comparator.nullsLast(Comparator.naturalOrder())
-                                )
-                                .reversed()
-                                .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
-                );
-            } else {
-                // 업로드순 (uploadedAt)
-                filteredPhotos.sort(Comparator.comparing(
-                                        Photo::getUploadedAt,
-                                        Comparator.nullsLast(Comparator.naturalOrder())
-                                )
-                                .reversed()
-                                .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
-                );
-            }
-            return PhotoConverter.toPhotoListResponseDTO(filteredPhotos);
-
-        } else {
-            photos = photoRepository.findAllByHall(hallId);
-            // 전부다 가져오기(private 이면 안가져옴 ) + AI , 정렬
-            // 필터링
-            List<Photo> filteredPhotos = photos.stream()
-                    .filter(photo -> !photo.getIsPrivate())
-                    .filter(photo -> aiFilter(photo, request.getIsAI()))
-                    .collect(Collectors.toList());
-            // 정렬
-            if (Boolean.TRUE.equals(request.getIsBydate())) {
-                // 날짜순 (occurredAt)
-                filteredPhotos.sort(Comparator.comparing(
-                                        Photo::getOccurredAt,
-                                        Comparator.nullsLast(Comparator.naturalOrder())
-                                )
-                                .reversed()
-                                .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
-                );
-            } else {
-                // 업로드순 (uploadedAt)
-                filteredPhotos.sort(Comparator.comparing(
-                                        Photo::getUploadedAt,
-                                        Comparator.nullsLast(Comparator.naturalOrder())
-                                )
-                                .reversed()
-                                .thenComparing(Photo::getId, Comparator.nullsLast(Comparator.reverseOrder()))
-                );
-            }
-            return PhotoConverter.toPhotoListResponseDTO(filteredPhotos);
-        }
-    }
-    private boolean aiFilter(Photo photo, Boolean isAI) {
-        if (Boolean.TRUE.equals(isAI)) {
-            // isAI=true일 때: AI 사진만
-            return Boolean.TRUE.equals(photo.getIsAi());
-        }
-        // isAI=null 또는 false: 전체 (AI+일반)
-        return true;
+        return PhotoConverter.toPhotoListResponseDTO(result);
     }
 
     @Override
@@ -149,7 +92,7 @@ public class PhotoServiceImpl implements PhotoService {
                 .content(request.getContent())
                 .url(request.getUrl())
                 .isPrivate(Boolean.TRUE.equals(request.getIsPrivate()))
-                .isAi(Boolean.TRUE.equals(request.getIsAI()))
+                .isAI(Boolean.TRUE.equals(request.getIsAI()))
                 .occurredAt(occurredAt)
                 .uploadedAt(LocalDateTime.now())
                 .build();
@@ -331,7 +274,6 @@ public class PhotoServiceImpl implements PhotoService {
             prompt.append("Reference images provided in order:\n");
             for (int i = 0; i < sortedImages.size(); i++) {
                 prompt.append("Image ").append(i + 1).append(": ");
-
                 switch (i) {
                     case 0:
                         prompt.append("Primary subject - Main person (preserve facial identity, features, and likeness)\n");
