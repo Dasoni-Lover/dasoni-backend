@@ -13,8 +13,6 @@ import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
-import dasoni_backend.domain.relationship.entity.Relationship;
-import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
