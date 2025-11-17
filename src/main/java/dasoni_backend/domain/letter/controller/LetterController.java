@@ -8,6 +8,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.letter.service.LetterService;
+import dasoni_backend.domain.relationship.dto.relationshipDTO.SettingDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
 import lombok.RequiredArgsConstructor;
@@ -66,7 +67,7 @@ public class LetterController {
     @DeleteMapping("/{hall_id}/letters/temp/{letter_id}/delete")
     public ResponseEntity<Void> deleteTempLetter(@PathVariable("hall_id") Long hallId, @PathVariable("letter_id") Long letterId, @AuthUser User user) {
         letterService.deleteTempLetter(hallId, letterId, user);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
     // 보낸 편지 삭제
@@ -82,6 +83,30 @@ public class LetterController {
     @DeleteMapping("/me/letters/send")
     public ResponseEntity<Void> sendMeLetter(@PathVariable("letter_id") Long letterId, @RequestBody myLetterRequestDTO request, @AuthUser User user) {
         letterService.sendMeLetter(letterId,request,user);
+        return ResponseEntity.ok().build();
+    }
+
+    // AI 음성편지 설정 조회
+    @GetMapping("{hall_id}/letters/settings")
+    public ResponseEntity<SettingDTO> getLetterSettings(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
+        return ResponseEntity.ok(letterService.getLetterSettings(hallId, user));
+    }
+
+    // AI 음성편지 설정
+    @PostMapping("/{hall_id}/letters/settings/create")
+    public ResponseEntity<Void> createLetterSettings(@PathVariable("hall_id") Long hallId,
+                                                     @RequestBody SettingDTO request,
+                                                     @AuthUser User user) {
+        letterService.createLetterSettings(hallId,request,user);
+        return ResponseEntity.ok().build();
+    }
+
+    // AI 음성편지 설정 수정
+    @PostMapping("{hall_id}/letters/settings/update")
+    public ResponseEntity<Void> updateLetterSettings(@PathVariable("hall_id") Long hallId,
+                                                     @RequestBody SettingDTO request,
+                                                     @AuthUser User user){
+        letterService.updateLetterSettings(hallId,request,user);
         return ResponseEntity.ok().build();
     }
 }

@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -68,6 +69,10 @@ public class Relationship {
     @Column(name = "review")
     private String review;
 
+    // 고인에 대한 설명
+    @Column(name = "explain")
+    private String explain;
+
     // 말버릇
     @Column(name = "speak_habit")
     private String speakHabit;
@@ -84,7 +89,8 @@ public class Relationship {
     @Column(name = "is_send")
     private Boolean isSend;
 
-    // AI 영상편지 설정읆 마쳤는지 여부
+    // AI 음성편지 설정읆 마쳤는지 여부
+    @Default
     @Column(name = "is_set")
-    private Boolean isSet;
+    private Boolean isSet = false;
 }
