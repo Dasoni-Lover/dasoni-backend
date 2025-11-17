@@ -89,6 +89,7 @@ public class Hall {
     @Column(name = "user_num")
     private Integer userNum;
 
+    // 받는 편지함 오픈
     @Column(name = "is_opened")
     private Boolean isOpened;
 
