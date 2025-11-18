@@ -71,7 +71,7 @@ public class Relationship {
 
     // 고인에 대한 설명
     @Column(name = "explanation")
-    private String explain;
+    private String explanation;
 
     // 말버릇
     @Column(name = "speak_habit")

@@ -13,7 +13,7 @@ public class relationshipDTO {
     @AllArgsConstructor
     public static class SettingDTO{
         private String detail;
-        private String explain;
+        private String explanation;
         private Boolean isPolite;
         private String calledName;
         private String speakHabit;
