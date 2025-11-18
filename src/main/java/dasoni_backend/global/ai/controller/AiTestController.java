@@ -1,4 +1,4 @@
-package dasoni_backend.global.ai;
+package dasoni_backend.global.ai.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.ai.google.genai.GoogleGenAiChatModel;
