@@ -19,7 +19,6 @@ import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
-import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.domain.voice.service.VoiceService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -296,5 +294,4 @@ public class LetterServiceImpl implements LetterService{
         relationship.setIsPolite(request.getIsPolite());
         relationship.setCalledName(request.getCalledName());
     }
-
 }
