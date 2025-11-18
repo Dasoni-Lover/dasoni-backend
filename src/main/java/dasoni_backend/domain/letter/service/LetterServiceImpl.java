@@ -129,6 +129,7 @@ public class LetterServiceImpl implements LetterService{
 //        }
         Letter letter = LetterConverter.RequestToLetter(request, hall, user);
         letterRepository.save(letter);
+        // :TODO 여기다가 답장에 isWanted 가 true 면 답장 오도록
     }
 
     // 임시보관함 조회
@@ -152,7 +153,7 @@ public class LetterServiceImpl implements LetterService{
         return LetterConverter.totempLetterDetailResponseDTO(letter);
     }
 
-    // 임시보과  편지 삭제
+    // 임시보관함 편지 삭제
     @Transactional
     @Override
     public void deleteTempLetter(Long hallId, Long letterId, User user) {

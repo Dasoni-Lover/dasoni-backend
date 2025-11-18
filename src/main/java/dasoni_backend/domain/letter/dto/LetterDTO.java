@@ -91,6 +91,7 @@ public class LetterDTO {
         private String content;
         @JsonProperty("isCompleted")
         private boolean isCompleted;
+        private boolean isWanted;
     }
 
     // 6. 임시보관함 조회
