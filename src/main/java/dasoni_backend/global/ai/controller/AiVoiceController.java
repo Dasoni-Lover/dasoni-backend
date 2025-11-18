@@ -18,8 +18,8 @@ public class AiVoiceController {
     private final GeminiVoiceScriptServiceImpl geminiVoiceScriptService;
 
     @PostMapping("/voice-script")
-    public VoiceScriptResponseDTO createVoiceScript(@RequestBody VoiceScriptRequestDTO dto) {
-        String script = geminiVoiceScriptService.generateVoiceScript(dto.getLetterContent());
+    public VoiceScriptResponseDTO createVoiceScript(@RequestBody VoiceScriptRequestDTO request) {
+        String script = geminiVoiceScriptService.generateVoiceReplyScript(request.getCurrentLetterContent(), request.getRecentLetterContents());
         return new VoiceScriptResponseDTO(script);
     }
 }
