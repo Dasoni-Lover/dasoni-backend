@@ -8,6 +8,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
+import dasoni_backend.domain.relationship.dto.relationshipDTO.SettingDTO;
 import dasoni_backend.domain.user.entity.User;
 
 public interface LetterService {
@@ -41,4 +42,13 @@ public interface LetterService {
 
     // 본인추모관 편지 쓰기
     void sendMeLetter(Long letterId, myLetterRequestDTO request, User user);
+
+    // AI 음성편지 설정 조회
+    SettingDTO getLetterSettings(Long hallId, User user);
+
+    // AI 음성편지 설정
+    void createLetterSettings(Long hallId, SettingDTO request, User user);
+
+    // AI 음성편지 설정 수정
+    void updateLetterSettings(Long hallId, SettingDTO request, User user);
 }

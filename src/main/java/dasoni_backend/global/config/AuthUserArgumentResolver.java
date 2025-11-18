@@ -1,7 +1,6 @@
 package dasoni_backend.global.config;
 
 import dasoni_backend.domain.user.repository.UserRepository;
-import dasoni_backend.domain.user.service.UserService;
 import dasoni_backend.global.annotation.AuthUser;
 import dasoni_backend.global.auth.JwtTokenProvider;
 import jakarta.annotation.Nullable;

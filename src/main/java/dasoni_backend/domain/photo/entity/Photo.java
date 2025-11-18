@@ -15,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Local;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -52,13 +51,13 @@ public class Photo {
 
     @Builder.Default
     @Column(name = "is_ai", nullable = false)
-    private Boolean isAi = false;
-
-    @Column(name = "uploaded_at")
-    private LocalDateTime uploadedAt;
+    private Boolean isAI = false;
 
     @Column(name = "occurred_at")
     private LocalDate occurredAt;
+
+    @Column(name = "uploaded_at")
+    private LocalDateTime uploadedAt;
 
     public void updateContent(String content) {
         this.content = content;

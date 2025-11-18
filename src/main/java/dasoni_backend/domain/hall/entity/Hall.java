@@ -1,6 +1,5 @@
 package dasoni_backend.domain.hall.entity;
 
-import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.enums.Personality;
@@ -16,7 +15,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -91,6 +89,7 @@ public class Hall {
     @Column(name = "user_num")
     private Integer userNum;
 
+    // 받는 편지함 오픈
     @Column(name = "is_opened")
     private Boolean isOpened;
 

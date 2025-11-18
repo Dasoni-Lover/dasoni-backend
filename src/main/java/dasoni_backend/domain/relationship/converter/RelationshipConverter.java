@@ -2,6 +2,7 @@ package dasoni_backend.domain.relationship.converter;
 
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.entity.Hall;
+import dasoni_backend.domain.relationship.dto.relationshipDTO.SettingDTO;
 import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.user.entity.User;
 
@@ -16,6 +17,18 @@ public class RelationshipConverter {
                 .natures(request.getNatures())  // List<Personality>를 바로 할당
                 .isSend(false)
                 .isSet(false)
+                .build();
+    }
+
+    public static SettingDTO RelationshiptoSettingDTO(Relationship relationship) {
+        return SettingDTO.builder()
+                .detail(relationship.getDetail())
+                .explain(relationship.getDetail())
+                .isPolite(relationship.getIsPolite())
+                .calledName(relationship.getCalledName())
+                .speakHabit(relationship.getSpeakHabit())
+                .voiceUrl(relationship.getHall().getVoice() != null ?
+                        relationship.getHall().getVoice().getUrl() : null)
                 .build();
     }
 }

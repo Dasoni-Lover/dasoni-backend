@@ -13,24 +13,34 @@ import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
+import dasoni_backend.domain.relationship.converter.RelationshipConverter;
+import dasoni_backend.domain.relationship.dto.relationshipDTO.SettingDTO;
 import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
+import dasoni_backend.domain.voice.entity.Voice;
+import dasoni_backend.domain.voice.service.VoiceService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class LetterServiceImpl implements LetterService{
 
     private final LetterRepository letterRepository;
     private final HallRepository hallRepository;
+    private final RelationshipRepository relationshipRepository;
+    private final VoiceService voiceService;
 
     // 1. 보낸 편지함 목록 조회
     @Transactional(readOnly = true)
@@ -86,23 +96,19 @@ public class LetterServiceImpl implements LetterService{
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        // 음성이 되어있는지 관리자가 설정되어 있는지
+        boolean isOpen = hall.getIsOpened();
 
-        // 베타데모데이 전까지는 음성녹음 기능 구현 x -> 항상 오픈 상태로 두기
-        boolean isOpen = true;
+        // 본인이 설정이 되어 있는 지
+        Relationship relationship = relationshipRepository.findByHallAndUser(hall,user)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        // 일단 false로 해놓고 수요일날 수정
-        boolean isSet = true;
+        boolean isSet = relationship.getIsSet();
 
         return LetterPreCheckResponseDTO.builder()
                 .isOpen(isOpen)
                 .isSet(isSet)
                 .build();
-    }
-    // 추후 교체(letters.setting api 구현 후)
-    private boolean hasAiInfoTemp(Hall hall) {
-        boolean hasName = StringUtils.hasText(hall.getName());
-        boolean hasAnyDate = hall.getBirthday() != null || hall.getDeadday() != null;
-        return hasName && hasAnyDate;
     }
 
     // 5. 추모관에 편지 쓰기 / 임시저장
@@ -205,4 +211,90 @@ public class LetterServiceImpl implements LetterService{
         Letter letter = LetterConverter.toMyLetterEntity(request, hall, user);
         letterRepository.save(letter);
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public SettingDTO getLetterSettings(Long hallId, User user) {
+        Relationship relationship = relationshipRepository
+                .findByHallIdAndUserId(hallId, user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
+
+        return RelationshipConverter.RelationshiptoSettingDTO(relationship);
+    }
+
+    @Override
+    @Transactional
+    public void createLetterSettings(Long hallId, SettingDTO request, User user) {
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new EntityNotFoundException("추모관을 찾을 수 없습니다"));
+
+        Relationship relationship = relationshipRepository
+                .findByHallIdAndUserId(hallId, user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
+
+        // 이미 설정되어 있는지 확인
+        if (Boolean.TRUE.equals(relationship.getIsSet())) {
+            throw new IllegalStateException("이미 설정이 완료되었습니다. 수정을 이용해주세요.");
+        }
+
+        // Relationship 업데이트
+        setRelationship(request,relationship);
+
+        // 음성 파일이 있으면 처리
+        boolean hasVoice = false;
+        if (request.getVoiceUrl() != null && !request.getVoiceUrl().isEmpty()) {
+            voiceService.uploadVoice(hallId,VoiceDTO.builder().url(request.getVoiceUrl()).build(),user);
+            hasVoice = true;
+        }
+
+        // 설정 완료 표시
+        relationship.setIsSet(true);
+        relationshipRepository.save(relationship);
+
+        // 음성까지 있으면 받는 편지함 오픈
+        if (hasVoice) {
+            hall.setIsOpened(true);
+            hallRepository.save(hall);
+            log.info("받는 편지함 오픈: hallId={}", hallId);
+        }
+        log.info("AI 음성편지 설정 생성 완료: hallId={}, userId={}, hasVoice={}",
+                hallId, user.getId(), hasVoice);
+    }
+
+    @Override
+    @Transactional
+    public void updateLetterSettings(Long hallId, SettingDTO request, User user) {
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new EntityNotFoundException("추모관을 찾을 수 없습니다"));
+
+        Relationship relationship = relationshipRepository
+                .findByHallIdAndUserId(hallId, user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
+
+        // 설정되지 않은 경우
+        if (!Boolean.TRUE.equals(relationship.getIsSet())) {
+            throw new IllegalStateException("먼저 설정을 생성해주세요.");
+        }
+
+        // Relationship 업데이트
+        setRelationship(request,relationship);
+        relationshipRepository.save(relationship);
+
+        // 음성 파일 처리
+        if (request.getVoiceUrl() != null && !request.getVoiceUrl().isEmpty()) {
+            voiceService.updateVoice(hall.getId(), VoiceDTO.builder().url(request.getVoiceUrl()).build(), user);
+        }
+
+        log.info("AI 음성편지 설정 수정 완료: hallId={}, userId={}", hallId, user.getId());
+    }
+
+    // 관계 세팅
+    private void setRelationship(SettingDTO request, Relationship relationship) {
+        relationship.setDetail(request.getDetail());
+        relationship.setExplain(request.getExplain());
+        relationship.setSpeakHabit(request.getSpeakHabit());
+        relationship.setIsPolite(request.getIsPolite());
+        relationship.setCalledName(request.getCalledName());
+    }
+
 }
