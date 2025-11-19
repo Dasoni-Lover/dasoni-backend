@@ -47,7 +47,8 @@ public class RequestServiceImpl implements RequestService {
                     .relation(request.getRelation())
                     .detail(request.getDetail())
                     .review(request.getReview())
-                    .natures(request.getNatures())  // ✅ List<Personality> 그대로 복사
+                    .natures(request.getNatures())
+                    .explain(null)
                     .isPolite(null)  // 또는 기본값 설정
                     .speakHabit(null)
                     .calledName(null)
