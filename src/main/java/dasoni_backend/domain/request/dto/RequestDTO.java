@@ -35,6 +35,7 @@ public class RequestDTO {
     // 개별 요청 DTO
     @Data
     @Builder
+    @Getter
     @NoArgsConstructor
     @AllArgsConstructor
     public static class RequestResponseDTO {

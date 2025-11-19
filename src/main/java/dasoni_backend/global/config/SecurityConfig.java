@@ -55,7 +55,10 @@ public class SecurityConfig {
                                 "/api/users/login/**",
                                 "/api/halls/healthy",
                                 "/ai/**",
-                                "/tts/**"
+                                "/tts/**",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**",
+                                "/swagger-resources/**"
                         ).permitAll()
 
                         // ✅ 파일 업로드용 presigned-url (공개 필요시)
