@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.ResponseBytes;
+import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
@@ -138,6 +139,28 @@ public class S3ServiceImpl implements S3Service {
         } catch (Exception e) {
             log.error("S3 파일 다운로드 실패 : {}", s3Key, e);
             throw new RuntimeException("S3 파일 다운로드 실패", e);
+        }
+    }
+
+    @Override
+    public String uploadFile(String s3Key, byte[] fileBytes, String contentType) {
+        try {
+            // 요청 객체
+            PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(s3Key)
+                    .contentType(contentType)
+                    .build();
+
+            // 요청 객체에 직접 실제로 음성 파일(bytes) 올리는 작업
+            // 백엔드가 직접 올리기 때문에 따로 Presigned URL 필요 x
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(fileBytes));
+            log.info("S3 파일 업로드 완료 : {}, s3Key");
+
+            return getS3Url(s3Key);
+        } catch (Exception e) {
+            log.error("S3 파일 업로드 실패 : {}", s3Key, e);
+            throw new RuntimeException("S3 파일 업로드 실패", e);
         }
     }
 }
