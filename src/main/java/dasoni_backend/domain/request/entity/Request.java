@@ -55,7 +55,7 @@ public class Request {
     private String detail;
 
     // 3개의 성격을 List로 저장
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "request_personalities",
             joinColumns = @JoinColumn(name = "request_id")
