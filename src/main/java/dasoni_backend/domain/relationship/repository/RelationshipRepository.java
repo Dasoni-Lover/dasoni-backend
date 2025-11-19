@@ -28,4 +28,7 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Long
 
     // Hall ID와 User ID로 조회
     Optional<Relationship> findByHallIdAndUserId(Long hallId, Long userId);
+
+    // 본인만 빼고 조회
+    List<Relationship> findByHallAndUserIdNot(Hall hall, Long userId);
 }

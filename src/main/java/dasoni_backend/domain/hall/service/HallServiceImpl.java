@@ -213,7 +213,7 @@ public class HallServiceImpl implements HallService {
     public VisitorListResponseDTO getVisitors(Long hallId, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
-        List<Relationship> relationships = relationshipRepository.findByHall(hall);
+        List<Relationship> relationships = relationshipRepository.findByHallAndUserIdNot(hall,user.getId());
         return userConverter.toVisitorListResponseDTO(relationships);
     }
 

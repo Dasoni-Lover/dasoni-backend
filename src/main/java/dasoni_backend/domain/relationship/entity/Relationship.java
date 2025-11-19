@@ -49,7 +49,7 @@ public class Relationship {
 
     // 친구, 연인, 가족 등
     @Enumerated(EnumType.STRING)
-    @Column(name = "relation", length = 20)
+    @Column(name = "relation")
     private RelationKind relation;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -62,7 +62,7 @@ public class Relationship {
     private List<Personality> natures;
 
     // 자세한 관계 설명
-    @Column(name = "detail")
+    @Column(name = "detail", columnDefinition = "TEXT")
     private String detail;
 
     // 한줄평
