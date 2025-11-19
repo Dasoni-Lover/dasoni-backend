@@ -50,7 +50,7 @@ public class HallController {
         return hallService.getManageHallList(admin);
     }
 
-    // 사이드바 정보(임시 notiCount 0)
+    // 사이드바 정보
     @GetMapping("/sidebar")
     public SidebarResponseDTO getSidebar(@AuthUser User user) {
         return hallService.getSidebar(user);

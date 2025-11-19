@@ -62,7 +62,6 @@ public class HallServiceImpl implements HallService {
     @Transactional(readOnly = true)
     @Override
     public HallListResponseDTO getHomeHallList(User user) {
-        // 로그인하지 않았을 경우, 빈 리스트 반환(수정 불가능)
         if (user == null)
             return HallConverter.toHallListResponseDTO(List.of());
 
@@ -84,7 +83,6 @@ public class HallServiceImpl implements HallService {
     @Transactional(readOnly = true)
     @Override
     public SidebarResponseDTO getSidebar(User user) {
-        // notiCount는 추후 알림 연동 예정 : 임시로 0으로 반환
         return SidebarResponseDTO.builder()
                 .name(user.getName())
                 .myProfile(user.getMyProfile())
@@ -224,7 +222,7 @@ public class HallServiceImpl implements HallService {
     public void updateProfile(ProfileRequestDTO request, User user){
         Hall hall = hallRepository.findBySubjectId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 없습니다."));
-        updateProfile(hall, request.getProfile());
+        updateProfile(hall, user,request.getProfile());
     }
 
     @Override
@@ -232,7 +230,7 @@ public class HallServiceImpl implements HallService {
     public void updateHall(Long hallId, HallUpdateRequestDTO request, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
-        updateProfile(hall,request.getProfile());
+        updateProfile(hall,user,request.getProfile());
 
         hall.setName(request.getName());
         hall.setBirthday(parseDate(request.getBirthday()));
@@ -242,7 +240,7 @@ public class HallServiceImpl implements HallService {
     }
 
     // 프로필 변경
-    private void updateProfile(Hall hall, String newProfileUrl) {
+    private void updateProfile(Hall hall,User user, String newProfileUrl) {
         // 기존 프로필 삭제
         if (hall.getProfile() != null && !hall.getProfile().isEmpty()) {
             try {
@@ -255,6 +253,7 @@ public class HallServiceImpl implements HallService {
         }
         // 새 프로필 설정
         hall.setProfile(newProfileUrl);
+        user.setMyProfile(newProfileUrl);
     }
 
     @Override

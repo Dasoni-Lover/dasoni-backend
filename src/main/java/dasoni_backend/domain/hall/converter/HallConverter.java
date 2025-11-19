@@ -30,7 +30,7 @@ public class HallConverter {
                 .name(hall.getName())
                 .birthday(hall.getBirthday())
                 .deadday(hall.getDeadday())
-                .adminName(hall.getAdmin().getName())
+                .adminName(hall.getAdmin() != null ? hall.getAdmin().getName() : "알 수 없음")
                 .build();
     }
 
