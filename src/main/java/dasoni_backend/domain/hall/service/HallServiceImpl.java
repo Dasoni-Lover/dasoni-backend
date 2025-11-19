@@ -258,7 +258,7 @@ public class HallServiceImpl implements HallService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public RequestListResponseDTO getRequests(Long hallId, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
