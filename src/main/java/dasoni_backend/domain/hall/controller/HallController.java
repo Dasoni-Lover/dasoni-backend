@@ -87,7 +87,7 @@ public class HallController {
 
     // 방문자 목록 조회
     @GetMapping("/{hall_id}/visitors")
-    public ResponseEntity<VisitorListResponseDTO>  getVisitorList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
+    public ResponseEntity<VisitorListResponseDTO> getVisitorList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
         return ResponseEntity.ok(hallService.getVisitors(hallId,user));
     }
 
