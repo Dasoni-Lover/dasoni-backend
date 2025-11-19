@@ -8,4 +8,6 @@ public interface S3Service {
     String getS3Url(String s3Key);
     // elevenlabs 용
     byte[] downloadFile(String s3Key);
+    // tts : script -> voice reply
+    String uploadFile(String s3Key, byte[] fileBytes, String contentType);
 }

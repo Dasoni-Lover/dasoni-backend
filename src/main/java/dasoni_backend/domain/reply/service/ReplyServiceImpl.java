@@ -8,8 +8,13 @@ import dasoni_backend.domain.reply.dto.ReplyDTO.AiReplyCreateResponseDTO;
 import dasoni_backend.domain.reply.entity.Reply;
 import dasoni_backend.domain.reply.repository.ReplyRepository;
 import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.S3.service.S3Service;
 import dasoni_backend.global.ai.service.GeminiVoiceScriptServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.springframework.ai.audio.tts.TextToSpeechModel;
+import org.springframework.ai.audio.tts.TextToSpeechPrompt;
+import org.springframework.ai.audio.tts.TextToSpeechResponse;
+import org.springframework.ai.elevenlabs.ElevenLabsTextToSpeechOptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +34,9 @@ public class ReplyServiceImpl implements ReplyService {
     private final ReplyRepository replyRepository;
     private final GeminiVoiceScriptServiceImpl geminiVoiceScriptService;
 
+    private final TextToSpeechModel tts;
+    private final S3Service s3Service;
+
     @Override
     public AiReplyCreateResponseDTO createAiReply(Long hallId, Long letterId, User user) {
         // 추모관 검증
@@ -38,6 +47,7 @@ public class ReplyServiceImpl implements ReplyService {
         Letter targetLetter = letterRepository.findById(letterId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "편지를 찾을 수 없습니다."));
 
+        // 해당 추모관이 맞는지 검증
         if (!targetLetter.getHall().getId().equals(hallId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 추모관의 편지가 아닙니다.");
         }
@@ -47,13 +57,19 @@ public class ReplyServiceImpl implements ReplyService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 편지만 AI 답장을 생성할 수 있습니다.");
         }
 
-        // 최근 편지들 조회(3개)
+        // 고인 음성 존재 여부 체크
+        if(hall.getVoice() == null || hall.getVoice().getVoiceId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "고인 음성이 설정되지 않았습니다. 먼저 음성 파일 업로드 및 voiceId 생성을 완료해주세요.");
+        }
+        String voiceId = hall.getVoice().getVoiceId();
+
+        // 최근 편지들 조회(3개) -> 추후 체크박스로 변경해야함
         List<Letter> recentLetters = letterRepository
                 .findTop3ByHall_IdAndUser_IdAndIsCompletedTrueOrderByCompletedAtDesc(
                         hallId, user.getId()
                 );
 
-        // 이번 편지(content)는 current로, 나머지 2개만 감정 방향성 참고용으로 넘김
+        // 이번 편지(content)는 current로, 나머지 2개만 감정 방향성 참고용으로 넘김 -> 얘도 체크박스로 변경
         String currentLetterContent = targetLetter.getContent();
 
         List<String> recentOthers = recentLetters.stream()
@@ -68,13 +84,26 @@ public class ReplyServiceImpl implements ReplyService {
                 recentOthers
         );
 
+        // Script -> Reply Voice
+        byte[] audioBytes = generateTtsAudio(script, voiceId);
+
+        // S3 업로드 key 생성
+        String s3Key = "audios/replies/" + hallId + "/" + UUID.randomUUID() + ".mp3";
+
+        // S3 음성 업로드
+        s3Service.uploadFile(s3Key, audioBytes, "audio/mpeg");
+
+        // 음성 파일의 URL 생성
+        String audioUrl = s3Service.getS3Url(s3Key);
+
+
         // Reply 엔티티 생성 (일단 audioUrl은 null, 나중에 ElevenLabs + S3 붙이기)
         Reply reply = Reply.builder()
                 .hall(hall)
                 .user(user)          // 누가 요청했는지(나중에 필요하면 고인 계정으로 바꿔도 됨)
                 .letter(targetLetter)
                 .content(script)
-                .audioUrl(null)      // :TODO ElevenLabs TTS + S3 연동 후 URL 저장
+                .audioUrl(audioUrl)
                 .isAi(true)
                 .isChecked(false)
                 .createdAt(LocalDateTime.now())
@@ -90,5 +119,18 @@ public class ReplyServiceImpl implements ReplyService {
                 .isChecked(reply.getIsChecked())
                 .createdAt(reply.getCreatedAt())
                 .build();
+    }
+
+    public byte[] generateTtsAudio(String text, String voiceId) {
+        var options = ElevenLabsTextToSpeechOptions.builder()
+                .model("eleven_turbo_v2_5")
+                .voiceId(voiceId)
+                .outputFormat("mp3_44100_128")
+                .build();
+
+        TextToSpeechPrompt prompt = new TextToSpeechPrompt(text, options);
+        TextToSpeechResponse response = tts.call(prompt);
+
+        return response.getResult().getOutput();
     }
 }
