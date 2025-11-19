@@ -25,7 +25,7 @@ public class ReplyController {
             @PathVariable("letter_id") Long letterId,
             @AuthUser User user
     ) {
-        AiReplyCreateResponseDTO response = replyService.createAiReply(hallId, letterId, user);
+        AiReplyCreateResponseDTO response = replyService.TestcreateAiReply(hallId, letterId, user);
         return ResponseEntity.ok(response);
     }
 }

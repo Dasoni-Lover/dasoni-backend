@@ -17,6 +17,7 @@ import dasoni_backend.domain.relationship.converter.RelationshipConverter;
 import dasoni_backend.domain.relationship.dto.relationshipDTO.SettingDTO;
 import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.repository.RelationshipRepository;
+import dasoni_backend.domain.reply.service.ReplyService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.domain.voice.service.VoiceService;
@@ -39,6 +40,7 @@ public class LetterServiceImpl implements LetterService{
     private final HallRepository hallRepository;
     private final RelationshipRepository relationshipRepository;
     private final VoiceService voiceService;
+    private final ReplyService replyService;
 
     // 1. 보낸 편지함 목록 조회
     @Transactional(readOnly = true)
@@ -129,7 +131,10 @@ public class LetterServiceImpl implements LetterService{
 //        }
         Letter letter = LetterConverter.RequestToLetter(request, hall, user);
         letterRepository.save(letter);
-        // :TODO 여기다가 답장에 isWanted 가 true 면 답장 오도록
+
+        // 답장에 isWanted 가 true 면 답장 오도록
+        if(letter.getIsWanted())
+            replyService.createAiReply(hallId,letter.getId(),user);
     }
 
     // 임시보관함 조회

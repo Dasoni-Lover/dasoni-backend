@@ -20,8 +20,6 @@ public class ReplyDTO {
 
         private String audioUrl;
 
-        private Boolean isAi;
-
         private Boolean isChecked;
 
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd HH:mm")
