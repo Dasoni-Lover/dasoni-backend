@@ -43,20 +43,50 @@ def _decode_b64(s: str) -> Tuple[bytes, Optional[str]]:
     return decoded_bytes, mime
 
 
-def _build_contents(prompt: str, ref_images_b64: List[str]) -> List[types.Content]:
-    """프롬프트와 참조 이미지들을 Gemini API 요청 형식으로 변환 (정렬된 순서 유지)"""
-    parts = [types.Part.from_text(text=prompt)]
+# app/services/gemini.py
 
-    # ✅ 정렬 안 함 (이미 Spring에서 정렬된 순서대로 받음)
+def _build_contents(prompt: str, ref_images_b64: List[str]) -> list[dict]:
+    """
+    프롬프트 + 참조 이미지들을 GenAI SDK가 이해하는 dict 형태로 구성
+    (pydantic types.Content / types.Part 대신 순수 dict 사용)
+    """
+    # 1) 텍스트 part
+    parts: list[dict] = [
+        {
+            "text": prompt
+        }
+    ]
+
+    # 2) 이미지 part들
     for idx, b64 in enumerate(ref_images_b64 or []):
         img_bytes, mime = _decode_b64(b64)
         mime_type = mime or "image/png"
-        parts.append(types.Part.from_bytes(data=img_bytes, mime_type=mime_type))
-        logger.debug(f"참조 이미지 {idx+1}/{len(ref_images_b64)} 추가: mime={mime_type}")
 
-    logger.info(f"Gemini 요청 컨텐츠 생성 완료: prompt_length={len(prompt)}, images={len(ref_images_b64)}")
-    return [types.Content(role="user", parts=parts)]
+        parts.append(
+            {
+                "inline_data": {
+                    "data": img_bytes,      # bytes 그대로
+                    "mime_type": mime_type,
+                }
+            }
+        )
+        logger.debug(
+            f"참조 이미지 {idx+1}/{len(ref_images_b64)} 추가: "
+            f"mime={mime_type}, bytes_len={len(img_bytes)}"
+        )
 
+    contents = [
+        {
+            "role": "user",
+            "parts": parts,
+        }
+    ]
+
+    logger.info(
+        f"Gemini 요청 컨텐츠 생성 완료: "
+        f"prompt_length={len(prompt)}, images={len(ref_images_b64)}"
+    )
+    return contents
 
 def generate_image_base64(prompt: str, ref_images_b64: List[str]) -> str:
     """
