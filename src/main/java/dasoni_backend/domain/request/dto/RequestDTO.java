@@ -21,7 +21,7 @@ public class RequestDTO {
     public static class RequestAcceptDTO {
         private Long requestId;
         @JsonProperty("isAccepted")
-        private boolean isAccepted;
+        private boolean accepted;
     }
 
 
