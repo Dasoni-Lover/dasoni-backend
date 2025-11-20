@@ -20,6 +20,7 @@ import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/halls")
@@ -123,6 +125,8 @@ public class HallController {
     @PostMapping("/{hall_id}/request/accept")
     public ResponseEntity<Void> acceptRequest(@PathVariable("hall_id") Long hallId,
                                               @RequestBody RequestAcceptDTO request){
+        log.info("acceptRequest 호출: hallId={}, requestId={}, isAccept={}",
+                hallId, request.getRequestId(), request.isAccept());
         requestService.acceptRequest(hallId,request);
         return ResponseEntity.ok().build();
     }
