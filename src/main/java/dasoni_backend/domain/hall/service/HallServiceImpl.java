@@ -218,12 +218,16 @@ public class HallServiceImpl implements HallService {
         // 3. 아무 관계도 없음
         return HallStatus.NONE;
     }
+
     @Override
     @Transactional
     public VisitorListResponseDTO getVisitors(Long hallId, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
-        List<Relationship> relationships = relationshipRepository.findByHallAndUserIdNot(hall,user.getId());
+        if (!hall.getAdmin().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
+        List<Relationship> relationships = relationshipRepository.findByHallAndUserNot(hall,user);
         return userConverter.toVisitorListResponseDTO(relationships);
     }
 
