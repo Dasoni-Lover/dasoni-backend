@@ -52,7 +52,7 @@ public class Relationship {
     @Column(name = "relation")
     private RelationKind relation;
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(
             name = "relationship_natures",
             joinColumns = @JoinColumn(name = "relationship_id")

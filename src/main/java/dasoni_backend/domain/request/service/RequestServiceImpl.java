@@ -32,9 +32,14 @@ public class RequestServiceImpl implements RequestService {
         Request request = requestRepository.findById(requestDTO.getRequestId())
                 .orElseThrow(() -> new RuntimeException("Request 없음."));
 
+        if (!request.getHall().getId().equals(hallId)) {
+            throw new IllegalArgumentException("요청한 hallId와 Request의 hall이 일치하지 않습니다.");
+        }
+
         // 거절 : request 가 거절로 바뀜
         if(!requestDTO.isAccepted()){
             request.setStatus(RequestStatus.REJECTED);
+            requestRepository.save(request);
         }
         // 승인 : request -> relationship 생성
         else {
