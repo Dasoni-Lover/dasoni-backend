@@ -37,7 +37,7 @@ public class RequestServiceImpl implements RequestService {
         }
 
         // 거절 : request 가 거절로 바뀜
-        if(!requestDTO.isAccepted()){
+        if(!requestDTO.isAccept()){
             request.setStatus(RequestStatus.REJECTED);
             requestRepository.save(request);
         }

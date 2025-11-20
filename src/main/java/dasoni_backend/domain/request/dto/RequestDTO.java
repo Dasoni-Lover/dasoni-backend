@@ -20,8 +20,8 @@ public class RequestDTO {
     @NoArgsConstructor
     public static class RequestAcceptDTO {
         private Long requestId;
-        @JsonProperty("isAccepted")
-        private boolean accepted;
+        @JsonProperty("isAccept")
+        private boolean isAccept;
     }
 
 
