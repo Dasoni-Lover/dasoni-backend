@@ -63,4 +63,7 @@ public class Letter {
 
     @Column(name = "is_completed", nullable = false)
     private Boolean isCompleted = false;
+
+    @Column(name = "is_wanted")
+    private Boolean isWanted = false;
 }

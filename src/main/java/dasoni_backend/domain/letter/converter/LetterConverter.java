@@ -96,6 +96,7 @@ public class LetterConverter {
                 .fromName(request.getFromName())
                 .content(request.getContent())
                 .isCompleted(request.isCompleted())
+                .isWanted(request.isWanted())
                 .createdAt(LocalDateTime.now())
                 .completedAt(request.isCompleted() ? LocalDateTime.now() : null).build();
     }

@@ -1,5 +1,6 @@
 package dasoni_backend.domain.request.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dasoni_backend.global.enums.Personality;
 import dasoni_backend.global.enums.RelationKind;
 import jakarta.validation.constraints.Size;
@@ -19,7 +20,8 @@ public class RequestDTO {
     @NoArgsConstructor
     public static class RequestAcceptDTO {
         private Long requestId;
-        private boolean isAccepted;
+        @JsonProperty("isAccept")
+        private boolean isAccept;
     }
 
 

@@ -44,7 +44,7 @@ public class UserConverter {
                 .userId(relationship.getUser().getId())
                 .name(relationship.getUser().getName())
                 .relation(relationship.getRelation().getValue())  // "친구", "연인", "가족"
-                .natures(getNatureValues(relationship.getHall().getTargetNatures()))
+                .natures(getNatureValues(relationship.getNatures()))
                 .review(relationship.getReview())
                 .detail(relationship.getDetail())
                 .build();

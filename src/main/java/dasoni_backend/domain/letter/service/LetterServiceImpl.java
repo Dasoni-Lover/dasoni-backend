@@ -17,6 +17,7 @@ import dasoni_backend.domain.relationship.converter.RelationshipConverter;
 import dasoni_backend.domain.relationship.dto.relationshipDTO.SettingDTO;
 import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.repository.RelationshipRepository;
+import dasoni_backend.domain.reply.service.ReplyService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.domain.voice.service.VoiceService;
@@ -39,6 +40,7 @@ public class LetterServiceImpl implements LetterService{
     private final HallRepository hallRepository;
     private final RelationshipRepository relationshipRepository;
     private final VoiceService voiceService;
+    private final ReplyService replyService;
 
     // 1. 보낸 편지함 목록 조회
     @Transactional(readOnly = true)
@@ -129,6 +131,10 @@ public class LetterServiceImpl implements LetterService{
 //        }
         Letter letter = LetterConverter.RequestToLetter(request, hall, user);
         letterRepository.save(letter);
+
+        // 답장에 isWanted 가 true 면 답장 오도록
+        if(letter.getIsWanted())
+            replyService.createAiReply(hallId,letter.getId(),user);
     }
 
     // 임시보관함 조회
@@ -152,7 +158,7 @@ public class LetterServiceImpl implements LetterService{
         return LetterConverter.totempLetterDetailResponseDTO(letter);
     }
 
-    // 임시보과  편지 삭제
+    // 임시보관함 편지 삭제
     @Transactional
     @Override
     public void deleteTempLetter(Long hallId, Long letterId, User user) {
@@ -286,7 +292,7 @@ public class LetterServiceImpl implements LetterService{
     // 관계 세팅
     private void setRelationship(SettingDTO request, Relationship relationship) {
         relationship.setDetail(request.getDetail());
-        relationship.setExplanation(request.getExplain());
+        relationship.setExplanation(request.getExplanation());
         relationship.setSpeakHabit(request.getSpeakHabit());
         relationship.setIsPolite(request.getIsPolite());
         relationship.setCalledName(request.getCalledName());
