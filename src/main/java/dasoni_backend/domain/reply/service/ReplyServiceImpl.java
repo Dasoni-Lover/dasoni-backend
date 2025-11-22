@@ -6,6 +6,8 @@ import dasoni_backend.domain.letter.converter.LetterConverter;
 import dasoni_backend.domain.letter.dto.LetterDTO.ReceiveLetterListResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
+import dasoni_backend.domain.relationship.entity.Relationship;
+import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.domain.reply.dto.ReplyDTO.AiReplyCreateResponseDTO;
 import dasoni_backend.domain.reply.entity.Reply;
 import dasoni_backend.domain.reply.repository.ReplyRepository;
@@ -38,6 +40,7 @@ public class ReplyServiceImpl implements ReplyService {
     private final LetterRepository letterRepository;
     private final ReplyRepository replyRepository;
     private final GeminiVoiceScriptServiceImpl geminiVoiceScriptService;
+    private final RelationshipRepository relationshipRepository;
 
     private final TextToSpeechModel tts;
     private final S3Service s3Service;
@@ -84,10 +87,42 @@ public class ReplyServiceImpl implements ReplyService {
                 .map(Letter::getContent)
                 .toList();
 
+        // 고인 정보
+        Relationship relationship = relationshipRepository
+                .findByHallIdAndUserId(hallId, user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "관계 정보를 찾을 수 없습니다."));
+
+        String relationshipStr = relationship.getRelation() != null
+                ? relationship.getRelation().getValue()
+                : "";
+
+        String deceasedInsight = relationship.getExplanation();
+        String tone = Boolean.TRUE.equals(relationship.getIsPolite()) ? "존댓말" : "반말";
+        String frequentWords = relationship.getSpeakHabit();
+
+        List<String> userDescriptions = relationship.getNatures() != null
+                ? relationship.getNatures().stream().map(p -> p.getValue()).toList()
+                : List.of();
+
+        double eCurrentScore = 0.6;  // TODO
+        double eDepthScore = 0.3;    // TODO
+        // 고인 정보 끝
+
         // GeminiAI 답장 스크립트 생성
+//        String script = geminiVoiceScriptService.generateVoiceReplyScript(
+//                currentLetterContent,
+//                recentOthers
+//        );
         String script = geminiVoiceScriptService.generateVoiceReplyScript(
                 currentLetterContent,
-                recentOthers
+                recentOthers,
+                relationshipStr,
+                deceasedInsight,
+                tone,
+                frequentWords,
+                userDescriptions,
+                eCurrentScore,
+                eDepthScore
         );
 
         // Script -> Reply Voice
@@ -183,10 +218,42 @@ public class ReplyServiceImpl implements ReplyService {
                 .map(Letter::getContent)
                 .toList();
 
+        // 고인 정보
+        Relationship relationship = relationshipRepository
+                .findByHallIdAndUserId(hallId, user.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "관계 정보를 찾을 수 없습니다."));
+
+        String relationshipStr = relationship.getRelation() != null
+                ? relationship.getRelation().getValue()
+                : "";
+
+        String deceasedInsight = relationship.getExplanation();
+        String tone = Boolean.TRUE.equals(relationship.getIsPolite()) ? "존댓말" : "반말";
+        String frequentWords = relationship.getSpeakHabit();
+
+        List<String> userDescriptions = relationship.getNatures() != null
+                ? relationship.getNatures().stream().map(p -> p.getValue()).toList()
+                : List.of();
+
+        double eCurrentScore = 0.6;  // TODO
+        double eDepthScore = 0.3;    // TODO
+        // 고인 정보 끝
+
         // GeminiAI 답장 스크립트 생성
+//        String script = geminiVoiceScriptService.generateVoiceReplyScript(
+//                currentLetterContent,
+//                recentOthers
+//        );
         String script = geminiVoiceScriptService.generateVoiceReplyScript(
                 currentLetterContent,
-                recentOthers
+                recentOthers,
+                relationshipStr,
+                deceasedInsight,
+                tone,
+                frequentWords,
+                userDescriptions,
+                eCurrentScore,
+                eDepthScore
         );
 
         // Script -> Reply Voice
