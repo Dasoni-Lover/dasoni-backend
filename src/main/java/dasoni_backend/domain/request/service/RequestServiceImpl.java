@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -59,7 +61,7 @@ public class RequestServiceImpl implements RequestService {
                     .relation(request.getRelation())
                     .detail(request.getDetail())
                     .review(request.getReview())
-                    .natures(request.getNatures())
+                    .natures(new ArrayList<>(request.getNatures()))
                     .explanation(null)
                     .isPolite(null)
                     .speakHabit(null)
