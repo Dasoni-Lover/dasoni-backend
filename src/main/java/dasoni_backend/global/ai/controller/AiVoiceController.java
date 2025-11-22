@@ -1,5 +1,6 @@
 package dasoni_backend.global.ai.controller;
 
+import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.global.ai.dto.VoiceScriptDTO;
 import dasoni_backend.global.ai.dto.VoiceScriptDTO.VoiceScriptRequestDTO;
 import dasoni_backend.global.ai.dto.VoiceScriptDTO.VoiceScriptResponseDTO;
@@ -16,10 +17,29 @@ import org.springframework.web.bind.annotation.RestController;
 public class AiVoiceController {
 
     private final GeminiVoiceScriptServiceImpl geminiVoiceScriptService;
+    private final RelationshipRepository relationshipRepository;
+//    @PostMapping("/voice-script")
+//    public VoiceScriptResponseDTO createVoiceScript(@RequestBody VoiceScriptRequestDTO request) {
+//        String script = geminiVoiceScriptService.generateVoiceReplyScript(request.getCurrentLetterContent(), request.getRecentLetterContents());
+//        return new VoiceScriptResponseDTO(script);
+//    }
 
     @PostMapping("/voice-script")
     public VoiceScriptResponseDTO createVoiceScript(@RequestBody VoiceScriptRequestDTO request) {
-        String script = geminiVoiceScriptService.generateVoiceReplyScript(request.getCurrentLetterContent(), request.getRecentLetterContents());
+
+        String script = geminiVoiceScriptService.generateVoiceReplyScript(
+                request.getCurrentLetterContent(),
+                request.getRecentLetterContents(),
+                request.getRelationship(),
+                request.getDeceasedInsight(),
+                request.getTone(),
+                request.getFrequentWords(),
+                request.getUserDescriptions(),
+                request.getECurrentScore(),
+                request.getEDepthScore()
+        );
+
         return new VoiceScriptResponseDTO(script);
     }
+
 }
