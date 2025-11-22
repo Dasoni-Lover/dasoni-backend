@@ -25,6 +25,7 @@ import dasoni_backend.domain.user.converter.UserConverter;
 import dasoni_backend.domain.user.dto.UserDTO.ProfileRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.VisitorListResponseDTO;
 import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.domain.user.repository.UserRepository;
 import dasoni_backend.global.S3.service.FileUploadService;
 import dasoni_backend.global.enums.HallStatus;
 import dasoni_backend.global.enums.Personality;
@@ -53,6 +54,7 @@ public class HallServiceImpl implements HallService {
     private final HallQueryRepository hallQueryRepository;
     private final RelationshipRepository relationshipRepository;
     private final RequestRepository requestRepository;
+    private final UserRepository userRepository;
 
     private final UserConverter userConverter;
     private final RequestConverter requestConverter;
@@ -62,11 +64,18 @@ public class HallServiceImpl implements HallService {
     @Transactional(readOnly = true)
     @Override
     public HallListResponseDTO getHomeHallList(User user) {
-        // 로그인하지 않았을 경우, 빈 리스트 반환(수정 불가능)
         if (user == null)
             return HallConverter.toHallListResponseDTO(List.of());
+    // relationships 조회
+        List<Relationship> relationships = relationshipRepository.findByUser(user);
 
-        List<Hall> halls = hallRepository.findAllByFollowerUserIdOrderByCreatedAtDesc(user.getId());
+    // relationships에서 hall들을 추출
+        List<Hall> halls = relationships.stream()
+                .map(Relationship::getHall)  // 각 Relationship에서 Hall을 가져옴
+                .filter(Objects::nonNull)  // null 체크 (안전성)
+                .collect(Collectors.toList());
+
+    // DTO로 변환하여 반환
         return HallConverter.toHallListResponseDTO(halls);
     }
 
@@ -84,7 +93,6 @@ public class HallServiceImpl implements HallService {
     @Transactional(readOnly = true)
     @Override
     public SidebarResponseDTO getSidebar(User user) {
-        // notiCount는 추후 알림 연동 예정 : 임시로 0으로 반환
         return SidebarResponseDTO.builder()
                 .name(user.getName())
                 .myProfile(user.getMyProfile())
@@ -210,12 +218,16 @@ public class HallServiceImpl implements HallService {
         // 3. 아무 관계도 없음
         return HallStatus.NONE;
     }
+
     @Override
     @Transactional
     public VisitorListResponseDTO getVisitors(Long hallId, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
-        List<Relationship> relationships = relationshipRepository.findByHall(hall);
+        if (!hall.getAdmin().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
+        List<Relationship> relationships = relationshipRepository.findByHallAndUserNot(hall,user);
         return userConverter.toVisitorListResponseDTO(relationships);
     }
 
@@ -224,7 +236,7 @@ public class HallServiceImpl implements HallService {
     public void updateProfile(ProfileRequestDTO request, User user){
         Hall hall = hallRepository.findBySubjectId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 없습니다."));
-        updateProfile(hall, request.getProfile());
+        updateProfileAll(hall,user,request.getProfile());
     }
 
     @Override
@@ -232,7 +244,7 @@ public class HallServiceImpl implements HallService {
     public void updateHall(Long hallId, HallUpdateRequestDTO request, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
-        updateProfile(hall,request.getProfile());
+        updateProfileAll(hall,user,request.getProfile());
 
         hall.setName(request.getName());
         hall.setBirthday(parseDate(request.getBirthday()));
@@ -242,7 +254,7 @@ public class HallServiceImpl implements HallService {
     }
 
     // 프로필 변경
-    private void updateProfile(Hall hall, String newProfileUrl) {
+    private void updateProfileAll(Hall hall,User user, String newProfileUrl) {
         // 기존 프로필 삭제
         if (hall.getProfile() != null && !hall.getProfile().isEmpty()) {
             try {
@@ -255,10 +267,12 @@ public class HallServiceImpl implements HallService {
         }
         // 새 프로필 설정
         hall.setProfile(newProfileUrl);
+        user.setMyProfile(newProfileUrl);
+        userRepository.save(user);
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public RequestListResponseDTO getRequests(Long hallId, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));

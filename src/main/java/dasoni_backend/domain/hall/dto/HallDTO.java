@@ -50,12 +50,9 @@ public class HallDTO {
     @Getter
     @Builder
     public static class SidebarResponseDTO {
-
         private String name;
-
         // 프로필 사진
         private String myProfile;
-
         private Integer notiCount; // 알림 수, 추후에 연동
     }
 

@@ -50,15 +50,10 @@ services:
     container_name: dasoni-fastapi
     environment:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
     ports:
       - "8000:8000"
     networks:
       - dasoni-network
-    depends_on:
-      redis:
-        condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
       interval: 30s
@@ -78,26 +73,20 @@ services:
       DB_URL: jdbc:mysql://mysql:3306/${DB_NAME}?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
-
       # Redis 연결
       REDIS_HOST: redis
       REDIS_PORT: 6379
-
       # JWT
       JWT_SECRET: ${JWT_SECRET}
-
       # AWS S3
       S3_ACCESS_KEY: ${S3_ACCESS_KEY}
       S3_SECRET_KEY: ${S3_SECRET_KEY}
       S3_BUCKET_NAME: ${S3_BUCKET_NAME}
-
       # FastAPI URL
       FASTAPI_URL: http://python-fastapi:8000
-
       # ElevenLabs 설정
       ELEVENLABS_URL: ${ELEVENLABS_URL}
       ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY}
-
       # Gemini API Key
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       # Spring Profile

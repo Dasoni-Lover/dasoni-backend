@@ -17,6 +17,7 @@ import dasoni_backend.domain.relationship.converter.RelationshipConverter;
 import dasoni_backend.domain.relationship.dto.relationshipDTO.SettingDTO;
 import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.repository.RelationshipRepository;
+import dasoni_backend.domain.reply.service.ReplyService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.domain.voice.service.VoiceService;
@@ -39,6 +40,7 @@ public class LetterServiceImpl implements LetterService{
     private final HallRepository hallRepository;
     private final RelationshipRepository relationshipRepository;
     private final VoiceService voiceService;
+    private final ReplyService replyService;
 
     // 1. 보낸 편지함 목록 조회
     @Transactional(readOnly = true)
@@ -129,7 +131,10 @@ public class LetterServiceImpl implements LetterService{
 //        }
         Letter letter = LetterConverter.RequestToLetter(request, hall, user);
         letterRepository.save(letter);
-        // :TODO 여기다가 답장에 isWanted 가 true 면 답장 오도록
+
+        // 답장에 isWanted 가 true 면 답장 오도록
+        if(letter.getIsWanted())
+            replyService.createAiReply(hallId,letter.getId(),user);
     }
 
     // 임시보관함 조회
@@ -245,15 +250,12 @@ public class LetterServiceImpl implements LetterService{
             voiceService.uploadVoice(hallId,VoiceDTO.builder().url(request.getVoiceUrl()).build(),user);
             hasVoice = true;
         }
-
         // 설정 완료 표시
         relationship.setIsSet(true);
-        relationshipRepository.save(relationship);
 
         // 음성까지 있으면 받는 편지함 오픈
         if (hasVoice) {
             hall.setIsOpened(true);
-            hallRepository.save(hall);
             log.info("받는 편지함 오픈: hallId={}", hallId);
         }
         log.info("AI 음성편지 설정 생성 완료: hallId={}, userId={}, hasVoice={}",
@@ -275,14 +277,14 @@ public class LetterServiceImpl implements LetterService{
             throw new IllegalStateException("먼저 설정을 생성해주세요.");
         }
 
+        // 음성 파일 먼저 처리
+        if (request.getVoiceUrl() != null && !request.getVoiceUrl().isEmpty()) {
+            voiceService.updateVoice(hall.getId(),
+                    VoiceDTO.builder().url(request.getVoiceUrl()).build(), user);
+        }
+
         // Relationship 업데이트
         setRelationship(request,relationship);
-        relationshipRepository.save(relationship);
-
-        // 음성 파일 처리
-        if (request.getVoiceUrl() != null && !request.getVoiceUrl().isEmpty()) {
-            voiceService.updateVoice(hall.getId(), VoiceDTO.builder().url(request.getVoiceUrl()).build(), user);
-        }
 
         log.info("AI 음성편지 설정 수정 완료: hallId={}, userId={}", hallId, user.getId());
     }
@@ -290,7 +292,7 @@ public class LetterServiceImpl implements LetterService{
     // 관계 세팅
     private void setRelationship(SettingDTO request, Relationship relationship) {
         relationship.setDetail(request.getDetail());
-        relationship.setExplain(request.getExplain());
+        relationship.setExplanation(request.getExplanation());
         relationship.setSpeakHabit(request.getSpeakHabit());
         relationship.setIsPolite(request.getIsPolite());
         relationship.setCalledName(request.getCalledName());

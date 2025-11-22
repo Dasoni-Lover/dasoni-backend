@@ -36,9 +36,6 @@ public class Reply {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "is_ai")
-    private Boolean isAi = false;
-
     @Column(name = "audio_url", columnDefinition = "TEXT")
     private String audioUrl;
 
