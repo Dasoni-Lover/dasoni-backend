@@ -97,7 +97,7 @@ public class LetterServiceImpl implements LetterService{
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
         // 음성이 되어있는지 관리자가 설정되어 있는지
-        boolean isOpen = hall.getIsOpened();
+        boolean isOpen = hall.isOpened();
 
         // 본인이 설정이 되어 있는 지
         Relationship relationship = relationshipRepository.findByHallAndUser(hall,user)
@@ -255,7 +255,7 @@ public class LetterServiceImpl implements LetterService{
 
         // 음성까지 있으면 받는 편지함 오픈
         if (hasVoice) {
-            hall.setIsOpened(true);
+            hall.setOpened(true);
             log.info("받는 편지함 오픈: hallId={}", hallId);
         }
         log.info("AI 음성편지 설정 생성 완료: hallId={}, userId={}, hasVoice={}",

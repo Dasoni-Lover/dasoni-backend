@@ -53,8 +53,9 @@ public class Reply {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "is_checked")
-    private Boolean isChecked = false;
+    @Column(name = "checked")
+    @Builder.Default
+    private boolean checked = false;
 
     @OneToOne
     @JoinColumn(name = "letter_id")

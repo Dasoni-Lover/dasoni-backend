@@ -112,7 +112,7 @@ public class ReplyServiceImpl implements ReplyService {
                 .letter(targetLetter)
                 .content(script)
                 .audioUrl(audioUrl)
-                .isChecked(false)
+                .checked(false)
                 .createdAt(LocalDateTime.now())
                 .build();
 
@@ -124,7 +124,7 @@ public class ReplyServiceImpl implements ReplyService {
                 .replyId(reply.getId())
                 .content(reply.getContent())
                 .audioUrl(reply.getAudioUrl())
-                .isChecked(reply.getIsChecked())
+                .isChecked(reply.isChecked())
                 .createdAt(reply.getCreatedAt())
                 .build();
     }
@@ -202,7 +202,7 @@ public class ReplyServiceImpl implements ReplyService {
                 .letter(targetLetter)
                 .content(script)
                 .audioUrl(audioUrl)
-                .isChecked(false)
+                .checked(false)
                 .createdAt(LocalDateTime.now())
                 .build();
 
