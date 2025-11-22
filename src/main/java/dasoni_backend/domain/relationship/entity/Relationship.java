@@ -70,8 +70,8 @@ public class Relationship {
     private String review;
 
     // 고인에 대한 설명
-    @Column(name = "explain")
-    private String explain;
+    @Column(name = "explanation")
+    private String explanation;
 
     // 말버릇
     @Column(name = "speak_habit")

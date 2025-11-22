@@ -286,7 +286,7 @@ public class LetterServiceImpl implements LetterService{
     // 관계 세팅
     private void setRelationship(SettingDTO request, Relationship relationship) {
         relationship.setDetail(request.getDetail());
-        relationship.setExplain(request.getExplain());
+        relationship.setExplanation(request.getExplain());
         relationship.setSpeakHabit(request.getSpeakHabit());
         relationship.setIsPolite(request.getIsPolite());
         relationship.setCalledName(request.getCalledName());

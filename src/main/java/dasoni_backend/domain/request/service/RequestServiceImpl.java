@@ -48,7 +48,7 @@ public class RequestServiceImpl implements RequestService {
                     .detail(request.getDetail())
                     .review(request.getReview())
                     .natures(request.getNatures())
-                    .explain(null)
+                    .explanation(null)
                     .isPolite(null)  // 또는 기본값 설정
                     .speakHabit(null)
                     .calledName(null)
