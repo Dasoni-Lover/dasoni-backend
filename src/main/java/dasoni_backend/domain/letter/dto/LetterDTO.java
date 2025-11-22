@@ -137,4 +137,23 @@ public class LetterDTO {
         private String fromName;
         private String content;
     }
+
+    // 받은 편지함 조회
+    @Getter
+    @Builder
+    public static class ReceiveLetterListResponseDTO {
+        private int count;
+        private List<ReceiveLetterResponseDTO> replies;
+    }
+
+    @Getter
+    @Builder
+    public static class ReceiveLetterResponseDTO {
+        private Long replyId;
+        private String userName;
+        private String subjectName;
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
+        private LocalDateTime createdAt;
+        private boolean isChecked;
+    }
 }

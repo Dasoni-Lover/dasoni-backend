@@ -50,8 +50,10 @@ dependencies {
     implementation 'org.springframework.ai:spring-ai-starter-model-google-genai'
 
     // Spring AI - ElevenLabs
+    implementation 'org.springframework.ai:spring-ai-elevenlabs'
+    implementation 'org.springframework.ai:spring-ai-openai'
     implementation 'org.springframework.ai:spring-ai-starter-model-elevenlabs'
-
+    implementation platform("org.springframework.ai:spring-ai-bom:1.0.0")
 
     // Database
     runtimeOnly 'com.mysql:mysql-connector-j'
@@ -68,6 +70,7 @@ dependencies {
     // Test
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
 }
 
 dependencyManagement {
