@@ -2,6 +2,7 @@ package dasoni_backend.domain.letter.controller;
 
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterPreCheckResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.ReceiveLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
@@ -9,6 +10,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.letter.service.LetterService;
 import dasoni_backend.domain.relationship.dto.relationshipDTO.SettingDTO;
+import dasoni_backend.domain.reply.service.ReplyService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LetterController {
 
     private final LetterService letterService;
+    private final ReplyService replyService;
 
     @GetMapping("/{hall_id}/letters/list")
     public ResponseEntity<SentLetterListResponseDTO> getSentLetterList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
@@ -87,7 +90,7 @@ public class LetterController {
     }
 
     // AI 음성편지 설정 조회
-    @GetMapping("{hall_id}/letters/settings")
+    @GetMapping("/{hall_id}/letters/settings")
     public ResponseEntity<SettingDTO> getLetterSettings(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
         return ResponseEntity.ok(letterService.getLetterSettings(hallId, user));
     }
@@ -102,11 +105,17 @@ public class LetterController {
     }
 
     // AI 음성편지 설정 수정
-    @PostMapping("{hall_id}/letters/settings/update")
+    @PostMapping("/{hall_id}/letters/settings/update")
     public ResponseEntity<Void> updateLetterSettings(@PathVariable("hall_id") Long hallId,
                                                      @RequestBody SettingDTO request,
                                                      @AuthUser User user){
         letterService.updateLetterSettings(hallId,request,user);
         return ResponseEntity.ok().build();
+    }
+
+    // 받은 편지함 조회
+    @GetMapping("/{hall_id}/letters/reply/list")
+    public ResponseEntity<ReceiveLetterListResponseDTO> getReceiveLetterList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
+        return ResponseEntity.ok(replyService.getReceiveLetterList(hallId, user));
     }
 }

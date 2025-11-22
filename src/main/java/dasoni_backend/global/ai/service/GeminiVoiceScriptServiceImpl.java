@@ -14,30 +14,6 @@ import java.util.Map;
 public class GeminiVoiceScriptServiceImpl {
 
     private final GoogleGenAiChatModel chatModel;
-//    테스트용
-//    public String generateVoiceScript(String letterContent) {
-//        String template = """
-//                너는 편지를 '음성으로 읽기 좋은 스크립트'로 변환하는 역할이야.
-//                요구사항:
-//                - 감정은 담되 과하지 않게.
-//                - 구어체로 자연스럽게.
-//                - 너무 길면 짧게 정리.
-//                - 존댓말 유지.
-//                - 문장 사이 약간의 쉬는 느낌을 넣기 위해 적절히 끊어줘.
-//                - 말투는 따뜻하고 차분하게.
-//
-//                원문:
-//                {content}
-//
-//                변환된 음성 스크립트:
-//                """;
-//
-//        PromptTemplate promptTemplate = new PromptTemplate(template);
-//        Prompt prompt = promptTemplate.create(Map.of("content", letterContent));
-//
-//        return chatModel.call(prompt).getResult().getOutput().getContent();
-//
-//    }
 
     public String generateVoiceReplyScript(String currentLetterContent,
                                            List<String> recentLetterContents) {

@@ -2,6 +2,8 @@ package dasoni_backend.domain.reply.service;
 
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallRepository;
+import dasoni_backend.domain.letter.converter.LetterConverter;
+import dasoni_backend.domain.letter.dto.LetterDTO.ReceiveLetterListResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
 import dasoni_backend.domain.reply.dto.ReplyDTO.AiReplyCreateResponseDTO;
@@ -16,6 +18,7 @@ import org.springframework.ai.audio.tts.TextToSpeechModel;
 import org.springframework.ai.audio.tts.TextToSpeechPrompt;
 import org.springframework.ai.audio.tts.TextToSpeechResponse;
 import org.springframework.ai.elevenlabs.ElevenLabsTextToSpeechOptions;
+import org.springframework.ai.elevenlabs.api.ElevenLabsApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -130,6 +133,15 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     @Override
+    public ReceiveLetterListResponseDTO getReceiveLetterList(Long hallId, User user) {
+
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "추모관을 찾을 수 없습니다."));
+
+        List<Reply> replies = replyRepository.findAllByHall_IdAndUser_IdOrderByCreatedAtDesc(hallId, user.getId());
+
+        return LetterConverter.toReceiveLetterListResponseDTO(replies);
+    }
     public void createAiReply(Long hallId, Long letterId, User user){
         // 추모관 검증
         Hall hall = hallRepository.findById(hallId)
@@ -213,9 +225,14 @@ public class ReplyServiceImpl implements ReplyService {
     }
 
     public byte[] generateTtsAudio(String text, String voiceId) {
+
+        // stability, similarityBoost, style, useSpeakerBoost, speed
+        var voiceSettings = new ElevenLabsApi.SpeechRequest.VoiceSettings((Double)0.4, (Double)0.75, (Double)0.0, Boolean.TRUE, (Double)0.85);
+
         var options = ElevenLabsTextToSpeechOptions.builder()
                 .model("eleven_turbo_v2_5")
                 .voiceId(voiceId)
+                .voiceSettings(voiceSettings)
                 .outputFormat("mp3_44100_128")
                 .build();
 
