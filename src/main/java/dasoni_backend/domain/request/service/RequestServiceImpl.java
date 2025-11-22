@@ -16,6 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+
 @Slf4j
 @Service
 @AllArgsConstructor
@@ -35,31 +37,33 @@ public class RequestServiceImpl implements RequestService {
         if (!request.getHall().getId().equals(hallId)) {
             throw new IllegalArgumentException("요청한 hallId와 Request의 hall이 일치하지 않습니다.");
         }
-        log.info("찾은 Request: id={}, hallId={}, status={}",
-                request.getId(),
-                request.getHall().getId(),
-                request.getStatus());
 
-        // 거절 : request 가 거절로 바뀜
-        if(!requestDTO.isAccept()){
-            log.info("Request 거절이요!");
-            request.setStatus(RequestStatus.REJECTED);
-            requestRepository.save(request);
+        // 이미 처리된 요청인지 체크
+        if (request.getStatus() != RequestStatus.PENDING) {
+            throw new IllegalStateException("이미 처리된 요청입니다.");
         }
-        // 승인 : request -> relationship 생성
+
+        // 거절
+        if(!requestDTO.isAccept()){
+            log.info("Request 거절!");
+            request.setStatus(RequestStatus.REJECTED);
+            // save() 불필요 - Dirty Checking
+        }
+        // 승인
         else {
+            log.info("Request 승인!");
             request.setStatus(RequestStatus.APPROVED);
 
-            // Request 데이터로 Relationship 생성
+            // Relationship 생성
             Relationship relationship = Relationship.builder()
                     .hall(request.getHall())
                     .user(request.getUser())
                     .relation(request.getRelation())
                     .detail(request.getDetail())
                     .review(request.getReview())
-                    .natures(request.getNatures())
+                    .natures(new ArrayList<>(request.getNatures()))
                     .explanation(null)
-                    .isPolite(null)  // 또는 기본값 설정
+                    .isPolite(null)
                     .speakHabit(null)
                     .calledName(null)
                     .isSend(false)
@@ -67,7 +71,12 @@ public class RequestServiceImpl implements RequestService {
                     .build();
 
             request.getHall().incrementUserNum();
+
+            // 새 엔티티만 save() 필수!
             relationshipRepository.save(relationship);
+
+            log.info("Relationship 생성 완료: userId={}, hallId={}",
+                    request.getUser().getId(), request.getHall().getId());
         }
     }
 

@@ -61,9 +61,11 @@ public class Letter {
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
 
+    @Builder.Default
     @Column(name = "is_completed", nullable = false)
     private Boolean isCompleted = false;
 
+    @Builder.Default
     @Column(name = "is_wanted")
     private Boolean isWanted = false;
 }
