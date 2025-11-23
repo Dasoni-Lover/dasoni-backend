@@ -97,7 +97,7 @@ public class ReplyServiceImpl implements ReplyService {
                 : "";
 
         String deceasedInsight = relationship.getExplanation();
-        String tone = Boolean.TRUE.equals(relationship.getIsPolite()) ? "존댓말" : "반말";
+        String tone = Boolean.TRUE.equals(relationship.getPolite()) ? "존댓말" : "반말";
         String frequentWords = relationship.getSpeakHabit();
 
         List<String> userDescriptions = relationship.getNatures() != null
@@ -228,7 +228,7 @@ public class ReplyServiceImpl implements ReplyService {
                 : "";
 
         String deceasedInsight = relationship.getExplanation();
-        String tone = Boolean.TRUE.equals(relationship.getIsPolite()) ? "존댓말" : "반말";
+        String tone = Boolean.TRUE.equals(relationship.getPolite()) ? "존댓말" : "반말";
         String frequentWords = relationship.getSpeakHabit();
 
         List<String> userDescriptions = relationship.getNatures() != null

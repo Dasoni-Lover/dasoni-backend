@@ -173,7 +173,7 @@ public class LetterConverter {
                 .createdAt(reply.getCreatedAt())
 //                NPE 방지 위해
 //                .isChecked(reply.getIsChecked())
-                .isChecked(Boolean.TRUE.equals(reply.getIsChecked()))
+                .isChecked(reply.isChecked())
                 .build();
     }
 
