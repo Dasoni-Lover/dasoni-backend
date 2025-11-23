@@ -110,4 +110,3 @@ public class Hall {
         this.userNum = (this.userNum == null ? 0 : this.userNum) + 1;
     }
 }
-

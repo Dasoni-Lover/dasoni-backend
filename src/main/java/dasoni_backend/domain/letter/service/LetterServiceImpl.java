@@ -103,7 +103,7 @@ public class LetterServiceImpl implements LetterService{
         Relationship relationship = relationshipRepository.findByHallAndUser(hall,user)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        boolean isSet = relationship.getIsSet();
+        boolean isSet = relationship.isSet();
 
         return LetterPreCheckResponseDTO.builder()
                 .isOpen(isOpen)
@@ -237,7 +237,7 @@ public class LetterServiceImpl implements LetterService{
                 .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
 
         // 이미 설정되어 있는지 확인
-        if (Boolean.TRUE.equals(relationship.getIsSet())) {
+        if (relationship.isSet()) {
             throw new IllegalStateException("이미 설정이 완료되었습니다. 수정을 이용해주세요.");
         }
 
@@ -251,7 +251,7 @@ public class LetterServiceImpl implements LetterService{
             hasVoice = true;
         }
         // 설정 완료 표시
-        relationship.setIsSet(true);
+        relationship.setSet(true);
 
         // 음성까지 있으면 받는 편지함 오픈
         if (hasVoice) {
@@ -273,16 +273,14 @@ public class LetterServiceImpl implements LetterService{
                 .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
 
         // 설정되지 않은 경우
-        if (!Boolean.TRUE.equals(relationship.getIsSet())) {
+        if (!relationship.isSet()) {
             throw new IllegalStateException("먼저 설정을 생성해주세요.");
         }
-
         // 음성 파일 먼저 처리
         if (request.getVoiceUrl() != null && !request.getVoiceUrl().isEmpty()) {
             voiceService.updateVoice(hall.getId(),
                     VoiceDTO.builder().url(request.getVoiceUrl()).build(), user);
         }
-
         // Relationship 업데이트
         setRelationship(request,relationship);
 
@@ -294,7 +292,7 @@ public class LetterServiceImpl implements LetterService{
         relationship.setDetail(request.getDetail());
         relationship.setExplanation(request.getExplanation());
         relationship.setSpeakHabit(request.getSpeakHabit());
-        relationship.setIsPolite(request.getIsPolite());
+        relationship.setPolite(request.getIsPolite());
         relationship.setCalledName(request.getCalledName());
     }
 }

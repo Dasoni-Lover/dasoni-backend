@@ -14,9 +14,9 @@ public class RelationshipConverter {
                 .hall(hall)
                 .relation(request.getRelation())
                 .review(request.getReview())
-                .natures(request.getNatures())  // List<Personality>를 바로 할당
-                .isSend(false)
-                .isSet(false)
+                .natures(request.getNatures())
+                .send(false)
+                .set(false)
                 .build();
     }
 
@@ -24,7 +24,7 @@ public class RelationshipConverter {
         return SettingDTO.builder()
                 .detail(relationship.getDetail())
                 .explanation(relationship.getDetail())
-                .isPolite(relationship.getIsPolite())
+                .isPolite(relationship.getPolite())
                 .calledName(relationship.getCalledName())
                 .speakHabit(relationship.getSpeakHabit())
                 .voiceUrl(relationship.getHall().getVoice() != null ?

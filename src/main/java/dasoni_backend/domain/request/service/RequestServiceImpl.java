@@ -63,11 +63,11 @@ public class RequestServiceImpl implements RequestService {
                     .review(request.getReview())
                     .natures(new ArrayList<>(request.getNatures()))
                     .explanation(null)
-                    .isPolite(null)
+                    .polite(null)
                     .speakHabit(null)
                     .calledName(null)
-                    .isSend(false)
-                    .isSet(false)
+                    .send(false)
+                    .set(false)
                     .build();
 
             request.getHall().incrementUserNum();
