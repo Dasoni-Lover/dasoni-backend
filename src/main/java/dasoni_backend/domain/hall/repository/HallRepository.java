@@ -40,7 +40,7 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
             "(:name IS NULL OR h.name LIKE %:name%) AND " +
             "(:birthday IS NULL OR h.birthday = :birthday) AND " +
             "(:deadDay IS NULL OR h.deadday = :deadDay) AND " +
-            "h.isSecret = false")
+            "h.secret = false")
     List<Hall> searchHalls(
             @Param("name") String name,
             @Param("birthday") LocalDate birthday,
