@@ -62,7 +62,7 @@ public class HallConverter {
                 .birthday(user.getBirthday())
                 .profile(user.getMyProfile())
                 .createdAt(LocalDateTime.now())
-                .isOpened(true)
+                .opened(true)
                 .userNum(1)
                 .build();
     }
@@ -81,7 +81,7 @@ public class HallConverter {
                 .phone(request.getPhone())
                 .docs(request.getDocs())
                 .createdAt(LocalDateTime.now())
-                .isOpened(true)
+                .opened(true)
                 .userNum(1)
                 .build();
     }
@@ -118,7 +118,7 @@ public class HallConverter {
                 .phone(phone)
                 .review(review)
                 .adminName(adminName)
-                .isOpen(Boolean.TRUE.equals(hall.getIsOpened()))
+                .isOpen(hall.isOpened())
                 .build();
 
         return HallDetailDataResponseDTO.builder()

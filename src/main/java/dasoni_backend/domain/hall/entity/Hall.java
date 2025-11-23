@@ -90,8 +90,9 @@ public class Hall {
     private Integer userNum;
 
     // 받는 편지함 오픈
-    @Column(name = "is_opened")
-    private Boolean isOpened;
+    @Column(name = "opened")
+    @Builder.Default
+    private boolean opened = false;
 
     @Column(name = "docs", columnDefinition = "TEXT")
     private String docs;
@@ -101,12 +102,11 @@ public class Hall {
     private String review;
 
     // 추모관 비공개 여부
-    @Column(name = "is_secret")
+    @Column(name = "secret")
     @Builder.Default
-    private boolean isSecret = false;
+    private boolean secret = false;
 
     public void incrementUserNum() {
         this.userNum = (this.userNum == null ? 0 : this.userNum) + 1;
     }
 }
-

@@ -276,13 +276,23 @@ public class PhotoServiceImpl implements PhotoService {
                 prompt.append("Image ").append(i + 1).append(": ");
                 switch (i) {
                     case 0:
-                        prompt.append("Primary subject - Main person (preserve facial identity, features, and likeness)\n");
+                        prompt.append("1. Primary Subject (Image 1)\n" +
+                                "- Role: Main Character (ANCHOR)\n" +
+                                "- Instruction: This image is MANDATORY. You must strictly preserve this person's facial identity, features, and likeness in the final output.\n");
                         break;
                     case 1:
-                        prompt.append("Secondary subject - Additional person (preserve facial identity and features)\n");
+                        prompt.append("2. Secondary Subject (Image 2)\n" +
+                                "- Role: Additional Character (Optional)\n" +
+                                "- Instruction:\n" +
+                                "    - IF an image is provided here: Maintain this person's facial identity and render them interacting with the Primary Subject.\n" +
+                                "    - IF NO image is provided here: Ignore this reference and focus solely on the Primary Subject (unless the Task description explicitly asks to generate another generic person).\n");
                         break;
                     case 2:
-                        prompt.append("Background environment - Location/setting to use as the scene\n");
+                        prompt.append("3. Background Environment (Image 3)\n" +
+                                "- Role: Scene Setting (Optional)\n" +
+                                "- Instruction:\n" +
+                                "    - IF an image is provided here: Use this exact location as the background. Analyze its lighting, shadows, and perspective to blend the subjects seamlessly.\n" +
+                                "    - IF NO image is provided here: Generate a realistic background based on the context described in the \"Task\" below.\n");
                         break;
                     default:
                         prompt.append("Additional reference image\n");
@@ -296,13 +306,26 @@ public class PhotoServiceImpl implements PhotoService {
 
         // ✅ 생성 요구사항
         prompt.append("""
-        Generation requirements:
-        • Create a photorealistic composite image combining all reference elements
-        • Preserve the exact facial identities, features, and likeness of both people
-        • Place the subjects naturally in the background environment
-        • Maintain natural lighting and perspective consistent with the background
-        • Ensure seamless blending without visible artifacts or distortions
-        • Generate high-quality output with proper composition and depth
+        Generation Requirements:
+        • Photorealistic Composite: Create a high-quality, realistic image combining the active reference elements.
+        
+        • STRICT IDENTITY ENFORCEMENT (CRITICAL):
+            - The facial features (eye shape, nose structure, mouth, jawline) must be an exact replica of the reference image.
+            - Do NOT apply "beautification" filters, smooth skin excessively, or alter the person's age.
+            - Preserve imperfections: Keep distinctive marks like moles, scars, skin texture, and facial asymmetry as they define the identity.
+            - Priority: Facial resemblance is MORE important than artistic style or lighting effects.
+        
+        • Atmosphere & Tone:
+            - The overall mood must be bright, warm, gentle, and inviting.
+            - Lighting: Use bright, soft, and diffused lighting to create an airy and luminous atmosphere. The scene should be well-lit and vibrant.
+            - Color Palette: Use light and warm tones (e.g., morning sunlight, soft creamy whites, light pastels, vibrant natural colors).
+            - Avoid: Dim lighting, muddy colors, harsh contrasts, dark shadows, or cold/clinical visual styles.
+        
+        • Natural Integration:
+            - If a Background Image is provided: Adjust the subjects' lighting to match the background, but apply a bright and warm color grading to the final composite.
+            - If NO Background Image is provided: Generate a background that inherently supports this bright, warm, and soft mood.
+        
+        • Quality: Ensure seamless blending without visible artifacts, distortions, or "floating" effects. High resolution and correct perspective are required.
         """);
 
         return prompt.toString();

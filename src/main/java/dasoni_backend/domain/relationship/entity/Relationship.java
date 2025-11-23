@@ -19,7 +19,6 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Builder.Default;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -83,14 +82,14 @@ public class Relationship {
 
     // 존댓말 여부
     @Column(name = "is_polite")
-    private Boolean isPolite;
+    private Boolean polite;
 
     // 오늘 편지를 보냈는지 여부
     @Column(name = "is_send")
-    private Boolean isSend;
+    private boolean send;
 
     // AI 음성편지 설정읆 마쳤는지 여부
     @Builder.Default
     @Column(name = "is_set")
-    private Boolean isSet = false;
+    private boolean set = false;
 }
