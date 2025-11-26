@@ -46,4 +46,13 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
             @Param("birthday") LocalDate birthday,
             @Param("deadDay") LocalDate deadDay
     );
+
+    // 생일 월/일로 조회
+    @Query("SELECT h FROM Hall h WHERE MONTH(h.birthday) = :month AND DAY(h.birthday) = :day")
+    List<Hall> findByBirthdayMonthAndDay(@Param("month") int month, @Param("day") int day);
+
+    // 기일 월/일로 조회 (deadday)
+    @Query("SELECT h FROM Hall h WHERE MONTH(h.deadday) = :month AND DAY(h.deadday) = :day")
+    List<Hall> findByDeaddayMonthAndDay(@Param("month") int month, @Param("day") int day);
+
 }
