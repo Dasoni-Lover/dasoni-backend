@@ -47,6 +47,7 @@ public class ReplyServiceImpl implements ReplyService {
 
     @Override
     public AiReplyCreateResponseDTO TestcreateAiReply(Long hallId, Long letterId, User user) {
+
         // 추모관 검증
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "추모관을 찾을 수 없습니다."));
@@ -71,21 +72,29 @@ public class ReplyServiceImpl implements ReplyService {
         }
         String voiceId = hall.getVoice().getVoiceId();
 
-        //:TODO 체크 1개 + 체크를 제외한 최근 2개, 두개가 모두 한달 이내에 와야함
-        // 최근 편지들 조회(3개) -> 추후 체크박스로 변경해야함
-        List<Letter> recentLetters = letterRepository
+        // 6. 한 달 이내 완료된 편지 중 최신 2개 조회
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+
+        List<Letter> recentTwo = letterRepository
                 .findTop3ByHall_IdAndUser_IdAndIsCompletedTrueOrderByCompletedAtDesc(
                         hallId, user.getId()
-                );
+                ).stream()
+                .filter(l -> l.getCompletedAt() != null && l.getCompletedAt().isAfter(oneMonthAgo))
+                .limit(2)
+                .toList();
+
+        // 7. 감정 편지
+        String p1Emotion = "";
+        String p2Emotion = "";
+        if (!recentTwo.isEmpty()) {
+            p1Emotion = recentTwo.getFirst().getContent();
+            if (recentTwo.size() > 1) {
+                p2Emotion = recentTwo.getLast().getContent();
+            }
+        }
 
         // 이번 편지(content)는 current로, 나머지 2개만 감정 방향성 참고용으로 넘김 -> 얘도 체크박스로 변경
         String currentLetterContent = targetLetter.getContent();
-
-        List<String> recentOthers = recentLetters.stream()
-                .filter(l -> !l.getId().equals(letterId))   // 지금 편지는 빼고
-                .limit(2)                                   // 1개만
-                .map(Letter::getContent)
-                .toList();
 
         // 고인 정보
         Relationship relationship = relationshipRepository
@@ -104,8 +113,6 @@ public class ReplyServiceImpl implements ReplyService {
                 ? relationship.getNatures().stream().map(p -> p.getValue()).toList()
                 : List.of();
 
-        double eCurrentScore = 0.6;  // TODO
-        double eDepthScore = 0.3;    // TODO
         // 고인 정보 끝
 
         // GeminiAI 답장 스크립트 생성
@@ -115,16 +122,14 @@ public class ReplyServiceImpl implements ReplyService {
 //        );
         String script = geminiVoiceScriptService.generateVoiceReplyScript(
                 currentLetterContent,
-                recentOthers,
+                p1Emotion,
+                p2Emotion,
                 relationshipStr,
                 deceasedInsight,
                 tone,
                 frequentWords,
-                userDescriptions,
-                eCurrentScore,
-                eDepthScore
+                userDescriptions
         );
-
         // Script -> Reply Voice
         byte[] audioBytes = generateTtsAudio(script, voiceId);
 
@@ -202,21 +207,29 @@ public class ReplyServiceImpl implements ReplyService {
         }
         String voiceId = hall.getVoice().getVoiceId();
 
-        //:TODO 체크 1개 + 체크를 제외한 최근 2개, 두개가 모두 한달 이내에 와야함
-        // 최근 편지들 조회(3개) -> 추후 체크박스로 변경해야함
-        List<Letter> recentLetters = letterRepository
+        // 6. 한 달 이내 완료된 편지 중 최신 2개 조회
+        LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
+
+        List<Letter> recentTwo = letterRepository
                 .findTop3ByHall_IdAndUser_IdAndIsCompletedTrueOrderByCompletedAtDesc(
                         hallId, user.getId()
-                );
+                ).stream()
+                .filter(l -> l.getCompletedAt() != null && l.getCompletedAt().isAfter(oneMonthAgo))
+                .limit(2)
+                .toList();
+
+        // 7. 감정 편지
+        String p1Emotion = "";
+        String p2Emotion = "";
+        if (!recentTwo.isEmpty()) {
+            p1Emotion = recentTwo.getFirst().getContent();
+            if (recentTwo.size() > 1) {
+                p2Emotion = recentTwo.getLast().getContent();
+            }
+        }
 
         // 이번 편지(content)는 current로, 나머지 2개만 감정 방향성 참고용으로 넘김 -> 얘도 체크박스로 변경
         String currentLetterContent = targetLetter.getContent();
-
-        List<String> recentOthers = recentLetters.stream()
-                .filter(l -> !l.getId().equals(letterId))   // 지금 편지는 빼고
-                .limit(2)                                   // 1개만
-                .map(Letter::getContent)
-                .toList();
 
         // 고인 정보
         Relationship relationship = relationshipRepository
@@ -235,8 +248,6 @@ public class ReplyServiceImpl implements ReplyService {
                 ? relationship.getNatures().stream().map(p -> p.getValue()).toList()
                 : List.of();
 
-        double eCurrentScore = 0.6;  // TODO
-        double eDepthScore = 0.3;    // TODO
         // 고인 정보 끝
 
         // GeminiAI 답장 스크립트 생성
@@ -246,14 +257,13 @@ public class ReplyServiceImpl implements ReplyService {
 //        );
         String script = geminiVoiceScriptService.generateVoiceReplyScript(
                 currentLetterContent,
-                recentOthers,
+                p1Emotion,
+                p2Emotion,
                 relationshipStr,
                 deceasedInsight,
                 tone,
                 frequentWords,
-                userDescriptions,
-                eCurrentScore,
-                eDepthScore
+                userDescriptions
         );
 
         // Script -> Reply Voice

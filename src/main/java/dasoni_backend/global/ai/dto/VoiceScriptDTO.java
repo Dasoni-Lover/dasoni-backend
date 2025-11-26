@@ -22,16 +22,13 @@ public class VoiceScriptDTO {
     public static class VoiceScriptRequestDTO {
 
         private String currentLetterContent;
-        private List<String> recentLetterContents;
-
+        private String p1Emotion;
+        private String p2Emotion;
         private String relationship;
         private String deceasedInsight;
         private String tone;
         private String frequentWords;
         private List<String> userDescriptions;
-
-        private double eCurrentScore;
-        private double eDepthScore;
     }
 
     @Getter
