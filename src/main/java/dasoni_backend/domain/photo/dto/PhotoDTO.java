@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class PhotoDTO {
@@ -17,7 +18,6 @@ public class PhotoDTO {
         private Boolean isPrivate;
         private Boolean isBydate;
         private Boolean isAI;
-        private Boolean isMine;
     }
 
     @Getter
@@ -47,6 +47,7 @@ public class PhotoDTO {
         private Long id;
         private String url;
         private Boolean isAI;
+        private Long ts;
     }
 
     @Getter
