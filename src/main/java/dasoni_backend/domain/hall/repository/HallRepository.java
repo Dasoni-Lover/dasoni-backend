@@ -47,7 +47,7 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
 
      @Query("""
             SELECT h FROM Hall h
-            WHERE h.isSecret = false
+            WHERE h.secret = false
             AND (:name IS NULL OR h.name LIKE %:name%)
             AND (:birthday IS NULL OR h.birthday= :birthday)
             AND (:deadDay IS NULL OR h.deadday =:deadDay)
