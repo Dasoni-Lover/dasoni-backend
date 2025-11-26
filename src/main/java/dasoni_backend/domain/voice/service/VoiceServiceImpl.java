@@ -77,7 +77,6 @@ public class VoiceServiceImpl implements VoiceService {
         // 업데이트 후 저장
         voiceRepository.save(voice);
         hall.setVoice(voice);
-        hallRepository.save(hall);
     }
 
     @Override
