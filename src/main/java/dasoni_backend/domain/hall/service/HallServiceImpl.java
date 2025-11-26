@@ -179,16 +179,17 @@ public class HallServiceImpl implements HallService {
 
     @Override
     @Transactional
-    public HallSearchResponseListDTO searchHalls(HallSearchRequestDTO requestDTO, User user) {
+    public HallSearchResponseListDTO searchHallsExceptMine(HallSearchRequestDTO requestDTO, User user) {
 
         LocalDate birthday = parseDate(requestDTO.getBirthday());
         LocalDate deadDay = parseDate(requestDTO.getDeadDay());
 
         // Repository에서 검색 (isSecret=false 자동 필터링)
-        List<Hall> halls = hallRepository.searchHalls(
+        List<Hall> halls = hallRepository.searchHallsExceptMine(
                 requestDTO.getName(),
                 birthday,
-                deadDay
+                deadDay,
+                user.getId()
         );
 
         // DTO 변환 및 status 설정
