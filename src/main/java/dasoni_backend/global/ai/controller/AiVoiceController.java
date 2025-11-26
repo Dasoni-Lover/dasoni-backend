@@ -29,17 +29,15 @@ public class AiVoiceController {
 
         String script = geminiVoiceScriptService.generateVoiceReplyScript(
                 request.getCurrentLetterContent(),
-                request.getRecentLetterContents(),
+                request.getP1Emotion(),
+                request.getP2Emotion(),
                 request.getRelationship(),
                 request.getDeceasedInsight(),
                 request.getTone(),
                 request.getFrequentWords(),
-                request.getUserDescriptions(),
-                request.getECurrentScore(),
-                request.getEDepthScore()
+                request.getUserDescriptions()
         );
 
         return new VoiceScriptResponseDTO(script);
     }
-
 }
