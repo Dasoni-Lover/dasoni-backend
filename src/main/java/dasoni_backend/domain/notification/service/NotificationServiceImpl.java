@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -26,4 +27,12 @@ public class NotificationServiceImpl implements NotificationService {
                 notificationRepository.findByUserAndIsReadFalseOrderByCreatedAtDesc(user);
         return NotificationConverter.toListDTO(notifications);
     }
+    @Override
+    @Transactional
+    public void closeNotification(Long notificationId, User user){
+        Notification notification = notificationRepository.findById(notificationId)
+                .orElseThrow(() -> new NoSuchElementException("Notification with id " + notificationId + " does not exist"));
+        notification.setIsRead(true);
+    }
+
 }
