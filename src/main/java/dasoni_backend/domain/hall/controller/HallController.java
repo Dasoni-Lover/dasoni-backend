@@ -124,7 +124,8 @@ public class HallController {
     // 추모관 입장 or 거절
     @PostMapping("/{hall_id}/request/accept")
     public ResponseEntity<Void> acceptRequest(@PathVariable("hall_id") Long hallId,
-                                              @RequestBody RequestAcceptDTO request){
+                                              @RequestBody RequestAcceptDTO request,
+                                              @AuthUser User user){
         log.info("acceptRequest 호출: hallId={}, requestId={}, isAccept={}",
                 hallId, request.getRequestId(), request.isAccept());
         requestService.acceptRequest(hallId,request);
