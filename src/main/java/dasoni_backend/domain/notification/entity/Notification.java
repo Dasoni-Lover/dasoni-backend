@@ -16,17 +16,18 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "notifications")
 public class Notification {
-
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,9 +48,6 @@ public class Notification {
     @Column(name = "title", length = 200, nullable = false)
     private String title;
 
-    @Column(name = "body", columnDefinition = "TEXT", nullable = false)
-    private String body;
-
     @Column(name = "is_read", nullable = false)
     private Boolean isRead = false;
 
@@ -68,17 +66,16 @@ public class Notification {
                 .user(user)
                 .kind(kind)
                 .title(generateTitle(hall))  // 제목 생성
-                .body(kind.getBodyMessage())  // Enum에서 본문 가져오기
                 .isRead(false)
                 .createdAt(LocalDateTime.now())
                 .build();
     }
 
     private static String generateTitle(Hall hall) {
-        return String.format("故 %s 추모관", hall.getDeceasedName());
+        if(hall.getAdmin().getId().equals(hall.getSubjectId()))
+            return String.format("%s 추모관", hall.getName());
+        else return String.format("故 %s 추모관", hall.getName());
     }
-
-
 }
 
 
