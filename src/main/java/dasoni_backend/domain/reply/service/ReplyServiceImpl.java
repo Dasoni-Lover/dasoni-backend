@@ -6,6 +6,7 @@ import dasoni_backend.domain.letter.converter.LetterConverter;
 import dasoni_backend.domain.letter.dto.LetterDTO.ReceiveLetterListResponseDTO;
 import dasoni_backend.domain.letter.entity.Letter;
 import dasoni_backend.domain.letter.repository.LetterRepository;
+import dasoni_backend.domain.notification.service.NotificationService;
 import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.domain.reply.dto.ReplyDTO.AiReplyCreateResponseDTO;
@@ -14,6 +15,7 @@ import dasoni_backend.domain.reply.repository.ReplyRepository;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.S3.service.S3Service;
 import dasoni_backend.global.ai.service.GeminiVoiceScriptServiceImpl;
+import dasoni_backend.global.enums.NotificationKind;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.audio.tts.TextToSpeechModel;
@@ -44,6 +46,7 @@ public class ReplyServiceImpl implements ReplyService {
 
     private final TextToSpeechModel tts;
     private final S3Service s3Service;
+    private final NotificationService notificationService;
 
     @Override
     public AiReplyCreateResponseDTO TestcreateAiReply(Long hallId, Long letterId, User user) {
@@ -298,7 +301,7 @@ public class ReplyServiceImpl implements ReplyService {
         log.info("\n엔티티 생성 완료!\n");
 
         replyRepository.save(reply);
-
+        notificationService.createNotification(hall, user, NotificationKind.REPLY_ARRIVED);
     }
 
     public byte[] generateTtsAudio(String text, String voiceId) {

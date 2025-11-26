@@ -104,7 +104,7 @@ public class HallController {
 
     // 추모관 검색
     @PostMapping("/search")
-    public ResponseEntity<HallSearchResponseListDTO> updateVoice(@RequestBody HallSearchRequestDTO request, @AuthUser User user){
+    public ResponseEntity<HallSearchResponseListDTO> searchHalls(@RequestBody HallSearchRequestDTO request, @AuthUser User user){
         HallSearchResponseListDTO response = hallService.searchHallsExceptMine(request, user);
         return ResponseEntity.ok(response);
     }
@@ -134,7 +134,8 @@ public class HallController {
     // 추모관 입장 or 거절
     @PostMapping("/{hall_id}/request/accept")
     public ResponseEntity<Void> acceptRequest(@PathVariable("hall_id") Long hallId,
-                                              @RequestBody RequestAcceptDTO request){
+                                              @RequestBody RequestAcceptDTO request,
+                                              @AuthUser User user){
         log.info("acceptRequest 호출: hallId={}, requestId={}, isAccept={}",
                 hallId, request.getRequestId(), request.isAccept());
         requestService.acceptRequest(hallId,request);

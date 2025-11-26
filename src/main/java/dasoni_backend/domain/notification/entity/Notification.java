@@ -14,10 +14,20 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "notifications")
 public class Notification {
 
@@ -34,20 +44,40 @@ public class Notification {
     private User user;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "kind")
+    @Column(name = "kind", nullable = false)
     private NotificationKind kind;
 
     @Column(name = "title", length = 200, nullable = false)
     private String title;
 
-    @Column(name = "body", columnDefinition = "TEXT")
-    private String body;
-
     @Column(name = "is_read", nullable = false)
     private Boolean isRead = false;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    // 읽음 처리
+    public void markAsRead() {
+        this.isRead = true;
+    }
+
+    // 생성 메소드
+    public static Notification create(Hall hall, User user, NotificationKind kind) {
+        return Notification.builder()
+                .hall(hall)
+                .user(user)
+                .kind(kind)
+                .title(generateTitle(hall))  // 제목 생성
+                .isRead(false)
+                .createdAt(LocalDateTime.now())
+                .build();
+    }
+
+    private static String generateTitle(Hall hall) {
+        if(hall.getAdmin().getId().equals(hall.getSubjectId()))
+            return String.format("%s 추모관", hall.getName());
+        else return String.format("故 %s 추모관", hall.getName());
+    }
 }
 
 

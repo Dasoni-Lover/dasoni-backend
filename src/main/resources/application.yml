@@ -1,7 +1,10 @@
 spring:
   application:
     name: dasoni-backend
-
+  task:
+    scheduling:
+      pool:
+        size: 5
   # Redis 설정 - Docker 컨테이너 이름 사용
   data:
     redis:

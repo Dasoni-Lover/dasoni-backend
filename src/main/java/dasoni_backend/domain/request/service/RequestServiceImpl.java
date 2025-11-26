@@ -2,6 +2,7 @@ package dasoni_backend.domain.request.service;
 
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallRepository;
+import dasoni_backend.domain.notification.service.NotificationService;
 import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.domain.request.converter.RequestConverter;
@@ -10,6 +11,7 @@ import dasoni_backend.domain.request.dto.RequestDTO.RequestAcceptDTO;
 import dasoni_backend.domain.request.entity.Request;
 import dasoni_backend.domain.request.repository.RequestRepository;
 import dasoni_backend.domain.user.entity.User;
+import dasoni_backend.global.enums.NotificationKind;
 import dasoni_backend.global.enums.RequestStatus;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +28,7 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final HallRepository hallRepository;
     private final RelationshipRepository relationshipRepository;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -77,6 +80,7 @@ public class RequestServiceImpl implements RequestService {
 
             log.info("Relationship 생성 완료: userId={}, hallId={}",
                     request.getUser().getId(), request.getHall().getId());
+            notificationService.createNotification(request.getHall(),request.getUser(),NotificationKind.REQUEST_APPROVED);
         }
     }
 
@@ -90,5 +94,6 @@ public class RequestServiceImpl implements RequestService {
         // Request 생성 및 저장
         Request request = RequestConverter.toRequest(user, hall, requestDTO);
         requestRepository.save(request);
+        notificationService.createNotification(hall, hall.getAdmin(), NotificationKind.ENTRY_REQUEST);
     }
 }
