@@ -43,6 +43,9 @@ public interface HallService {
     // 추모관 방문자 조회
     VisitorListResponseDTO getVisitors(Long hallId, User user);
 
+    // 추모관 방문자 내보내기
+    void getOutVisitor(Long hallId, Long visitorId, User user);
+
     // 프로필 사진 수정
     void updateProfile(ProfileRequestDTO request, User user);
 
