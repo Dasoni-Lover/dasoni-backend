@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,17 +36,6 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
     // 본인 추모관인지 확인하기 위한
     Optional<Hall> findBySubjectId(Long subjectId);
 
-    // 추모관 검색
-    @Query("SELECT h FROM Hall h WHERE " +
-            "(:name IS NULL OR h.name LIKE %:name%) AND " +
-            "(:birthday IS NULL OR h.birthday = :birthday) AND " +
-            "(:deadDay IS NULL OR h.deadday = :deadDay) AND " +
-            "h.secret = false")
-    List<Hall> searchHalls(
-            @Param("name") String name,
-            @Param("birthday") LocalDate birthday,
-            @Param("deadDay") LocalDate deadDay
-    );
 
     // 생일 월/일로 조회
     @Query("SELECT h FROM Hall h WHERE MONTH(h.birthday) = :month AND DAY(h.birthday) = :day")
@@ -54,5 +44,15 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
     // 기일 월/일로 조회 (deadday)
     @Query("SELECT h FROM Hall h WHERE MONTH(h.deadday) = :month AND DAY(h.deadday) = :day")
     List<Hall> findByDeaddayMonthAndDay(@Param("month") int month, @Param("day") int day);
+
+     @Query("""
+            SELECT h FROM Hall h
+            WHERE h.isSecret = false
+            AND (:name IS NULL OR h.name LIKE %:name%)
+            AND (:birthday IS NULL OR h.birthday= :birthday)
+            AND (:deadDay IS NULL OR h.deadday =:deadDay)
+            AND (h.subjectId <> :userId)
+            """)
+    List<Hall> searchHallsExceptMine(@Param("name")String name, @Param("birthday") LocalDate birthday, @Param("deadDay")LocalDate deadDay, @Param("userId")Long userId);
 
 }

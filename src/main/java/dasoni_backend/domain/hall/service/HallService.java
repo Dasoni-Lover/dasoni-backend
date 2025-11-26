@@ -9,10 +9,16 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallUpdateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.MyHallResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.SidebarResponseDTO;
+import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.request.dto.RequestDTO.RequestListResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.ProfileRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.VisitorListResponseDTO;
 import dasoni_backend.domain.user.entity.User;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 public interface HallService {
 
@@ -37,11 +43,14 @@ public interface HallService {
     // 본인 추모관 조회
     MyHallResponseDTO getMyHall(User user);
 
-    // 추모관 검색
-    HallSearchResponseListDTO searchHalls(HallSearchRequestDTO request, User user);
+    // 추모관 검색(나의 추모관 제외)
+    HallSearchResponseListDTO searchHallsExceptMine(HallSearchRequestDTO requestDTO, User user);
 
     // 추모관 방문자 조회
     VisitorListResponseDTO getVisitors(Long hallId, User user);
+
+    // 추모관 방문자 내보내기
+    void getOutVisitor(Long hallId, Long visitorId, User user);
 
     // 프로필 사진 수정
     void updateProfile(ProfileRequestDTO request, User user);

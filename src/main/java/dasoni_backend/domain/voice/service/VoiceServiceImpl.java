@@ -63,24 +63,41 @@ public class VoiceServiceImpl implements VoiceService {
                 String oldS3Key = fileUploadService.extractS3Key(oldVoice.getUrl());
                 fileUploadService.deleteFile(oldS3Key);
                 log.info("기존 음성 파일 삭제 완료: {}", oldS3Key);
+                hall.setVoice(null);
+                voiceRepository.delete(oldVoice);
+                voiceRepository.flush();
             } catch (Exception e) {
                 log.warn("기존 음성 파일 삭제 실패: {}", e.getMessage());
             }
         }
 
-        Voice voice = Voice.builder()
+        Voice newVoice = Voice.builder()
                 .url(request.getUrl())
                 .updateAt(LocalDateTime.now())
                 .build();
 
         // 업데이트 후 저장
-        voiceRepository.save(voice);
-        hall.setVoice(voice);
-        hallRepository.save(hall);
+        voiceRepository.save(newVoice);
+        hall.setVoice(newVoice);
     }
 
     @Override
     @Transactional
+    public void deleteVoice(Long hallId, User user){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
+        if (!hall.getAdmin().getId().equals(user.getId())) {
+            throw new IllegalStateException("권한이 없습니다");
+        }
+        Voice oldVoice = hall.getVoice();
+        String oldUrl = oldVoice.getUrl();
+        fileUploadService.deleteFile(fileUploadService.extractS3Key(oldUrl));
+        voiceRepository.delete(oldVoice);
+        hall.setVoice(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public VoiceDTO getVoice(Long hallId, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
@@ -90,6 +107,11 @@ public class VoiceServiceImpl implements VoiceService {
         }
 
         Voice voice = hall.getVoice();
+
+        if (voice == null) {
+            return VoiceDTO.builder()
+                    .url(null)
+                    .build();         }
 
         return VoiceDTO.builder()
                 .url(voice.getUrl())

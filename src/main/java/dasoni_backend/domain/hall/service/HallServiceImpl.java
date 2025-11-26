@@ -38,6 +38,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -178,16 +179,17 @@ public class HallServiceImpl implements HallService {
 
     @Override
     @Transactional
-    public HallSearchResponseListDTO searchHalls(HallSearchRequestDTO requestDTO, User user) {
+    public HallSearchResponseListDTO searchHallsExceptMine(HallSearchRequestDTO requestDTO, User user) {
 
         LocalDate birthday = parseDate(requestDTO.getBirthday());
         LocalDate deadDay = parseDate(requestDTO.getDeadDay());
 
         // Repository에서 검색 (isSecret=false 자동 필터링)
-        List<Hall> halls = hallRepository.searchHalls(
+        List<Hall> halls = hallRepository.searchHallsExceptMine(
                 requestDTO.getName(),
                 birthday,
-                deadDay
+                deadDay,
+                user.getId()
         );
 
         // DTO 변환 및 status 설정
@@ -219,6 +221,8 @@ public class HallServiceImpl implements HallService {
         return HallStatus.NONE;
     }
 
+
+    // 방문자 조회
     @Override
     @Transactional
     public VisitorListResponseDTO getVisitors(Long hallId, User user){
@@ -230,6 +234,24 @@ public class HallServiceImpl implements HallService {
         List<Relationship> relationships = relationshipRepository.findByHallAndUserNot(hall,user);
         return userConverter.toVisitorListResponseDTO(relationships);
     }
+    // 방문자 내보내기
+    @Override
+    @Transactional
+    public void getOutVisitor(Long hallId, Long visitorId, User user){
+
+        Hall hall = hallRepository.findById(hallId).orElseThrow(()->new NoSuchElementException("추모관 존재X"));
+
+        if(!hall.getAdmin().getId().equals(user.getId())){
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
+        User visitor = userRepository.findById(visitorId).orElseThrow(()->new NoSuchElementException(("방문자 존재X")));
+
+        Relationship relationship = relationshipRepository.findByHallAndUser(hall,visitor)
+                .orElseThrow(() -> new IllegalArgumentException("관계가 없습니다."));
+
+        relationshipRepository.delete(relationship);
+    }
+
 
     @Override
     @Transactional
@@ -239,6 +261,7 @@ public class HallServiceImpl implements HallService {
         updateProfileAll(hall,user,request.getProfile());
     }
 
+    // 추모관 정보 수정
     @Override
     @Transactional
     public void updateHall(Long hallId, HallUpdateRequestDTO request, User user){
