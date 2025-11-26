@@ -11,6 +11,10 @@ public interface VoiceService {
     // 추모관 음성파일 수정
     void updateVoice(Long hallId, VoiceDTO request, User user);
 
+    //추모관 음성파일 삭제
+    void deleteVoice(Long hallId, User user);
+
+    // 추모관 음성파일 조회
     VoiceDTO getVoice(Long hallId, User user);
 
     // elevenlabs 용 : create IVC voice
