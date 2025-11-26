@@ -66,7 +66,7 @@ public class PhotoServiceImpl implements PhotoService {
                 .sorted(comparator)
                 .collect(Collectors.toList());
 
-        return PhotoConverter.toPhotoListResponseDTO(result);
+        return PhotoConverter.toPhotoListResponseDTO(result, Boolean.TRUE.equals(request.getIsBydate()));
     }
 
     @Override
