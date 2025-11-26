@@ -63,6 +63,7 @@ public class VoiceServiceImpl implements VoiceService {
                 String oldS3Key = fileUploadService.extractS3Key(oldVoice.getUrl());
                 fileUploadService.deleteFile(oldS3Key);
                 log.info("기존 음성 파일 삭제 완료: {}", oldS3Key);
+                voiceRepository.delete(oldVoice);
             } catch (Exception e) {
                 log.warn("기존 음성 파일 삭제 실패: {}", e.getMessage());
             }
@@ -105,6 +106,11 @@ public class VoiceServiceImpl implements VoiceService {
         }
 
         Voice voice = hall.getVoice();
+
+        if (voice == null) {
+            return VoiceDTO.builder()
+                    .url(null)
+                    .build();         }
 
         return VoiceDTO.builder()
                 .url(voice.getUrl())
