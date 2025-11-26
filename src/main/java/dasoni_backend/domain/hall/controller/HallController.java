@@ -95,7 +95,7 @@ public class HallController {
 
     // 추모관 검색
     @PostMapping("/search")
-    public ResponseEntity<HallSearchResponseListDTO> updateVoice(@RequestBody HallSearchRequestDTO request, @AuthUser User user){
+    public ResponseEntity<HallSearchResponseListDTO> searchHalls(@RequestBody HallSearchRequestDTO request, @AuthUser User user){
         return ResponseEntity.ok(hallService.searchHalls(request,user));
     }
 

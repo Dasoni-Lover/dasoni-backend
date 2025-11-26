@@ -27,6 +27,7 @@ public class NotificationServiceImpl implements NotificationService {
                 notificationRepository.findByUserAndIsReadFalseOrderByCreatedAtDesc(user);
         return NotificationConverter.toListDTO(notifications);
     }
+
     @Override
     @Transactional
     public void closeNotification(Long notificationId, User user){
@@ -34,5 +35,4 @@ public class NotificationServiceImpl implements NotificationService {
                 .orElseThrow(() -> new NoSuchElementException("Notification with id " + notificationId + " does not exist"));
         notification.setIsRead(true);
     }
-
 }
