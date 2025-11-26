@@ -93,6 +93,15 @@ public class HallController {
         return ResponseEntity.ok(hallService.getVisitors(hallId,user));
     }
 
+    // 방문자 내보내기
+    @PatchMapping("{hall_id}/visitor/{user_id}/out")
+    public ResponseEntity<Void> getOutVisitor(@PathVariable("hall_id") Long hallId,
+                                              @PathVariable("user_id") Long userId,
+                                              @AuthUser User user) {
+        hallService.getOutVisitor(hallId,userId,user);
+        return ResponseEntity.ok().build();
+    }
+
     // 추모관 검색
     @PostMapping("/search")
     public ResponseEntity<HallSearchResponseListDTO> updateVoice(@RequestBody HallSearchRequestDTO request, @AuthUser User user){
