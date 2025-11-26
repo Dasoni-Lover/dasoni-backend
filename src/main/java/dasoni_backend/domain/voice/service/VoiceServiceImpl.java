@@ -63,20 +63,22 @@ public class VoiceServiceImpl implements VoiceService {
                 String oldS3Key = fileUploadService.extractS3Key(oldVoice.getUrl());
                 fileUploadService.deleteFile(oldS3Key);
                 log.info("기존 음성 파일 삭제 완료: {}", oldS3Key);
+                hall.setVoice(null);
                 voiceRepository.delete(oldVoice);
+                voiceRepository.flush();
             } catch (Exception e) {
                 log.warn("기존 음성 파일 삭제 실패: {}", e.getMessage());
             }
         }
 
-        Voice voice = Voice.builder()
+        Voice newVoice = Voice.builder()
                 .url(request.getUrl())
                 .updateAt(LocalDateTime.now())
                 .build();
 
         // 업데이트 후 저장
-        voiceRepository.save(voice);
-        hall.setVoice(voice);
+        voiceRepository.save(newVoice);
+        hall.setVoice(newVoice);
     }
 
     @Override
@@ -95,7 +97,7 @@ public class VoiceServiceImpl implements VoiceService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public VoiceDTO getVoice(Long hallId, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
