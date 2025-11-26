@@ -105,7 +105,8 @@ public class HallController {
     // 추모관 검색
     @PostMapping("/search")
     public ResponseEntity<HallSearchResponseListDTO> updateVoice(@RequestBody HallSearchRequestDTO request, @AuthUser User user){
-        return ResponseEntity.ok(hallService.searchHalls(request,user));
+        HallSearchResponseListDTO response = hallService.searchHallsExceptMine(request, user);
+        return ResponseEntity.ok(response);
     }
 
     // 본인 추모관 프로필 수정
