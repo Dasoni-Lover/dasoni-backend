@@ -12,6 +12,7 @@ public class NotificationConverter {
     public static NotificationResponseDTO toDTO(Notification notification) {
         return NotificationResponseDTO.builder()
                 .notificationId(notification.getId())
+                .hallId(notification.getHall().getId())
                 .kind(notification.getKind().getDescription())
                 .title(notification.getTitle())  // "故 박영수 추모관"
                 .body(notification.getKind().getBodyMessage())  // Enum에서 body 가져오기
