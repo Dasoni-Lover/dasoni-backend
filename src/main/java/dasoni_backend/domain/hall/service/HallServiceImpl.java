@@ -184,12 +184,15 @@ public class HallServiceImpl implements HallService {
         LocalDate birthday = parseDate(requestDTO.getBirthday());
         LocalDate deadDay = parseDate(requestDTO.getDeadDay());
 
+        // user가 null일 수 있으므로 안전하게 id를 추출
+        Long userId = (user != null) ? user.getId() : null;
+
         // Repository에서 검색 (isSecret=false 자동 필터링)
         List<Hall> halls = hallRepository.searchHallsExceptMine(
                 requestDTO.getName(),
                 birthday,
                 deadDay,
-                user.getId()
+                userId
         );
 
         // DTO 변환 및 status 설정
@@ -203,6 +206,11 @@ public class HallServiceImpl implements HallService {
     }
 
     private HallStatus determineHallStatus(Hall hall, User user) {
+        // 인증된 사용자가 없으면 상태는 NONE
+        if (user == null) {
+            return HallStatus.NONE;
+        }
+
         // 1. Relationship 확인 - 이미 참여 중인가?
         boolean hasRelationship = relationshipRepository.existsByHallAndUser(hall, user);
 
