@@ -56,11 +56,6 @@ public class Notification {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    // 읽음 처리
-    public void markAsRead() {
-        this.isRead = true;
-    }
-
     // 생성 메소드
     public static Notification create(Hall hall, User user, NotificationKind kind) {
         return Notification.builder()

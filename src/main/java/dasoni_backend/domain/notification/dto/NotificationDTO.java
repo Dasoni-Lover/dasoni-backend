@@ -15,6 +15,7 @@ public class NotificationDTO {
     @AllArgsConstructor
     public static class NotificationResponseDTO{
         private Long notificationId;
+        private Long hallId;
         private String kind;
         private String title;
         private String body;
