@@ -258,7 +258,9 @@ public class HallServiceImpl implements HallService {
     public void updateProfile(ProfileRequestDTO request, User user){
         Hall hall = hallRepository.findBySubjectId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 없습니다."));
-        updateProfileAll(hall,user,request.getProfile());
+        updateProfileHall(hall,request.getProfile());
+        user.setMyProfile(request.getProfile());
+        userRepository.save(user);
     }
 
     // 추모관 정보 수정
@@ -267,7 +269,7 @@ public class HallServiceImpl implements HallService {
     public void updateHall(Long hallId, HallUpdateRequestDTO request, User user){
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
-        updateProfileAll(hall,user,request.getProfile());
+        updateProfileHall(hall,request.getProfile());
 
         hall.setName(request.getName());
         hall.setBirthday(parseDate(request.getBirthday()));
@@ -277,7 +279,7 @@ public class HallServiceImpl implements HallService {
     }
 
     // 프로필 변경
-    private void updateProfileAll(Hall hall,User user, String newProfileUrl) {
+    private void updateProfileHall(Hall hall,String newProfileUrl) {
         // 기존 프로필 삭제
         if (hall.getProfile() != null && !hall.getProfile().isEmpty()) {
             try {
@@ -290,8 +292,6 @@ public class HallServiceImpl implements HallService {
         }
         // 새 프로필 설정
         hall.setProfile(newProfileUrl);
-        user.setMyProfile(newProfileUrl);
-        userRepository.save(user);
     }
 
     @Override
