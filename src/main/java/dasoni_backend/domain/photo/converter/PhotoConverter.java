@@ -4,6 +4,7 @@ import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoDetailResponseDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoInfoDTO;
 import dasoni_backend.domain.photo.dto.PhotoDTO.PhotoListResponseDTO;
 import dasoni_backend.domain.photo.entity.Photo;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value.Bool;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,11 +25,13 @@ public class PhotoConverter {
 
         Long ts = null;
 
-        if(photo.getOccurredAt() != null) {
-            ts = photo.getOccurredAt()
-                    .atStartOfDay(ZoneId.of("Asia/Seoul"))
-                    .toInstant()
-                    .toEpochMilli();
+        if(Boolean.TRUE.equals(isBydate)) {
+            if(photo.getOccurredAt() != null) {
+                ts = photo.getOccurredAt()
+                        .atStartOfDay(ZoneId.of("Asia/Seoul"))
+                        .toInstant()
+                        .toEpochMilli();
+            }
         }
         else {
             if(photo.getUploadedAt() != null) {
