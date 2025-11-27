@@ -53,6 +53,7 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
             AND (:deadDay IS NULL OR h.deadday =:deadDay)
             AND (h.subjectId <> :userId)
             """)
-    List<Hall> searchHallsExceptMine(@Param("name")String name, @Param("birthday") LocalDate birthday, @Param("deadDay")LocalDate deadDay, @Param("userId")Long userId);
+    List<Hall> searchHallsExceptMine(@Param("name")String name, @Param("birthday") LocalDate birthday,
+                                     @Param("deadDay")LocalDate deadDay, @Param("userId")Long userId);
 
 }

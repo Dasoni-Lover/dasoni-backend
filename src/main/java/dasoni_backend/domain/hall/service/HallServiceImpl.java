@@ -186,10 +186,7 @@ public class HallServiceImpl implements HallService {
 
         // Repository에서 검색 (isSecret=false 자동 필터링)
         List<Hall> halls = hallRepository.searchHallsExceptMine(
-                requestDTO.getName(),
-                birthday,
-                deadDay,
-                user.getId()
+                requestDTO.getName(), birthday, deadDay, user.getId()
         );
 
         // DTO 변환 및 status 설정
@@ -203,24 +200,27 @@ public class HallServiceImpl implements HallService {
     }
 
     private HallStatus determineHallStatus(Hall hall, User user) {
-        // 1. Relationship 확인 - 이미 참여 중인가?
-        boolean hasRelationship = relationshipRepository.existsByHallAndUser(hall, user);
 
-        if (hasRelationship) {
+        // 관리자인지 검사
+        if(hall.getAdmin().equals(user)){
+            return HallStatus.ADMIN;
+        }
+
+        // Relationship 확인 - 이미 참여 중인가?
+        if (relationshipRepository.existsByHallAndUser(hall, user)) {
             return HallStatus.ENTERING;  // 관계가 있음 = 입장 중
         }
 
-        // 2. Request 확인 - 요청을 보냈는가?
+        // Request 확인 - 요청을 보냈는가?
         Optional<Request> pendingRequest = requestRepository
                 .findByHallAndUserAndStatus(hall, user, RequestStatus.PENDING);
-
         if (pendingRequest.isPresent()) {
             return HallStatus.WAITING;  // 요청 대기 중
         }
+
         // 3. 아무 관계도 없음
         return HallStatus.NONE;
     }
-
 
     // 방문자 조회
     @Override
@@ -234,6 +234,7 @@ public class HallServiceImpl implements HallService {
         List<Relationship> relationships = relationshipRepository.findByHallAndUserNot(hall,user);
         return userConverter.toVisitorListResponseDTO(relationships);
     }
+
     // 방문자 내보내기
     @Override
     @Transactional

@@ -305,28 +305,33 @@ public class PhotoServiceImpl implements PhotoService {
         prompt.append("Task: ").append(base).append("\n\n");
 
         // ✅ 생성 요구사항
-        prompt.append("""
+        prompt.append(
+        """
         Generation Requirements:
-        • Photorealistic Composite: Create a high-quality, realistic image combining the active reference elements.
-        
-        • STRICT IDENTITY ENFORCEMENT (CRITICAL):
+        1. Photorealistic Composite: Create a high-quality, realistic image combining the active reference elements.
+        2. STRICT IDENTITY ENFORCEMENT (CRITICAL):
             - The facial features (eye shape, nose structure, mouth, jawline) must be an exact replica of the reference image.
             - Do NOT apply "beautification" filters, smooth skin excessively, or alter the person's age.
             - Preserve imperfections: Keep distinctive marks like moles, scars, skin texture, and facial asymmetry as they define the identity.
             - Priority: Facial resemblance is MORE important than artistic style or lighting effects.
-        
-        • Atmosphere & Tone:
+        3. Atmosphere & Tone:
             - The overall mood must be bright, warm, gentle, and inviting.
             - Lighting: Use bright, soft, and diffused lighting to create an airy and luminous atmosphere. The scene should be well-lit and vibrant.
             - Color Palette: Use light and warm tones (e.g., morning sunlight, soft creamy whites, light pastels, vibrant natural colors).
             - Avoid: Dim lighting, muddy colors, harsh contrasts, dark shadows, or cold/clinical visual styles.
-        
-        • Natural Integration:
+        4. Subject Characteristics (Ethnicity):
+            - All generated characters (including the Primary/Secondary subjects and any additional background characters/extras) must appear Korean.
+            - If specific reference images are provided, follow the reference strictly.
+            - If new characters need to be generated (e.g., crowd, friends), ensure they have Korean facial features and styling.
+        5. Natural Integration:
             - If a Background Image is provided: Adjust the subjects' lighting to match the background, but apply a bright and warm color grading to the final composite.
             - If NO Background Image is provided: Generate a background that inherently supports this bright, warm, and soft mood.
-        
-        • Quality: Ensure seamless blending without visible artifacts, distortions, or "floating" effects. High resolution and correct perspective are required.
-        """);
+        6. Output Format & Composition:
+            - Aspect Ratio: 1:1 (Square).
+            - Framing: Center the subjects appropriately within the square frame. Ensure that the head, hair, and essential features are fully visible and NOT cropped out by the edges.
+        7. Quality: Ensure seamless blending without visible artifacts, distortions, or "floating" effects. High resolution and correct perspective are required.
+        """
+        );
 
         return prompt.toString();
     }
