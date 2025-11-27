@@ -45,14 +45,14 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
     @Query("SELECT h FROM Hall h WHERE MONTH(h.deadday) = :month AND DAY(h.deadday) = :day")
     List<Hall> findByDeaddayMonthAndDay(@Param("month") int month, @Param("day") int day);
 
-     @Query("""
-            SELECT h FROM Hall h
-            WHERE h.secret = false
-            AND (:name IS NULL OR h.name LIKE %:name%)
-            AND (:birthday IS NULL OR h.birthday= :birthday)
-            AND (:deadDay IS NULL OR h.deadday =:deadDay)
-            AND (h.subjectId IS NULL OR h.subjectId <> :userId)
-            """)
+    @Query("""
+        SELECT h FROM Hall h
+        WHERE h.secret = false
+        AND (:name IS NULL OR LOWER(h.name) LIKE LOWER(CONCAT('%', :name, '%')))
+        AND (:birthday IS NULL OR h.birthday = :birthday)
+        AND (:deadDay IS NULL OR h.deadday = :deadDay)
+        AND (h.subjectId IS NULL OR h.subjectId <> :userId)
+    """)
     List<Hall> searchHallsExceptMine(@Param("name")String name, @Param("birthday") LocalDate birthday,
                                      @Param("deadDay")LocalDate deadDay, @Param("userId")Long userId);
 

@@ -184,18 +184,39 @@ public class HallServiceImpl implements HallService {
         LocalDate birthday = parseDate(requestDTO.getBirthday());
         LocalDate deadDay = parseDate(requestDTO.getDeadDay());
 
-        // Repository에서 검색 (isSecret=false 자동 필터링)
+        // 🔍 파라미터 로깅
+        System.out.println("========== 검색 파라미터 ==========");
+        System.out.println("name: " + requestDTO.getName());
+        System.out.println("birthday: " + birthday);
+        System.out.println("deadDay: " + deadDay);
+        System.out.println("userId: " + user.getId());
+        System.out.println("===================================");
+
         List<Hall> halls = hallRepository.searchHallsExceptMine(
                 requestDTO.getName(), birthday, deadDay, user.getId()
         );
 
-        // DTO 변환 및 status 설정
+        // 🔍 조회 결과 로깅
+        System.out.println("========== 조회된 Hall 목록 ==========");
+        System.out.println("총 개수: " + halls.size());
+        halls.forEach(hall -> {
+            System.out.println(String.format(
+                    "ID: %d | Name: %s | SubjectId: %s | AdminId: %s",
+                    hall.getId(),
+                    hall.getName(),
+                    hall.getSubjectId(),
+                    hall.getAdmin() != null ? hall.getAdmin().getId() : "null"
+            ));
+        });
+        System.out.println("======================================");
+
         List<HallSearchResponseDTO> responseDTOs = halls.stream()
                 .map(hall -> {
-                    HallStatus status = determineHallStatus(hall,user);
+                    HallStatus status = determineHallStatus(hall, user);
                     return toSearchResponseDTO(hall, status);
                 })
                 .collect(Collectors.toList());
+
         return toSearchResponseListDTO(responseDTOs);
     }
 
