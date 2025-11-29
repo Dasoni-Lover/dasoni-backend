@@ -122,26 +122,17 @@ public class HallDTO {
     @Getter
     @Builder
     public static class HallDetailResponseDTO {
-
         private String name;
-
         private String profile;
-
         private String birthday;
-
         private String deadday;
-
         private List<String> nature;
-
         private String place;
-
         private String phone;
-
         private String review;
-
         private String adminName;
-
         private boolean isOpen;
+        private boolean secret;
     }
 
     @Data

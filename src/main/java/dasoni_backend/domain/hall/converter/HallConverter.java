@@ -46,7 +46,6 @@ public class HallConverter {
 
     //  본인/타인 추모관 개설(hallId 반환)
     public static HallCreateResponseDTO toHallCreateResponseDTO(Hall hall) {
-
         return HallCreateResponseDTO.builder()
                 .hallId(hall.getId())
                 .build();
@@ -62,6 +61,7 @@ public class HallConverter {
                 .birthday(user.getBirthday())
                 .createdAt(LocalDateTime.now())
                 .opened(true)
+                .secret(true)
                 .userNum(1)
                 .build();
     }
@@ -118,6 +118,7 @@ public class HallConverter {
                 .phone(phone)
                 .review(review)
                 .adminName(adminName)
+                .secret(hall.isSecret())
                 .isOpen(hall.isOpened())
                 .build();
 
