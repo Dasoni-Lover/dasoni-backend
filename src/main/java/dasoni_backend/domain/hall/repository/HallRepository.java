@@ -51,9 +51,9 @@ public interface HallRepository extends JpaRepository<Hall, Long> {
         AND (:name IS NULL OR LOWER(h.name) LIKE LOWER(CONCAT('%', :name, '%')))
         AND (:birthday IS NULL OR h.birthday = :birthday)
         AND (:deadDay IS NULL OR h.deadday = :deadDay)
-        AND (h.subjectId IS NULL OR h.subjectId <> :userId)
+        AND h.subjectId IS NULL
     """)
     List<Hall> searchHallsExceptMine(@Param("name")String name, @Param("birthday") LocalDate birthday,
-                                     @Param("deadDay")LocalDate deadDay, @Param("userId")Long userId);
+                                     @Param("deadDay")LocalDate deadDay);
 
 }

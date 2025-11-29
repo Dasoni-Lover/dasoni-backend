@@ -195,7 +195,7 @@ public class HallServiceImpl implements HallService {
         System.out.println("===================================");
 
         List<Hall> halls = hallRepository.searchHallsExceptMine(
-                requestDTO.getName(), birthday, deadDay, user.getId()
+                requestDTO.getName(), birthday, deadDay
         );
 
         // 🔍 조회 결과 로깅
