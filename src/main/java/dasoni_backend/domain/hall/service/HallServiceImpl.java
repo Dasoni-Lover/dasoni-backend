@@ -74,6 +74,8 @@ public class HallServiceImpl implements HallService {
         List<Hall> halls = relationships.stream()
                 .map(Relationship::getHall)  // 각 Relationship에서 Hall을 가져옴
                 .filter(Objects::nonNull)  // null 체크 (안전성)
+                .filter(hall -> hall.getAdmin() == null // 관리하는 추모관 제외
+                        || !Objects.equals(hall.getAdmin().getId(), user.getId()))
                 .collect(Collectors.toList());
 
     // DTO로 변환하여 반환
