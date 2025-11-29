@@ -63,6 +63,7 @@ public class HallConverter {
                 .opened(true)
                 .secret(true)
                 .userNum(1)
+                .profile(null)
                 .build();
     }
 

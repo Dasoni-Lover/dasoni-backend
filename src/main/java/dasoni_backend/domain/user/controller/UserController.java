@@ -1,7 +1,7 @@
 package dasoni_backend.domain.user.controller;
 
-import dasoni_backend.domain.user.dto.UserDTO;
 import dasoni_backend.domain.user.dto.UserDTO.CheckResponseDTO;
+import dasoni_backend.domain.user.dto.UserDTO.ProfileRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RefreshTokenRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.AccessTokenResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.LoginRequestDTO;
@@ -64,7 +64,7 @@ public class UserController {
 
     // 프로필 수정
     @PostMapping("/profile")
-    public ResponseEntity<Void> updateProfile(@Valid @RequestBody UserDTO.ProfileRequestDTO request, @AuthUser User user) {
+    public ResponseEntity<Void> updateProfile(@RequestBody ProfileRequestDTO request, @AuthUser User user) {
         userService.updateProfile(request,user);
         return ResponseEntity.ok().build();
     }

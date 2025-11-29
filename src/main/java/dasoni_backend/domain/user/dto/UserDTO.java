@@ -94,6 +94,8 @@ public class UserDTO {
 
     @Getter
     @Setter
+    @Builder
+    @AllArgsConstructor
     @NoArgsConstructor
     public static class ProfileRequestDTO {
         private String profile;

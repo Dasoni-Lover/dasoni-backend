@@ -314,6 +314,7 @@ public class HallServiceImpl implements HallService {
         }
         // 새 프로필 설정
         hall.setProfile(newProfileUrl);
+        hallRepository.save(hall);
     }
 
     @Override
