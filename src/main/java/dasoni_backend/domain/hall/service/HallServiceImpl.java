@@ -127,10 +127,8 @@ public class HallServiceImpl implements HallService {
     public HallCreateResponseDTO createOtherHall(User admin, HallCreateRequestDTO request) {
         // 타인 추모관 개설
         Hall hall = hallRepository.save(HallConverter.fromSaveRequestForOther(admin, request));
-
         // Relationship 저장 시 natures도 함께 저장됨 (JPA가 자동 처리)
         relationshipRepository.save(RelationshipConverter.fromRequestToRelationship(admin, hall, request));
-
         return HallConverter.toHallCreateResponseDTO(hall);
     }
 

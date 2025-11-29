@@ -60,7 +60,6 @@ public class HallConverter {
                 .subjectId(user.getId())
                 .name(user.getName())
                 .birthday(user.getBirthday())
-                .profile(user.getMyProfile())
                 .createdAt(LocalDateTime.now())
                 .opened(true)
                 .userNum(1)
