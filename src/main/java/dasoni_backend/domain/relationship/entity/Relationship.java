@@ -88,7 +88,7 @@ public class Relationship {
     @Column(name = "is_send")
     private boolean send;
 
-    // AI 음성편지 설정읆 마쳤는지 여부
+    // AI 음성편지 설정을 마쳤는지 여부
     @Builder.Default
     @Column(name = "is_set")
     private boolean set = false;
