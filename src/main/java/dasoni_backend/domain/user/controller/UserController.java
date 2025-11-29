@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -63,7 +64,7 @@ public class UserController {
     }
 
     // 프로필 수정
-    @PostMapping("/profile")
+    @PatchMapping("/profile")
     public ResponseEntity<Void> updateProfile(@RequestBody ProfileRequestDTO request, @AuthUser User user) {
         userService.updateProfile(request,user);
         return ResponseEntity.ok().build();
