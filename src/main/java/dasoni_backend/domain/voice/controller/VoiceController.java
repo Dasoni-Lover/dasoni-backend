@@ -34,17 +34,17 @@ public class VoiceController {
 
     // 추모관 음성 삭제
     @DeleteMapping("/delete")
-    public ResponseEntity<Void> deleteVoice(@PathVariable("hall_id") Long hallId,@AuthUser User user){
+    public ResponseEntity<Void> deleteVoice(@PathVariable("hall_id") Long hallId,
+                                            @AuthUser User user){
         voiceService.deleteVoice(hallId,user);
         return ResponseEntity.ok().build();
     }
 
     // 추모관 음성 수정
     @PatchMapping("/update")
-    public ResponseEntity<Void> updateVoice(
-            @PathVariable("hall_id") Long hallId,
-            @Valid @RequestBody VoiceDTO request,
-            @AuthUser User user) {
+    public ResponseEntity<Void> updateVoice(@PathVariable("hall_id") Long hallId,
+                                            @Valid @RequestBody VoiceDTO request,
+                                            @AuthUser User user) {
         voiceService.updateVoice(hallId, request, user);
         return ResponseEntity.ok().build();
     }

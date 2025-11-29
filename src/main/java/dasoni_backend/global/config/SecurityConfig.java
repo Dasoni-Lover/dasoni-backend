@@ -41,13 +41,13 @@ public class SecurityConfig {
 
                 // 인가 규칙
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ CORS 프리플라이트 무조건 허용
+                        // CORS 프리플라이트 무조건 허용
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                        // ✅ 헬스/에러/루트
-                        .requestMatchers("/", "/error", "/actuator/health").permitAll()
+                        // 헬스/에러/루트
+                        .requestMatchers("/", "/error", "/api/halls/healthy", "/favicon.ico").permitAll()
 
-                        // ✅ 회원가입/로그인/토큰재발급(네가 추가한 경로들)
+                        // 회원가입/로그인/토큰재발급/
                         .requestMatchers(
                                 "/api/users/register",
                                 "/api/users/register/**",
@@ -61,10 +61,10 @@ public class SecurityConfig {
                                 "/swagger-resources/**"
                         ).permitAll()
 
-                        // ✅ 파일 업로드용 presigned-url (공개 필요시)
+                        // 파일 업로드용 presigned-url (공개 필요시)
                         .requestMatchers("/api/files/images/presigned-url").permitAll()
 
-                        // ✅ 내부 연동용 FastAPI 엔드포인트(필요 시만 개방)
+                        // 내부 연동용 FastAPI 엔드포인트(필요 시만 개방)
                         .requestMatchers(HttpMethod.POST, "/api/halls/photos/ai").permitAll()
 
                         // 🔒 그 외는 인증 필요

@@ -3,6 +3,7 @@ package dasoni_backend.domain.hall.entity;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.global.enums.Personality;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -48,7 +49,7 @@ public class Hall {
     private User admin;
 
     // FK -> voices.id
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "voice_id")
     private Voice voice;
 
