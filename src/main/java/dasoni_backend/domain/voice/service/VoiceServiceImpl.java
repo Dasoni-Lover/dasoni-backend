@@ -80,6 +80,12 @@ public class VoiceServiceImpl implements VoiceService {
         voiceRepository.save(newVoice);
         hall.setVoice(newVoice);
         hallRepository.save(hall);
+
+        log.info("새 Voice 저장 완료 → voiceId: {}, url: {}",
+                newVoice.getId(), newVoice.getUrl());
+
+        log.info("Hall FK 업데이트 확인 → hallId: {}, hall.voiceId: {}",
+                hall.getId(), hall.getVoice() != null ? hall.getVoice().getId() : null);
     }
 
     @Override
