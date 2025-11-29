@@ -6,6 +6,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.ReceiveLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterListResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterDetailResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.letter.service.LetterService;
@@ -64,6 +65,12 @@ public class LetterController {
     @GetMapping("/{hall_id}/letters/temp/list")
     public ResponseEntity<TempLetterListResponseDTO> getTempLetterList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
         return ResponseEntity.ok(letterService.getTempLetterList(hallId, user));
+    }
+
+    // 임시보관함 편지 확인(내용)
+    @GetMapping("/{hall_id}/letters/temp/{letter_id}")
+    public ResponseEntity<TempLetterDetailResponseDTO> getTempLetterDetail(@PathVariable("hall_id") Long hallId, @PathVariable("letter_id") Long letterId, @AuthUser User user) {
+        return ResponseEntity.ok(letterService.getTempLetterDetail(hallId, letterId, user));
     }
 
     // 임시보관 편지 삭제

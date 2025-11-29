@@ -32,7 +32,7 @@ public interface LetterService {
     TempLetterListResponseDTO getTempLetterList(Long hallId, User user);
 
     // 임시보관 편지 내용 상세 조회
-    TempLetterDetailResponseDTO getTempLetterDetail(Long hallId, Long letterId);
+    TempLetterDetailResponseDTO getTempLetterDetail(Long hallId, Long letterId, User user);
 
     // 임시보관 편지 삭제
     void deleteTempLetter(Long hallId, Long letterId, User user);
