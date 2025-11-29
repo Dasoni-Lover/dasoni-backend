@@ -296,6 +296,7 @@ public class HallServiceImpl implements HallService {
         hall.setDeadday(parseDate(request.getDeadday()));
         hall.setPlace(request.getPlace());
         hall.setPhone(request.getPhone());
+        hall.setSecret(request.isSecret());
     }
 
     // 프로필 변경

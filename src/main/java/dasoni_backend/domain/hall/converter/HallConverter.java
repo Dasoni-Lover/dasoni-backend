@@ -81,6 +81,7 @@ public class HallConverter {
                 .phone(request.getPhone())
                 .docs(request.getDocs())
                 .createdAt(LocalDateTime.now())
+                .secret(request.isSecret())
                 .opened(true)
                 .userNum(1)
                 .build();
