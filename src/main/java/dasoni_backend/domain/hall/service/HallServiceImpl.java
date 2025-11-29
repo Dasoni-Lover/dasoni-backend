@@ -170,6 +170,7 @@ public class HallServiceImpl implements HallService {
         // 변환(me일때는 필요없는 null처리 )
         return HallConverter.toHallDetailResponse(hall, role, result);
     }
+
     @Override
     @Transactional(readOnly = true)
     public MyHallResponseDTO getMyHall(User user){
