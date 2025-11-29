@@ -111,7 +111,8 @@ public class VoiceServiceImpl implements VoiceService {
         if (voice == null) {
             return VoiceDTO.builder()
                     .url(null)
-                    .build();         }
+                    .build();
+        }
 
         return VoiceDTO.builder()
                 .url(voice.getUrl())

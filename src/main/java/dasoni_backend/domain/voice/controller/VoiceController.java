@@ -29,8 +29,7 @@ public class VoiceController {
     @GetMapping
     public ResponseEntity<VoiceDTO> getVoice(@PathVariable("hall_id") Long hallId,
                                              @AuthUser User user) {
-        VoiceDTO voice = voiceService.getVoice(hallId, user);
-        return ResponseEntity.ok(voice);
+        return ResponseEntity.ok(voiceService.getVoice(hallId, user));
     }
 
     // 추모관 음성 삭제

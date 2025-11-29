@@ -281,8 +281,6 @@ public class HallServiceImpl implements HallService {
         Hall hall = hallRepository.findBySubjectId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 없습니다."));
         updateProfileHall(hall,request.getProfile());
-        user.setMyProfile(request.getProfile());
-        userRepository.save(user);
     }
 
     // 추모관 정보 수정
