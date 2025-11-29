@@ -129,10 +129,8 @@ public class HallServiceImpl implements HallService {
     public HallCreateResponseDTO createOtherHall(User admin, HallCreateRequestDTO request) {
         // 타인 추모관 개설
         Hall hall = hallRepository.save(HallConverter.fromSaveRequestForOther(admin, request));
-
         // Relationship 저장 시 natures도 함께 저장됨 (JPA가 자동 처리)
         relationshipRepository.save(RelationshipConverter.fromRequestToRelationship(admin, hall, request));
-
         return HallConverter.toHallCreateResponseDTO(hall);
     }
 
@@ -283,8 +281,6 @@ public class HallServiceImpl implements HallService {
         Hall hall = hallRepository.findBySubjectId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 없습니다."));
         updateProfileHall(hall,request.getProfile());
-        user.setMyProfile(request.getProfile());
-        userRepository.save(user);
     }
 
     // 추모관 정보 수정
@@ -300,6 +296,7 @@ public class HallServiceImpl implements HallService {
         hall.setDeadday(parseDate(request.getDeadday()));
         hall.setPlace(request.getPlace());
         hall.setPhone(request.getPhone());
+        hall.setSecret(request.isSecret());
     }
 
     // 프로필 변경

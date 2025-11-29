@@ -104,6 +104,8 @@ public class HallDTO {
 
         private String phone;
 
+        private boolean secret;
+
         // 사망확인서
         private String docs;
     }
@@ -183,6 +185,7 @@ public class HallDTO {
         private String name;
         private String birthday;
         private String deadday;
+        private boolean secret;
         private String place;
         private String phone;
     }

@@ -79,6 +79,13 @@ public class VoiceServiceImpl implements VoiceService {
         // 업데이트 후 저장
         voiceRepository.save(newVoice);
         hall.setVoice(newVoice);
+        hallRepository.save(hall);
+
+        log.info("새 Voice 저장 완료 → voiceId: {}, url: {}",
+                newVoice.getId(), newVoice.getUrl());
+
+        log.info("Hall FK 업데이트 확인 → hallId: {}, hall.voiceId: {}",
+                hall.getId(), hall.getVoice() != null ? hall.getVoice().getId() : null);
     }
 
     @Override
@@ -102,17 +109,18 @@ public class VoiceServiceImpl implements VoiceService {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
 
-        if (!hall.getAdmin().getId().equals(user.getId())) {
+        if (!hall.getAdmin().equals(user)) {
             throw new IllegalStateException("권한이 없습니다");
         }
 
         Voice voice = hall.getVoice();
+        log.info(">> hall.getVoice() 결과: {}", voice != null ? voice.getId() : null);
 
         if (voice == null) {
             return VoiceDTO.builder()
                     .url(null)
-                    .build();         }
-
+                    .build();
+        }
         return VoiceDTO.builder()
                 .url(voice.getUrl())
                 .build();

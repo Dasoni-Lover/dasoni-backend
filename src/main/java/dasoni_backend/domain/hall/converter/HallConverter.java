@@ -60,7 +60,6 @@ public class HallConverter {
                 .subjectId(user.getId())
                 .name(user.getName())
                 .birthday(user.getBirthday())
-                .profile(user.getMyProfile())
                 .createdAt(LocalDateTime.now())
                 .opened(true)
                 .userNum(1)
@@ -81,6 +80,7 @@ public class HallConverter {
                 .phone(request.getPhone())
                 .docs(request.getDocs())
                 .createdAt(LocalDateTime.now())
+                .secret(request.isSecret())
                 .opened(true)
                 .userNum(1)
                 .build();

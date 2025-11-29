@@ -5,10 +5,12 @@ import dasoni_backend.domain.user.dto.UserDTO.AccessTokenResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.CheckResponseDTO;
 import dasoni_backend.domain.user.dto.UserDTO.LoginRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.LoginResponseDTO;
+import dasoni_backend.domain.user.dto.UserDTO.ProfileRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RefreshTokenRequestDTO;
 import dasoni_backend.domain.user.dto.UserDTO.RegisterRequestDTO;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.user.repository.UserRepository;
+import dasoni_backend.global.S3.service.FileUploadService;
 import dasoni_backend.global.auth.JwtTokenProvider;
 import dasoni_backend.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +26,7 @@ public class UserServiceImpl implements UserService{
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
     private final PasswordEncoder passwordEncoder;
+    private final FileUploadService fileUploadService;
 
     @Override
     @Transactional
@@ -103,5 +106,16 @@ public class UserServiceImpl implements UserService{
     @Transactional
     public void logout(User user){
         redisService.deleteRefreshToken(String.valueOf(user.getId()));
+    }
+
+    @Override
+    @Transactional
+    public void updateProfile(ProfileRequestDTO request, User user) {
+        if (user.getMyProfile() != null && !user.getMyProfile().isEmpty()) {
+            String oldS3Key = fileUploadService.extractS3Key(user.getMyProfile());
+            fileUploadService.deleteFile(oldS3Key);
+        }
+        user.setMyProfile(request.getProfile());
+        userRepository.save(user);
     }
 }
