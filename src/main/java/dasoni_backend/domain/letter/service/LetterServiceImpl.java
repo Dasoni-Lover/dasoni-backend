@@ -152,7 +152,7 @@ public class LetterServiceImpl implements LetterService{
     // 임시보관 편지 내용 상세 확인
     @Transactional
     @Override
-    public TempLetterDetailResponseDTO getTempLetterDetail(Long hallId, Long letterId) {
+    public TempLetterDetailResponseDTO getTempLetterDetail(Long hallId, Long letterId, User user) {
         Letter letter = letterRepository.findById(letterId)
                 .orElseThrow(() -> new RuntimeException("편지를 찾을 수 없습니다."));
         return LetterConverter.totempLetterDetailResponseDTO(letter);
