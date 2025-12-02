@@ -9,7 +9,9 @@ import dasoni_backend.domain.letter.repository.LetterRepository;
 import dasoni_backend.domain.notification.service.NotificationService;
 import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.repository.RelationshipRepository;
+import dasoni_backend.domain.reply.converter.ReplyConverter;
 import dasoni_backend.domain.reply.dto.ReplyDTO.AiReplyCreateResponseDTO;
+import dasoni_backend.domain.reply.dto.ReplyDTO.ReplyResponseDTO;
 import dasoni_backend.domain.reply.entity.Reply;
 import dasoni_backend.domain.reply.repository.ReplyRepository;
 import dasoni_backend.domain.user.entity.User;
@@ -185,6 +187,7 @@ public class ReplyServiceImpl implements ReplyService {
 
         return LetterConverter.toReceiveLetterListResponseDTO(replies);
     }
+
     public void createAiReply(Long hallId, Long letterId, User user){
         // 추모관 검증
         Hall hall = hallRepository.findById(hallId)
@@ -320,5 +323,20 @@ public class ReplyServiceImpl implements ReplyService {
         TextToSpeechResponse response = tts.call(prompt);
 
         return response.getResult().getOutput();
+    }
+
+    @Override
+    @Transactional
+    public ReplyResponseDTO getOneReply(Long hallId, Long replyId, User user) {
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "추모관을 찾을 수 없습니다."));
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "답장을 찾을 수 없습니다."));
+
+        if(!reply.getHall().equals(hall)){ throw new RuntimeException("잘못된 답장입니다: 추모관과 답장 불일치"); }
+
+        // 확인된걸로 바꿈
+        reply.setChecked(true);
+        return  ReplyConverter.toReplyResponseDTO(reply);
     }
 }

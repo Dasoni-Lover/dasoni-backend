@@ -142,19 +142,18 @@ public class LetterDTO {
     @Getter
     @Builder
     public static class ReceiveLetterListResponseDTO {
-        private int count;
-        private List<ReceiveLetterResponseDTO> replies;
+        private int totalCount;
+        private int unreadCount;
+        private int readCount;
+        private List<ReplySummaryDTO> replies;
     }
 
     @Getter
     @Builder
-    public static class ReceiveLetterResponseDTO {
+    public static class ReplySummaryDTO {
         private Long replyId;
-        private String userName;
-        private String subjectName;
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
         private LocalDateTime createdAt;
-        private boolean isChecked;
-        private String audioUrl;
+        private boolean checked;
     }
 }

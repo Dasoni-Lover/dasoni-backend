@@ -1,7 +1,7 @@
 package dasoni_backend.domain.letter.converter;
 
 import dasoni_backend.domain.letter.dto.LetterDTO.ReceiveLetterListResponseDTO;
-import dasoni_backend.domain.letter.dto.LetterDTO.ReceiveLetterResponseDTO;
+import dasoni_backend.domain.letter.dto.LetterDTO.ReplySummaryDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterDetailResponseDTO;
@@ -161,41 +161,34 @@ public class LetterConverter {
                 .build();
     }
 
-    // AI 받은 편지함 조회
-    public static ReceiveLetterResponseDTO toReceiveLetterResponseDTO(Reply reply) {
-
-        if(reply == null) return null;
-
-        return ReceiveLetterResponseDTO.builder()
-                .replyId(reply.getId())
-                .userName(reply.getUser().getName())
-                .subjectName(reply.getHall().getName())
-                .createdAt(reply.getCreatedAt())
-//                NPE 방지 위해
-//                .isChecked(reply.getIsChecked())
-                .audioUrl(reply.getAudioUrl())
-                .isChecked(reply.isChecked())
-                .build();
-    }
-
-
-
     public static ReceiveLetterListResponseDTO toReceiveLetterListResponseDTO(List<Reply> replies) {
-        if(replies == null) {
-            return ReceiveLetterListResponseDTO.builder()
-                    .count(0)
-                    .replies(List.of())
-                    .build();}
 
-            // count 값 세기 위함
-            var receiveLetter = replies.stream()
-                    .map(LetterConverter::toReceiveLetterResponseDTO)
-                    .collect(Collectors.toList());
+            // 전체 개수
+            int totalCount = replies.size();
+
+            // 읽지 않은 개수
+            int unreadCount = (int) replies.stream()
+                    .filter(reply -> !reply.isChecked())
+                    .count();
+
+            // 읽은 개수
+            int readCount = totalCount - unreadCount;
+
+            // replies → ReplySummaryDTO 리스트로 변환
+            List<ReplySummaryDTO> replyList = replies.stream()
+                    .map(reply -> ReplySummaryDTO.builder()
+                            .replyId(reply.getId())
+                            .createdAt(reply.getCreatedAt())
+                            .checked(reply.isChecked())
+                            .build())
+                    .toList();
 
             return ReceiveLetterListResponseDTO.builder()
-                    .count(receiveLetter.size())
-                    .replies(receiveLetter)
+                    .totalCount(totalCount)
+                    .unreadCount(unreadCount)
+                    .readCount(readCount)
+                    .replies(replyList)
                     .build();
-    }
+        }
 }
 
