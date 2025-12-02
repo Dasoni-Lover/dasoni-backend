@@ -155,5 +155,6 @@ public class LetterDTO {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
         private LocalDateTime createdAt;
         private boolean isChecked;
+        private String audioUrl;
     }
 }
