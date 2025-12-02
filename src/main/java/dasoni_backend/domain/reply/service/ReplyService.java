@@ -1,8 +1,8 @@
 package dasoni_backend.domain.reply.service;
 
 import dasoni_backend.domain.letter.dto.LetterDTO.ReceiveLetterListResponseDTO;
-import dasoni_backend.domain.reply.dto.ReplyDTO;
 import dasoni_backend.domain.reply.dto.ReplyDTO.AiReplyCreateResponseDTO;
+import dasoni_backend.domain.reply.dto.ReplyDTO.ReplyResponseDTO;
 import dasoni_backend.domain.user.entity.User;
 
 public interface ReplyService {
@@ -15,4 +15,6 @@ public interface ReplyService {
     AiReplyCreateResponseDTO TestcreateAiReply(Long hallId, Long letterId, User user);
 
     void createAiReply(Long hallId, Long letterId, User user);
+
+    ReplyResponseDTO getOneReply(Long hallId, Long replyId, User user);
 }

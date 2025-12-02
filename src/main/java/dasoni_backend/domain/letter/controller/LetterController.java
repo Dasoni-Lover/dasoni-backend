@@ -11,6 +11,7 @@ import dasoni_backend.domain.letter.dto.LetterDTO.TempLetterListResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.myLetterRequestDTO;
 import dasoni_backend.domain.letter.service.LetterService;
 import dasoni_backend.domain.relationship.dto.relationshipDTO.SettingDTO;
+import dasoni_backend.domain.reply.dto.ReplyDTO.ReplyResponseDTO;
 import dasoni_backend.domain.reply.service.ReplyService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.global.annotation.AuthUser;
@@ -85,14 +86,14 @@ public class LetterController {
     public ResponseEntity<Void> deleteLetter(@PathVariable("hall_id") Long hallId,
                                              @PathVariable("letter_id") Long letterId,
                                              @AuthUser User user) {
-        letterService.deleteSendLetter(hallId,letterId,user);
+        letterService.deleteSendLetter(hallId, letterId, user);
         return ResponseEntity.ok().build();
     }
 
     // 본인추모관 편지 남기기
     @DeleteMapping("/me/letters/send")
     public ResponseEntity<Void> sendMeLetter(@PathVariable("letter_id") Long letterId, @RequestBody myLetterRequestDTO request, @AuthUser User user) {
-        letterService.sendMeLetter(letterId,request,user);
+        letterService.sendMeLetter(letterId, request, user);
         return ResponseEntity.ok().build();
     }
 
@@ -107,7 +108,7 @@ public class LetterController {
     public ResponseEntity<Void> createLetterSettings(@PathVariable("hall_id") Long hallId,
                                                      @RequestBody SettingDTO request,
                                                      @AuthUser User user) {
-        letterService.createLetterSettings(hallId,request,user);
+        letterService.createLetterSettings(hallId, request, user);
         return ResponseEntity.ok().build();
     }
 
@@ -115,8 +116,8 @@ public class LetterController {
     @PostMapping("/{hall_id}/letters/settings/update")
     public ResponseEntity<Void> updateLetterSettings(@PathVariable("hall_id") Long hallId,
                                                      @RequestBody SettingDTO request,
-                                                     @AuthUser User user){
-        letterService.updateLetterSettings(hallId,request,user);
+                                                     @AuthUser User user) {
+        letterService.updateLetterSettings(hallId, request, user);
         return ResponseEntity.ok().build();
     }
 
@@ -124,5 +125,12 @@ public class LetterController {
     @GetMapping("/{hall_id}/letters/reply/list")
     public ResponseEntity<ReceiveLetterListResponseDTO> getReceiveLetterList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
         return ResponseEntity.ok(replyService.getReceiveLetterList(hallId, user));
+    }
+
+    @GetMapping("/{hall_id}/letters/reply/{reply_id}")
+    public ResponseEntity<ReplyResponseDTO> getReplyOne(@PathVariable("hall_id") Long hallId,
+                                                        @PathVariable("reply_id") Long replyId,
+                                                        @AuthUser User user) {
+        return ResponseEntity.ok(replyService.getOneReply(hallId,replyId,user));
     }
 }
