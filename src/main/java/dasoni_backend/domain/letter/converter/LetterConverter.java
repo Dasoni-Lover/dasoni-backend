@@ -173,6 +173,7 @@ public class LetterConverter {
                 .createdAt(reply.getCreatedAt())
 //                NPE 방지 위해
 //                .isChecked(reply.getIsChecked())
+                .audioUrl(reply.getAudioUrl())
                 .isChecked(reply.isChecked())
                 .build();
     }
