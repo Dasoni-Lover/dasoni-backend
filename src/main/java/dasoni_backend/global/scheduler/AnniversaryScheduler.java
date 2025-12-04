@@ -28,7 +28,7 @@ public class AnniversaryScheduler {
     private final NotificationService notificationService;
 
     // 매일 오전 9시 실행 내일이 기념일인 경우 알림 전송
-    @Scheduled(cron = "0 0 9 * * *")
+    @Scheduled(cron = "0 35 18 * * *")
     @Transactional
     public void sendAnniversaryNotifications() {
         LocalDate tomorrow = LocalDate.now().plusDays(1);
