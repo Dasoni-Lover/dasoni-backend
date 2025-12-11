@@ -63,6 +63,19 @@ async def generate_image(hall_id: int, request: ImageGenerationRequestDTO):
             contents=contents
         )
 
+        if response.usage_metadata:
+            prompt_tokens = response.usage_metadata.prompt_token_count
+            candidates_tokens = response.usage_metadata.candidates_token_count
+            total_tokens = response.usage_metadata.total_token_count
+
+            logger.info(
+                f"🌟 토큰 사용량: 입력(프롬프트+이미지)={prompt_tokens}개, "
+                f"출력(응답 이미지)={candidates_tokens}개, "
+                f"총계={total_tokens}개"
+            )
+        else:
+            logger.warning("응답에서 사용량 메타데이터(usage_metadata)를 찾을 수 없습니다.")
+
         generated_image_base64 = None
         for part in response.parts:
             if part.inline_data is not None:
