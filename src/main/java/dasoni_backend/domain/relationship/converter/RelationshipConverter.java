@@ -23,7 +23,7 @@ public class RelationshipConverter {
     public static SettingDTO RelationshiptoSettingDTO(Relationship relationship) {
         return SettingDTO.builder()
                 .detail(relationship.getDetail())
-                .explanation(relationship.getDetail())
+                .explanation(relationship.getExplanation())
                 .isPolite(relationship.getPolite())
                 .calledName(relationship.getCalledName())
                 .speakHabit(relationship.getSpeakHabit())

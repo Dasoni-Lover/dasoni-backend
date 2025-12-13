@@ -60,11 +60,11 @@ public class Relationship {
     @Column(name = "nature")
     private List<Personality> natures;
 
-    // 자세한 관계 설명
+    // 자세한 관계 설명 - 방문자가 요청시 작성
     @Column(name = "detail", columnDefinition = "TEXT")
     private String detail;
 
-    // 한줄평
+    // 한줄평 (관리자, 방문자 모두)
     @Column(name = "review")
     private String review;
 
