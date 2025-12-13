@@ -91,6 +91,8 @@ public class LetterConverter {
                 .completedAt(letter.getCompletedAt())
                 .build();
     }
+
+    // 편지 보내기할 때 : 요청 -> 편지 생성
     public static Letter RequestToLetter(LetterSaveRequestDTO request, Hall hall, User user) {
         return Letter.builder()
                 .hall(hall)
@@ -103,6 +105,17 @@ public class LetterConverter {
                 .createdAt(LocalDateTime.now())
                 .completedAt(request.isCompleted() ? LocalDateTime.now() : null).build();
     }
+
+    // 편지 보내기할 때 : 요청 -> 편지 업데이트
+    public static void updateLetterFromRequest(Letter letter, LetterSaveRequestDTO request) {
+        letter.setToName(request.getToName());
+        letter.setFromName(request.getFromName());
+        letter.setContent(request.getContent());
+        letter.setIsWanted(request.isWanted());
+        letter.setIsCompleted(request.isCompleted());
+        letter.setCompletedAt(LocalDateTime.now());
+    }
+
 
     // 임시보관함 조회
     public static TempLetterResponseDTO toTempLetterResponseDTO(Letter letter) {

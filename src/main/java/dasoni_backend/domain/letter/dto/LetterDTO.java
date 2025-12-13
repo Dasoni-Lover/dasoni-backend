@@ -86,6 +86,7 @@ public class LetterDTO {
     @Getter
     @NoArgsConstructor
     public static class LetterSaveRequestDTO {
+        private Long letterId;
         private String toName;
         private String fromName;
         private String content;
