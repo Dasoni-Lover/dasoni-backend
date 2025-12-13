@@ -26,7 +26,7 @@ public class ShareLinkController {
 
     // 공유 링크로 접속
     @GetMapping("/share-links/{code}")
-    public HallResponse getHallByCode(@PathVariable String code, @AuthUser User user) {
-        return shareLinkService.getHallByCode(code,user);
+    public HallResponse getHallByCode(@PathVariable String code) {
+        return shareLinkService.getHallByCode(code);
     }
 }
