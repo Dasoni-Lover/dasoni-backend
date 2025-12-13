@@ -106,13 +106,20 @@ public class ReplyServiceImpl implements ReplyService {
                 .findByHallIdAndUserId(hallId, user.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "관계 정보를 찾을 수 없습니다."));
 
-        String relationshipStr = relationship.getRelation() != null
-                ? relationship.getRelation().getValue()
-                : "";
+        String relationDetail =
+                relationship.getDetail() != null ? relationship.getDetail() : "";
 
-        String deceasedInsight = relationship.getExplanation();
-        String tone = Boolean.TRUE.equals(relationship.getPolite()) ? "존댓말" : "반말";
-        String frequentWords = relationship.getSpeakHabit();
+        String deceasedInsight =
+                relationship.getExplanation() != null ? relationship.getExplanation() : "";
+
+        String tone =
+                Boolean.TRUE.equals(relationship.getPolite()) ? "존댓말" : "반말";
+
+        String frequentWords =
+                relationship.getSpeakHabit() != null ?relationship.getSpeakHabit() : "";
+
+        String calledName =
+                relationship.getCalledName() != null ? relationship.getCalledName() : "";
 
         List<String> userDescriptions = relationship.getNatures() != null
                 ? relationship.getNatures().stream().map(p -> p.getValue()).toList()
@@ -129,10 +136,11 @@ public class ReplyServiceImpl implements ReplyService {
                 currentLetterContent,
                 p1Emotion,
                 p2Emotion,
-                relationshipStr,
+                relationDetail,
                 deceasedInsight,
                 tone,
                 frequentWords,
+                calledName,
                 userDescriptions
         );
         // Script -> Reply Voice
@@ -242,18 +250,29 @@ public class ReplyServiceImpl implements ReplyService {
                 .findByHallIdAndUserId(hallId, user.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "관계 정보를 찾을 수 없습니다."));
 
-        String relationshipStr = relationship.getRelation() != null
-                ? relationship.getRelation().getValue()
-                : "";
 
-        String deceasedInsight = relationship.getExplanation();
-        String tone = Boolean.TRUE.equals(relationship.getPolite()) ? "존댓말" : "반말";
-        String frequentWords = relationship.getSpeakHabit();
+        List<String> userDescriptions =
+                relationship.getNatures() != null
+                ? relationship.getNatures()
+                        .stream()
+                        .map(p -> p.getValue())
+                        .toList()
+               : List.of();
 
-        List<String> userDescriptions = relationship.getNatures() != null
-                ? relationship.getNatures().stream().map(p -> p.getValue()).toList()
-                : List.of();
+        String relationDetail =
+                relationship.getDetail() != null ? relationship.getDetail() : "";
 
+        String deceasedInsight =
+                relationship.getExplanation() != null ? relationship.getExplanation() : "";
+
+        String tone =
+                Boolean.TRUE.equals(relationship.getPolite()) ? "존댓말" : "반말";
+
+        String frequentWords =
+                relationship.getSpeakHabit() != null ?relationship.getSpeakHabit() : "";
+
+        String calledName =
+                relationship.getCalledName() != null ? relationship.getCalledName() : "";
         // 고인 정보 끝
 
         // GeminiAI 답장 스크립트 생성
@@ -265,10 +284,11 @@ public class ReplyServiceImpl implements ReplyService {
                 currentLetterContent,
                 p1Emotion,
                 p2Emotion,
-                relationshipStr,
+                relationDetail,
                 deceasedInsight,
                 tone,
                 frequentWords,
+                calledName,
                 userDescriptions
         );
 

@@ -18,12 +18,20 @@ public class GeminiVoiceScriptServiceImpl {
     public String generateVoiceReplyScript(String currentLetterContent,
                                            String p1Emotion,
                                            String p2Emotion,
-                                           String relationship,           // R
-                                           String deceasedInsight,        // I
-                                           String tone,                   // T (존댓말/반말)
-                                           String frequentWords,          // W
+                                           String relationDetail,
+                                           String deceasedInsight,
+                                           String tone,
+                                           String frequentWords,
+                                           String calledName,
                                            List<String> userDescriptions // A (3단어)
     ) {
+        // NPE 방지
+        if (relationDetail == null) relationDetail = "";
+        if (deceasedInsight == null) deceasedInsight = "";
+        if (tone == null) tone = "";
+        if (frequentWords == null) frequentWords = "";
+        if (calledName == null) calledName = "";
+        if (userDescriptions == null) userDescriptions = List.of();
 
         String userDescriptionsJoined = String.join(", ", userDescriptions);
 
@@ -46,7 +54,8 @@ public class GeminiVoiceScriptServiceImpl {
                 - 문어체 대신 구어체를 사용하고, 끊김 없이 자연스럽게 이어지는 대화 흐름을 유지합니다.
 
                 [참고 정보]
-                관계 (R): 고인과 사용자의 관계 ({relationship})
+                관계 설명: ({relationDetail})
+                고인이 자주 부르던 호칭: ({calledName})
                 고인의 인식 (I): 고인이 사용자에 대해 알려준 내용 ({deceasedInsight})
                 말투 (T): 주로 쓰던 말투 ([존댓말/반말] 중 택 1) ({tone})
                 자주 쓰던 말 (W): 고인이 자주 사용하던 말이나 단어 ({frequentWords})
@@ -78,10 +87,11 @@ public class GeminiVoiceScriptServiceImpl {
         PromptTemplate promptTemplate = new PromptTemplate(template);
         Prompt prompt = promptTemplate.create(
                 Map.of(
-                        "relationship", relationship,
+                        "relationDetail", relationDetail,
                         "deceasedInsight", deceasedInsight,
                         "tone", tone,
                         "frequentWords", frequentWords,
+                        "calledName", calledName,
                         "userDescriptions", userDescriptionsJoined,
                         "p1", p1Emotion,
                         "p2", p2Emotion,
