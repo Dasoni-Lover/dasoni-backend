@@ -24,7 +24,7 @@ import java.util.UUID;
 public class ShareLinkServiceImpl implements ShareLinkService {
 
     // 프론토 도메인
-    @Value("$}")
+    @Value("${app.frontend.base-url}")
     private String frontendBaseUrl;
 
     // 공유 링크 만료일 설정
