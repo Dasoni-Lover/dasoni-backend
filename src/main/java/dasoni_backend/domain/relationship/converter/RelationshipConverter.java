@@ -15,7 +15,7 @@ public class RelationshipConverter {
                 .relation(request.getRelation())
                 .review(request.getReview())
                 .natures(request.getNatures())
-                .send(false)
+                .sent(false)
                 .set(false)
                 .build();
     }

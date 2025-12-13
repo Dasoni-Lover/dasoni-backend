@@ -69,7 +69,7 @@ public class RequestServiceImpl implements RequestService {
                     .polite(null)
                     .speakHabit(null)
                     .calledName(null)
-                    .send(false)
+                    .sent(false)
                     .set(false)
                     .build();
 
