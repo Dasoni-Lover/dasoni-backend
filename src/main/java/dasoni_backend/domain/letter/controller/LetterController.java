@@ -1,5 +1,6 @@
 package dasoni_backend.domain.letter.controller;
 
+import dasoni_backend.domain.letter.dto.LetterDTO.LetterCheckDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterPreCheckResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.ReceiveLetterListResponseDTO;
@@ -127,10 +128,15 @@ public class LetterController {
         return ResponseEntity.ok(replyService.getReceiveLetterList(hallId, user));
     }
 
+    // 받은 편지함 개별 조회
     @GetMapping("/{hall_id}/letters/reply/{reply_id}")
     public ResponseEntity<ReplyResponseDTO> getReplyOne(@PathVariable("hall_id") Long hallId,
                                                         @PathVariable("reply_id") Long replyId,
                                                         @AuthUser User user) {
         return ResponseEntity.ok(replyService.getOneReply(hallId,replyId,user));
     }
+
+    // 오늘 편지 보냈는 지 여부
+    @GetMapping("/{hall_id}/letters/check")
+    public ResponseEntity<LetterCheckDTO>
 }

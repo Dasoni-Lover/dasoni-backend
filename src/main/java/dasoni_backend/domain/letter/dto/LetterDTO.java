@@ -156,4 +156,10 @@ public class LetterDTO {
         private LocalDateTime createdAt;
         private boolean checked;
     }
+
+    @Getter
+    @Builder
+    public static class LetterCheckDTO{
+        private boolean isSendToday;
+    }
 }
