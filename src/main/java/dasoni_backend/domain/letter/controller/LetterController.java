@@ -138,5 +138,7 @@ public class LetterController {
 
     // 오늘 편지 보냈는 지 여부
     @GetMapping("/{hall_id}/letters/check")
-    public ResponseEntity<LetterCheckDTO>
+    public ResponseEntity<LetterCheckDTO> checkSentToday(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
+        return ResponseEntity.ok(letterService.checkSentToday(hallId,user));
+    }
 }

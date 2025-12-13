@@ -3,6 +3,7 @@ package dasoni_backend.domain.letter.service;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.letter.converter.LetterConverter;
+import dasoni_backend.domain.letter.dto.LetterDTO.LetterCheckDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterPreCheckResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
@@ -294,5 +295,19 @@ public class LetterServiceImpl implements LetterService{
         relationship.setSpeakHabit(request.getSpeakHabit());
         relationship.setPolite(request.getIsPolite());
         relationship.setCalledName(request.getCalledName());
+    }
+
+    // 오늘 편지 보냈는 지 여부
+    @Transactional
+    @Override
+    public LetterCheckDTO checkSentToday(Long hallId, User user){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new EntityNotFoundException("추모관을 찾을 수 없습니다"));
+
+        Relationship relationship = relationshipRepository
+                .findByHallIdAndUserId(hallId, user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
+
+        return LetterCheckDTO.builder().isSendToday(relationship.isSent()).build();
     }
 }
