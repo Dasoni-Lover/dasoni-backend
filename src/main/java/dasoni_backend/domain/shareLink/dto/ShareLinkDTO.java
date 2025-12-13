@@ -12,4 +12,14 @@ public class ShareLinkDTO {
     public static class ShareLinkResponseDTO{
         private String ShareUrl;
     }
+
+
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class ShareLinkResolveResponseDTO{
+        private Long hallId;
+        private boolean loginRequired;
+    }
+
 }

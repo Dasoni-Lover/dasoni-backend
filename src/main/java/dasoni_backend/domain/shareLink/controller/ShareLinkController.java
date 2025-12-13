@@ -1,5 +1,6 @@
 package dasoni_backend.domain.shareLink.controller;
 
+import dasoni_backend.domain.shareLink.dto.ShareLinkDTO.ShareLinkResolveResponseDTO;
 import dasoni_backend.domain.shareLink.dto.ShareLinkDTO.ShareLinkResponseDTO;
 import dasoni_backend.domain.shareLink.service.ShareLinkService;
 import dasoni_backend.domain.user.entity.User;
@@ -26,7 +27,7 @@ public class ShareLinkController {
 
     // 공유 링크로 접속
     @GetMapping("/share-links/{code}")
-    public HallResponse getHallByCode(@PathVariable String code) {
-        return shareLinkService.getHallByCode(code);
+    public ShareLinkResolveResponseDTO getHallByCode(@PathVariable String code) {
+        return shareLinkService.resolveLink(code);
     }
 }

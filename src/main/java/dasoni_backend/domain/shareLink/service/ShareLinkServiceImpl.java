@@ -2,6 +2,7 @@ package dasoni_backend.domain.shareLink.service;
 
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallRepository;
+import dasoni_backend.domain.shareLink.dto.ShareLinkDTO.ShareLinkResolveResponseDTO;
 import dasoni_backend.domain.shareLink.dto.ShareLinkDTO.ShareLinkResponseDTO;
 import dasoni_backend.domain.shareLink.entity.ShareLink;
 import dasoni_backend.domain.shareLink.repository.ShareLinkRepository;
@@ -10,9 +11,12 @@ import dasoni_backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -67,5 +71,24 @@ public class ShareLinkServiceImpl implements ShareLinkService {
     // 공유 링크 생성
     private String buildShareUrl(String code) {
         return frontendBaseUrl + "/share-links/" + code;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ShareLinkResolveResponseDTO resolveLink(String code) {
+
+        ShareLink link = shareLinkRepository.findByCode(code)
+                .orElseThrow(() -> new IllegalArgumentException("유효하지않은 코드입니다."));
+
+        if (link.isExpired()) {
+            // 410 오류
+            throw new ResponseStatusException( HttpStatus.GONE, "공유 링크가 만료되었습니다.");
+        }
+
+        Hall hall = link.getHall();
+
+        return ShareLinkResolveResponseDTO.builder()
+                .hallId(hall.getId())
+                .build();
     }
 }
