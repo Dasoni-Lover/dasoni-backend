@@ -1,6 +1,7 @@
 package dasoni_backend.domain.shareLink.entity;
 
 import dasoni_backend.domain.hall.entity.Hall;
+import dasoni_backend.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,13 +36,24 @@ public class ShareLink {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 추모관
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "hall_id")
     private Hall hall;
 
+    // 발급자
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "issued_by")
+    private User user;
+
+    @Column(name = "code", nullable = false)
+    private String code;
+
+    // 생성 시각
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    // 만료 시각
     @Column(name = "expires_at")
     private LocalDateTime expiresAt;
 

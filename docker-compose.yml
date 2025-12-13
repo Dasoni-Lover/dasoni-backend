@@ -91,6 +91,8 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY}
       # Spring Profile
       SPRING_PROFILES_ACTIVE: docker
+      # Frontend BaseURL
+      FRONTEND_BASE_URL: ${FRONTEND_BASE_URL}
     ports:
       - "8080:8080"
     networks:
@@ -103,7 +105,6 @@ services:
       python-fastapi:
         condition: service_healthy
     restart: on-failure:3
-
 
 # 네트워크 설정
 networks:
