@@ -19,7 +19,5 @@ public class ShareLinkDTO {
     @AllArgsConstructor
     public static class ShareLinkResolveResponseDTO{
         private Long hallId;
-        private boolean loginRequired;
     }
-
 }

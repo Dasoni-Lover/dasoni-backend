@@ -7,11 +7,9 @@ import dasoni_backend.domain.shareLink.dto.ShareLinkDTO.ShareLinkResponseDTO;
 import dasoni_backend.domain.shareLink.entity.ShareLink;
 import dasoni_backend.domain.shareLink.repository.ShareLinkRepository;
 import dasoni_backend.domain.user.entity.User;
-import dasoni_backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Service;
@@ -35,9 +33,9 @@ public class ShareLinkServiceImpl implements ShareLinkService {
     private static final int EXPIRE_DAYS = 3;
 
     private final ShareLinkRepository shareLinkRepository;
-    private final UserRepository userRepository;
     private final HallRepository hallRepository;
 
+    // 공유링크 생성
     @Override
     @Transactional
     public ShareLinkResponseDTO issueShareLink(Long hallId, User issuer){
@@ -73,6 +71,7 @@ public class ShareLinkServiceImpl implements ShareLinkService {
         return frontendBaseUrl + "/share-links/" + code;
     }
 
+    // 공유링크 접속시 hallId 반환
     @Override
     @Transactional(readOnly = true)
     public ShareLinkResolveResponseDTO resolveLink(String code) {
