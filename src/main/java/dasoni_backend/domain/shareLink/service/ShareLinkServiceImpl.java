@@ -77,8 +77,7 @@ public class ShareLinkServiceImpl implements ShareLinkService {
     public ShareLinkResolveResponseDTO resolveLink(String code) {
 
         ShareLink link = shareLinkRepository.findByCode(code)
-                .orElseThrow(() -> new IllegalArgumentException("유효하지않은 코드입니다."));
-
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "유효하지 않은 공유 링크입니다."));
         if (link.isExpired()) {
             // 410 오류
             throw new ResponseStatusException( HttpStatus.GONE, "공유 링크가 만료되었습니다.");
