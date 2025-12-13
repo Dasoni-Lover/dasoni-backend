@@ -62,14 +62,14 @@ public class RequestServiceImpl implements RequestService {
                     .hall(request.getHall())
                     .user(request.getUser())
                     .relation(request.getRelation())
-                    .detail(request.getDetail())
                     .review(request.getReview())
                     .natures(new ArrayList<>(request.getNatures()))
+                    .detail(null)
                     .explanation(null)
                     .polite(null)
                     .speakHabit(null)
                     .calledName(null)
-                    .send(false)
+                    .sent(false)
                     .set(false)
                     .build();
 
@@ -90,7 +90,6 @@ public class RequestServiceImpl implements RequestService {
         // Hall 조회
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new RuntimeException("Hall not found"));
-
         // Request 생성 및 저장
         Request request = RequestConverter.toRequest(user, hall, requestDTO);
         requestRepository.save(request);

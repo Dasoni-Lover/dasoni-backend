@@ -3,6 +3,7 @@ package dasoni_backend.domain.letter.service;
 import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.hall.repository.HallRepository;
 import dasoni_backend.domain.letter.converter.LetterConverter;
+import dasoni_backend.domain.letter.dto.LetterDTO.LetterCheckDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterPreCheckResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
@@ -117,24 +118,34 @@ public class LetterServiceImpl implements LetterService{
     public void saveLetter(Long hallId, User user, LetterSaveRequestDTO request) {
 
         Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"추모관을 못 찾겠어요."));
 
         System.out.println("✅ request.isCompleted = " + request.isCompleted());
 
-        // :TODO 일단 테스트를 위해서
-//        // isCompleted=true면 오늘 이미 보냈는지 검사
-//        if (request.isCompleted()
-//                && letterRepository.existsByHall_IdAndUser_IdAndIsCompletedTrueAndCompletedAtBetween(
-//                hallId, user.getId(), LocalDate.now().atStartOfDay(), LocalDate.now().plusDays(1).atStartOfDay()
-//        )) {
-//            throw new ResponseStatusException(HttpStatus.CONFLICT, "이미 편지를 보냈어요");
-//        }
-        Letter letter = LetterConverter.RequestToLetter(request, hall, user);
-        letterRepository.save(letter);
+        Letter letter;
+
+        if(request.getLetterId() != null){
+            // 임시보관함으로 만든 것들은 업데이트
+            letter =  letterRepository.findById(request.getLetterId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "편지를 못 찾겠어요."));
+            LetterConverter.updateLetterFromRequest(letter, request);
+        }
+        else{
+            // 그냥 바로 만든 거는 저장
+            letter = LetterConverter.RequestToLetter(request, hall, user);
+            letterRepository.save(letter);
+        }
 
         // 답장에 isWanted 가 true 면 답장 오도록
         if(letter.getIsWanted())
             replyService.createAiReply(hallId,letter.getId(),user);
+
+        if(letter.getIsCompleted()) {
+            Relationship relationship = relationshipRepository
+                    .findByHallIdAndUserId(hallId, user.getId())
+                    .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
+            relationship.setSent(true);
+        }
     }
 
     // 임시보관함 조회
@@ -294,5 +305,16 @@ public class LetterServiceImpl implements LetterService{
         relationship.setSpeakHabit(request.getSpeakHabit());
         relationship.setPolite(request.getIsPolite());
         relationship.setCalledName(request.getCalledName());
+    }
+
+    // 오늘 편지 보냈는 지 여부
+    @Transactional
+    @Override
+    public LetterCheckDTO checkSentToday(Long hallId, User user){
+        Relationship relationship = relationshipRepository
+                .findByHallIdAndUserId(hallId, user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
+
+        return LetterCheckDTO.builder().isSendToday(relationship.isSent()).build();
     }
 }

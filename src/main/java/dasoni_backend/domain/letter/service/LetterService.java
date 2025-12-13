@@ -1,5 +1,6 @@
 package dasoni_backend.domain.letter.service;
 
+import dasoni_backend.domain.letter.dto.LetterDTO.LetterCheckDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterPreCheckResponseDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.LetterSaveRequestDTO;
 import dasoni_backend.domain.letter.dto.LetterDTO.SentLetterCalenderListResponseDTO;
@@ -51,4 +52,7 @@ public interface LetterService {
 
     // AI 음성편지 설정 수정
     void updateLetterSettings(Long hallId, SettingDTO request, User user);
+
+    // 오늘 편지 보냈는 지 여부
+    LetterCheckDTO checkSentToday(Long hallId, User user);
 }
