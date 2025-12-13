@@ -301,9 +301,6 @@ public class LetterServiceImpl implements LetterService{
     @Transactional
     @Override
     public LetterCheckDTO checkSentToday(Long hallId, User user){
-        Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new EntityNotFoundException("추모관을 찾을 수 없습니다"));
-
         Relationship relationship = relationshipRepository
                 .findByHallIdAndUserId(hallId, user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
