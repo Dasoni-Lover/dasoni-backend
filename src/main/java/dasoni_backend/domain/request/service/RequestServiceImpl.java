@@ -69,7 +69,7 @@ public class RequestServiceImpl implements RequestService {
                     .polite(null)
                     .speakHabit(null)
                     .calledName(null)
-                    .send(false)
+                    .sent(false)
                     .set(false)
                     .build();
 
@@ -90,7 +90,6 @@ public class RequestServiceImpl implements RequestService {
         // Hall 조회
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new RuntimeException("Hall not found"));
-
         // Request 생성 및 저장
         Request request = RequestConverter.toRequest(user, hall, requestDTO);
         requestRepository.save(request);

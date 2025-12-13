@@ -86,6 +86,7 @@ public class LetterDTO {
     @Getter
     @NoArgsConstructor
     public static class LetterSaveRequestDTO {
+        private Long letterId;
         private String toName;
         private String fromName;
         private String content;
@@ -155,5 +156,11 @@ public class LetterDTO {
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy.MM.dd")
         private LocalDateTime createdAt;
         private boolean checked;
+    }
+
+    @Getter
+    @Builder
+    public static class LetterCheckDTO{
+        private boolean isSendToday;
     }
 }

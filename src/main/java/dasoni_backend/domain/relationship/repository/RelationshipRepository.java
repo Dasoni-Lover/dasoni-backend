@@ -4,6 +4,8 @@ import dasoni_backend.domain.hall.entity.Hall;
 import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,4 +33,9 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Long
 
     // 본인만 빼고 조회
     List<Relationship> findByHallAndUserNot(Hall hall, User user);
+
+    // 편지 초기화 할때 update로 처리
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Relationship r SET r.sent = false")
+    int resetAllSentStatus();
 }

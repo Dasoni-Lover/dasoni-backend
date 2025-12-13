@@ -85,8 +85,8 @@ public class Relationship {
     private Boolean polite;
 
     // 오늘 편지를 보냈는지 여부
-    @Column(name = "is_send")
-    private boolean send;
+    @Column(name = "is_sent")
+    private boolean sent;
 
     // AI 음성편지 설정을 마쳤는지 여부
     @Builder.Default
