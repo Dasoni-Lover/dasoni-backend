@@ -4,6 +4,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallRelationMeResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallUpdateRequestDTO;
@@ -60,5 +61,8 @@ public interface HallService {
 
     // 추모관 입장 요청들 조회
     RequestListResponseDTO getRequests(Long hallId, User user);
+
+    // 추모관 들어와 있는지 여부 확인
+    HallRelationMeResponseDTO getMeAndHallRelationship(Long hallId, User user);
 }
 
