@@ -1,0 +1,92 @@
+package dasoni_backend.domain.shareLink.service;
+
+import dasoni_backend.domain.hall.entity.Hall;
+import dasoni_backend.domain.hall.repository.HallRepository;
+import dasoni_backend.domain.shareLink.dto.ShareLinkDTO.ShareLinkResolveResponseDTO;
+import dasoni_backend.domain.shareLink.dto.ShareLinkDTO.ShareLinkResponseDTO;
+import dasoni_backend.domain.shareLink.entity.ShareLink;
+import dasoni_backend.domain.shareLink.repository.ShareLinkRepository;
+import dasoni_backend.domain.user.entity.User;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class ShareLinkServiceImpl implements ShareLinkService {
+
+    // 프론토 도메인
+    @Value("${app.frontend.base-url}")
+    private String frontendBaseUrl;
+
+    // 공유 링크 만료일 설정
+    private static final int EXPIRE_DAYS = 3;
+
+    private final ShareLinkRepository shareLinkRepository;
+    private final HallRepository hallRepository;
+
+    // 공유링크 생성
+    @Override
+    @Transactional
+    public ShareLinkResponseDTO issueShareLink(Long hallId, User issuer){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
+
+        if (issuer == null) {
+            throw new AuthenticationCredentialsNotFoundException("로그인이 필요합니다.");
+        }
+        ShareLink shareLink = ShareLink.builder()
+                .hall(hall)
+                .user(issuer)
+                .code(generateCode())
+                .expiresAt(LocalDateTime.now().plusDays(EXPIRE_DAYS))
+                .build();
+
+        shareLinkRepository.save(shareLink);
+
+        String ShareUrl = buildShareUrl(shareLink.getCode());
+
+        return ShareLinkResponseDTO.builder().ShareUrl(ShareUrl).build();
+    }
+
+    // 랜덤 코드 생성
+    private String generateCode() {
+        return UUID.randomUUID()
+                .toString()
+                .replace("-", "");
+    }
+
+    // 공유 링크 생성
+    private String buildShareUrl(String code) {
+        return frontendBaseUrl + "/share-links/" + code;
+    }
+
+    // 공유링크 접속시 hallId 반환
+    @Override
+    @Transactional(readOnly = true)
+    public ShareLinkResolveResponseDTO resolveLink(String code) {
+
+        ShareLink link = shareLinkRepository.findByCode(code)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "유효하지 않은 공유 링크입니다."));
+        if (link.isExpired()) {
+            // 410 오류
+            throw new ResponseStatusException( HttpStatus.GONE, "공유 링크가 만료되었습니다.");
+        }
+
+        Hall hall = link.getHall();
+
+        return ShareLinkResolveResponseDTO.builder()
+                .hallId(hall.getId())
+                .build();
+    }
+}

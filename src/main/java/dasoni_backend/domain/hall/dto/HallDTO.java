@@ -180,4 +180,10 @@ public class HallDTO {
         private String place;
         private String phone;
     }
+
+    @Getter
+    @AllArgsConstructor
+    public static class HallRelationMeResponseDTO {
+        private boolean isRegistered;
+    }
 }

@@ -73,7 +73,7 @@ public class PhotoServiceImpl implements PhotoService {
     @Transactional
     public void uploadPhoto(Long hallId, PhotoUploadRequestDTO request, User user){
         Hall hall = hallRepository.findById(hallId)
-                .orElseThrow(() -> new IllegalArgumentException("홀을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("추모관을 찾을 수 없습니다."));
 
         // URL에서 s3Key 추출 후 파일 존재 확인
         String s3Key = fileUploadService.extractS3Key(request.getUrl());

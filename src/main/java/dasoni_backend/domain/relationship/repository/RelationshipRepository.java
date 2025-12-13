@@ -34,6 +34,10 @@ public interface RelationshipRepository extends JpaRepository<Relationship, Long
     // 본인만 빼고 조회
     List<Relationship> findByHallAndUserNot(Hall hall, User user);
 
+
+    // 관계가 존재하는 지
+    boolean existsByHallIdAndUserId(Long hallId, Long userId);
+  
     // 편지 초기화 할때 update로 처리
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("UPDATE Relationship r SET r.sent = false")

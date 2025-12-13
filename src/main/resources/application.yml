@@ -82,3 +82,8 @@ aws:
 elevenlabs:
   url: ${ELEVENLABS_URL}
   api-key: ${ELEVENLABS_API_KEY}
+
+# 프론트엔드 설정
+app:
+  frontend:
+    base-url: ${FRONTEND_BASE_URL}

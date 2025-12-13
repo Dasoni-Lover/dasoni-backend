@@ -4,6 +4,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallRelationMeResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallUpdateRequestDTO;
@@ -22,6 +23,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -149,5 +151,11 @@ public class HallController {
                                               @AuthUser User user){
         requestService.createRequest(hallId, requestDTO, user);
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{hall_id}/relations/me")
+    public ResponseEntity<HallRelationMeResponseDTO> getMeAndHallRelationship(@PathVariable("hall_id") Long hallId,
+                                                                   @AuthUser User user) {
+        return ResponseEntity.ok(hallService.getMeAndHallRelationship(hallId,user));
     }
 }

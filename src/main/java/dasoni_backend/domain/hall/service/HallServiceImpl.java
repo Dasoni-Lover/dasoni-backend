@@ -5,6 +5,7 @@ import dasoni_backend.domain.hall.dto.HallDTO.HallCreateRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallCreateResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallDetailDataResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallListResponseDTO;
+import dasoni_backend.domain.hall.dto.HallDTO.HallRelationMeResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchRequestDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseDTO;
 import dasoni_backend.domain.hall.dto.HallDTO.HallSearchResponseListDTO;
@@ -330,5 +331,14 @@ public class HallServiceImpl implements HallService {
     private LocalDate parseDate(String dateString) {
         if (dateString == null || dateString.isEmpty()) { return null; }
         return LocalDate.parse(dateString, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    }
+
+    @Override
+    public HallRelationMeResponseDTO getMeAndHallRelationship(Long hallId, User user){
+
+        boolean isRegistered =
+                relationshipRepository.existsByHallIdAndUserId(hallId, user.getId());
+
+        return new HallRelationMeResponseDTO(isRegistered);
     }
 }
