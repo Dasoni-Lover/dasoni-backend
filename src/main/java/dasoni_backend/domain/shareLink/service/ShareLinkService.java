@@ -10,5 +10,4 @@ public interface ShareLinkService {
 
     // 공유링크 조회
     ShareLinkResolveResponseDTO resolveLink(String code);
-
 }
