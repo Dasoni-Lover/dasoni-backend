@@ -35,9 +35,10 @@ public class AiVoiceController {
                 request.getDeceasedInsight(),
                 request.getTone(),
                 request.getFrequentWords(),
+                request.getCalledName(),
                 request.getUserDescriptions()
         );
-
+a
         return new VoiceScriptResponseDTO(script);
     }
 }

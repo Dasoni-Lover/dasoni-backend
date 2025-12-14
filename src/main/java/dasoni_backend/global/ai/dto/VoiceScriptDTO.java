@@ -20,7 +20,6 @@ public class VoiceScriptDTO {
     @Getter
     @Setter
     public static class VoiceScriptRequestDTO {
-
         private String currentLetterContent;
         private String p1Emotion;
         private String p2Emotion;
@@ -28,6 +27,7 @@ public class VoiceScriptDTO {
         private String deceasedInsight;
         private String tone;
         private String frequentWords;
+        private String calledName;
         private List<String> userDescriptions;
     }
 
