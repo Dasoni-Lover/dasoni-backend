@@ -38,7 +38,6 @@ public class AiVoiceController {
                 request.getCalledName(),
                 request.getUserDescriptions()
         );
-a
         return new VoiceScriptResponseDTO(script);
     }
 }
