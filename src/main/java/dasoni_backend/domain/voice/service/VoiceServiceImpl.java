@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 
@@ -48,7 +50,8 @@ public class VoiceServiceImpl implements VoiceService {
 
     @Override
     @Transactional
-    public void updateVoice(Long hallId, VoiceDTO request, User user){
+    public void updateVoice(Long hallId, VoiceDTO request, User user) {
+
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
 
@@ -56,36 +59,45 @@ public class VoiceServiceImpl implements VoiceService {
             throw new IllegalStateException("권한이 없습니다");
         }
 
-        // 기존 voice 삭제
+        // 기존 Voice 보관 (삭제는 나중에)
         Voice oldVoice = hall.getVoice();
-        if (oldVoice != null && oldVoice.getUrl() != null) {
-            try {
-                String oldS3Key = fileUploadService.extractS3Key(oldVoice.getUrl());
-                fileUploadService.deleteFile(oldS3Key);
-                log.info("기존 음성 파일 삭제 완료: {}", oldS3Key);
-                hall.setVoice(null);
-                voiceRepository.delete(oldVoice);
-                voiceRepository.flush();
-            } catch (Exception e) {
-                log.warn("기존 음성 파일 삭제 실패: {}", e.getMessage());
-            }
-        }
 
+        // 새 Voice 생성
         Voice newVoice = Voice.builder()
                 .url(request.getUrl())
                 .updateAt(LocalDateTime.now())
                 .build();
 
-        // 업데이트 후 저장
         voiceRepository.save(newVoice);
+
+        //  Hall에 새 Voice 연결
         hall.setVoice(newVoice);
         hallRepository.save(hall);
 
         log.info("새 Voice 저장 완료 → voiceId: {}, url: {}",
                 newVoice.getId(), newVoice.getUrl());
 
-        log.info("Hall FK 업데이트 확인 → hallId: {}, hall.voiceId: {}",
-                hall.getId(), hall.getVoice() != null ? hall.getVoice().getId() : null);
+        log.info("Hall FK 업데이트 완료 → hallId: {}, hall.voiceId: {}",
+                hall.getId(), newVoice.getId());
+
+        // 트랜잭션 커밋 후 S3 + DB 삭제
+        if (oldVoice != null && oldVoice.getUrl() != null) {
+            TransactionSynchronizationManager.registerSynchronization(
+                    new TransactionSynchronization() {
+                        @Override
+                        public void afterCommit() {
+                            try {
+                                String oldS3Key = fileUploadService.extractS3Key(oldVoice.getUrl());
+                                fileUploadService.deleteFile(oldS3Key);
+                                voiceRepository.delete(oldVoice);
+                                log.info("기존 Voice 삭제 완료 (AFTER_COMMIT): {}", oldS3Key);
+                            } catch (Exception e) {
+                                log.warn("기존 Voice 삭제 실패 (AFTER_COMMIT): {}", e.getMessage());
+                            }
+                        }
+                    }
+            );
+        }
     }
 
     @Override
