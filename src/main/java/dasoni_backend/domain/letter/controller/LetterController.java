@@ -104,7 +104,7 @@ public class LetterController {
         return ResponseEntity.ok(letterService.getLetterSettings(hallId, user));
     }
 
-    // AI 음성편지 설정
+    // AI 음성편지 설정 하기
     @PostMapping("/{hall_id}/letters/settings/create")
     public ResponseEntity<Void> createLetterSettings(@PathVariable("hall_id") Long hallId,
                                                      @RequestBody SettingDTO request,
