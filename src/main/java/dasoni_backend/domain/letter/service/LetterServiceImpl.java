@@ -21,7 +21,9 @@ import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.domain.reply.service.ReplyService;
 import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
+import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.domain.voice.service.VoiceService;
+import dasoni_backend.global.S3.service.S3Service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +44,7 @@ public class LetterServiceImpl implements LetterService{
     private final RelationshipRepository relationshipRepository;
     private final VoiceService voiceService;
     private final ReplyService replyService;
+    private final S3Service s3Service;
 
     // 1. 보낸 편지함 목록 조회
     @Transactional(readOnly = true)
@@ -234,7 +237,16 @@ public class LetterServiceImpl implements LetterService{
                 .findByHallIdAndUserId(hallId, user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
 
-        return RelationshipConverter.RelationshiptoSettingDTO(relationship);
+        String voiceUrl = null;
+
+        Voice voice = relationship.getHall().getVoice();
+        if (voice != null && voice.getS3Key() != null) {
+            voiceUrl = s3Service.generatePresignedDownloadUrl(voice.getS3Key());
+        }
+
+        SettingDTO dto = RelationshipConverter.RelationshiptoSettingDTO(relationship);
+        dto.setVoiceUrl(voiceUrl);
+        return dto;
     }
 
     @Override

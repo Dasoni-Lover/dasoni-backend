@@ -7,6 +7,7 @@ import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.domain.voice.repository.VoiceRepository;
 import dasoni_backend.global.S3.service.FileUploadService;
+import dasoni_backend.global.S3.service.S3Service;
 import dasoni_backend.global.elevenlabs.ElevenLabsClient;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ import java.time.LocalDateTime;
 public class VoiceServiceImpl implements VoiceService {
 
     private final FileUploadService fileUploadService;
+    private final S3Service s3Service;
     private final HallRepository hallRepository;
     private final ElevenLabsClient elevenLabsClient;
     private final VoiceRepository voiceRepository;
@@ -38,8 +40,10 @@ public class VoiceServiceImpl implements VoiceService {
             throw new IllegalStateException("권한이 없습니다");
         }
 
+        String s3Key = fileUploadService.extractS3Key(request.getUrl());
+
         Voice voice = Voice.builder()
-                .url(request.getUrl())
+                .s3Key(s3Key)
                 .updateAt(LocalDateTime.now())
                 .build();
 
@@ -63,8 +67,10 @@ public class VoiceServiceImpl implements VoiceService {
         Voice oldVoice = hall.getVoice();
 
         // 새 Voice 생성
+        String s3Key = fileUploadService.extractS3Key(request.getUrl());
+
         Voice newVoice = Voice.builder()
-                .url(request.getUrl())
+                .s3Key(s3Key)
                 .updateAt(LocalDateTime.now())
                 .build();
 
@@ -74,23 +80,20 @@ public class VoiceServiceImpl implements VoiceService {
         hall.setVoice(newVoice);
         hallRepository.save(hall);
 
-        log.info("새 Voice 저장 완료 → voiceId: {}, url: {}",
-                newVoice.getId(), newVoice.getUrl());
+        log.info("새 Voice 저장 완료 → voiceId: {}", newVoice.getId());
 
-        log.info("Hall FK 업데이트 완료 → hallId: {}, hall.voiceId: {}",
-                hall.getId(), newVoice.getId());
+        log.info("Hall FK 업데이트 완료 → hallId: {}", hall.getId());
 
         // 트랜잭션 커밋 후 S3 + DB 삭제
-        if (oldVoice != null && oldVoice.getUrl() != null) {
+        if (oldVoice != null && oldVoice.getS3Key() != null) {
             TransactionSynchronizationManager.registerSynchronization(
                     new TransactionSynchronization() {
                         @Override
                         public void afterCommit() {
                             try {
-                                String oldS3Key = fileUploadService.extractS3Key(oldVoice.getUrl());
-                                fileUploadService.deleteFile(oldS3Key);
+                                s3Service.deleteFile(oldVoice.getS3Key());
                                 voiceRepository.delete(oldVoice);
-                                log.info("기존 Voice 삭제 완료 (AFTER_COMMIT): {}", oldS3Key);
+                                log.info("기존 Voice 삭제 완료 (AFTER_COMMIT)");
                             } catch (Exception e) {
                                 log.warn("기존 Voice 삭제 실패 (AFTER_COMMIT): {}", e.getMessage());
                             }
@@ -109,8 +112,7 @@ public class VoiceServiceImpl implements VoiceService {
             throw new IllegalStateException("권한이 없습니다");
         }
         Voice oldVoice = hall.getVoice();
-        String oldUrl = oldVoice.getUrl();
-        fileUploadService.deleteFile(fileUploadService.extractS3Key(oldUrl));
+        fileUploadService.deleteFile(oldVoice.getS3Key());
         voiceRepository.delete(oldVoice);
         hall.setVoice(null);
     }
@@ -133,8 +135,11 @@ public class VoiceServiceImpl implements VoiceService {
                     .url(null)
                     .build();
         }
+
+        String getUrl = s3Service.generatePresignedDownloadUrl(voice.getS3Key());
+
         return VoiceDTO.builder()
-                .url(voice.getUrl())
+                .url(getUrl)
                 .build();
     }
 
@@ -149,11 +154,11 @@ public class VoiceServiceImpl implements VoiceService {
         }
 
         Voice voice = hall.getVoice();
-        if(voice == null || voice.getUrl() == null) {
+        if(voice == null || voice.getS3Key() == null) {
             throw new IllegalStateException("먼저 음성 파일을 업로드해야 합니다.");
         }
 
-        String key = fileUploadService.extractS3Key(voice.getUrl());
+        String key = voice.getS3Key();
         byte[] audioBytes = fileUploadService.downloadFile(key);
 
         String name = hall.getName() + "_voice";

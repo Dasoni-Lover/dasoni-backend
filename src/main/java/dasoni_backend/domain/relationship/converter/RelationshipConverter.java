@@ -27,8 +27,6 @@ public class RelationshipConverter {
                 .isPolite(relationship.getPolite())
                 .calledName(relationship.getCalledName())
                 .speakHabit(relationship.getSpeakHabit())
-                .voiceUrl(relationship.getHall().getVoice() != null ?
-                        relationship.getHall().getVoice().getUrl() : null)
                 .build();
     }
 }
