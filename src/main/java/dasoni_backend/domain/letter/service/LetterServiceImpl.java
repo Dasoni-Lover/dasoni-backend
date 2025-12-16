@@ -216,7 +216,7 @@ public class LetterServiceImpl implements LetterService{
 
     @Override
     @Transactional
-    public void sendMeLetter(Long letterId, myLetterRequestDTO request, User user){
+    public void sendMeLetter(myLetterRequestDTO request, User user){
 
         Hall hall = hallRepository.findBySubjectId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 존재하지 않습니다."));
