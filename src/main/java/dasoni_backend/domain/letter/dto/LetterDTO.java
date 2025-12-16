@@ -118,6 +118,8 @@ public class LetterDTO {
         private String toName;
 
         private String content;
+
+        private boolean isWanted;
     }
 
     @Getter
