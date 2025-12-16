@@ -42,7 +42,7 @@ public interface LetterService {
     void deleteSendLetter(Long hallId,Long letterId, User user);
 
     // 본인추모관 편지 쓰기
-    void sendMeLetter(Long letterId, myLetterRequestDTO request, User user);
+    void sendMeLetter(myLetterRequestDTO request, User user);
 
     // AI 음성편지 설정 조회
     SettingDTO getLetterSettings(Long hallId, User user);
