@@ -28,7 +28,7 @@ public class RelationshipConverter {
                 .calledName(relationship.getCalledName())
                 .speakHabit(relationship.getSpeakHabit())
                 .voiceUrl(relationship.getHall().getVoice() != null ?
-                        relationship.getHall().getVoice().getUrl() : null)
+                        relationship.getHall().getVoice().getS3Key() : null)
                 .build();
     }
 }

@@ -39,7 +39,7 @@ public class VoiceServiceImpl implements VoiceService {
         }
 
         Voice voice = Voice.builder()
-                .url(request.getUrl())
+                .s3Key(request.getUrl())
                 .updateAt(LocalDateTime.now())
                 .build();
 
@@ -64,7 +64,7 @@ public class VoiceServiceImpl implements VoiceService {
 
         // 새 Voice 생성
         Voice newVoice = Voice.builder()
-                .url(request.getUrl())
+                .s3Key(request.getUrl())
                 .updateAt(LocalDateTime.now())
                 .build();
 
@@ -75,19 +75,19 @@ public class VoiceServiceImpl implements VoiceService {
         hallRepository.save(hall);
 
         log.info("새 Voice 저장 완료 → voiceId: {}, url: {}",
-                newVoice.getId(), newVoice.getUrl());
+                newVoice.getId(), newVoice.getS3Key());
 
         log.info("Hall FK 업데이트 완료 → hallId: {}, hall.voiceId: {}",
                 hall.getId(), newVoice.getId());
 
         // 트랜잭션 커밋 후 S3 + DB 삭제
-        if (oldVoice != null && oldVoice.getUrl() != null) {
+        if (oldVoice != null && oldVoice.getS3Key() != null) {
             TransactionSynchronizationManager.registerSynchronization(
                     new TransactionSynchronization() {
                         @Override
                         public void afterCommit() {
                             try {
-                                String oldS3Key = fileUploadService.extractS3Key(oldVoice.getUrl());
+                                String oldS3Key = fileUploadService.extractS3Key(oldVoice.getS3Key());
                                 fileUploadService.deleteFile(oldS3Key);
                                 voiceRepository.delete(oldVoice);
                                 log.info("기존 Voice 삭제 완료 (AFTER_COMMIT): {}", oldS3Key);
@@ -109,7 +109,7 @@ public class VoiceServiceImpl implements VoiceService {
             throw new IllegalStateException("권한이 없습니다");
         }
         Voice oldVoice = hall.getVoice();
-        String oldUrl = oldVoice.getUrl();
+        String oldUrl = oldVoice.getS3Key();
         fileUploadService.deleteFile(fileUploadService.extractS3Key(oldUrl));
         voiceRepository.delete(oldVoice);
         hall.setVoice(null);
@@ -134,7 +134,7 @@ public class VoiceServiceImpl implements VoiceService {
                     .build();
         }
         return VoiceDTO.builder()
-                .url(voice.getUrl())
+                .url(voice.getS3Key())
                 .build();
     }
 
@@ -149,11 +149,11 @@ public class VoiceServiceImpl implements VoiceService {
         }
 
         Voice voice = hall.getVoice();
-        if(voice == null || voice.getUrl() == null) {
+        if(voice == null || voice.getS3Key() == null) {
             throw new IllegalStateException("먼저 음성 파일을 업로드해야 합니다.");
         }
 
-        String key = fileUploadService.extractS3Key(voice.getUrl());
+        String key = fileUploadService.extractS3Key(voice.getS3Key());
         byte[] audioBytes = fileUploadService.downloadFile(key);
 
         String name = hall.getName() + "_voice";

@@ -27,7 +27,7 @@ public class Voice {
     private Long id;
 
     @Column(columnDefinition = "TEXT")
-    private String url;
+    private String s3Key;
 
     // elevenLabs 용 voiceId
     @Column(name = "voice_id")
