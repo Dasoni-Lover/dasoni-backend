@@ -4,6 +4,7 @@ import dasoni_backend.domain.notification.dto.NotificationDTO.NotificationListDT
 import dasoni_backend.domain.notification.dto.NotificationDTO.NotificationResponseDTO;
 import dasoni_backend.domain.notification.entity.Notification;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,6 +17,7 @@ public class NotificationConverter {
                 .kind(notification.getKind().getDescription())
                 .title(notification.getTitle())  // "故 박영수 추모관"
                 .body(notification.getKind().getBodyMessage())  // Enum에서 body 가져오기
+                .date(notification.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"))) // 생성 날짜
                 .build();
     }
 

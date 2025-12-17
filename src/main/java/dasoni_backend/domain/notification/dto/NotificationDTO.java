@@ -19,6 +19,7 @@ public class NotificationDTO {
         private String kind;
         private String title;
         private String body;
+        private String date;
     }
 
     @Getter
