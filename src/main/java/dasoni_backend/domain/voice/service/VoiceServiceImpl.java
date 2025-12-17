@@ -29,7 +29,6 @@ public class VoiceServiceImpl implements VoiceService {
     private final HallRepository hallRepository;
     private final ElevenLabsClient elevenLabsClient;
     private final VoiceRepository voiceRepository;
-    private final VoiceServiceTx voiceServiceTx;
 
     @Override
     @Transactional
@@ -182,13 +181,14 @@ public class VoiceServiceImpl implements VoiceService {
     }
 
     private void generateVoiceIdInternal(Long voiceId, String hallName) {
-
         Voice voice = voiceRepository.findById(voiceId)
                 .orElseThrow(() -> new EntityNotFoundException("Voice not found"));
 
         byte[] audioBytes = s3Service.downloadFile(voice.getS3Key());
         String newVoiceId = elevenLabsClient.createIVCVoice(audioBytes, hallName + "_voice");
 
-        voiceServiceTx.updateVoiceId(voiceId, newVoiceId);
+        voice.setVoiceId(newVoiceId);
+        voice.setUpdateAt(LocalDateTime.now());
+        voiceRepository.save(voice);
     }
 }
