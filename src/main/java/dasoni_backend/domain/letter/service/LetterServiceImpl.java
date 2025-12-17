@@ -142,14 +142,14 @@ public class LetterServiceImpl implements LetterService{
         }
 
         // 답장에 isWanted 가 true 면 답장 오도록
-        if(letter.getIsWanted())
-            replyService.createAiReply(hallId,letter.getId(),user);
-
-        if(letter.getIsCompleted()) {
-            Relationship relationship = relationshipRepository
-                    .findByHallIdAndUserId(hallId, user.getId())
-                    .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
-            relationship.setSent(true);
+        if(letter.getIsWanted()) {
+            replyService.createAiReply(hallId, letter.getId(), user);
+            if(letter.getIsCompleted()) {
+                Relationship relationship = relationshipRepository
+                        .findByHallIdAndUserId(hallId, user.getId())
+                        .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
+                relationship.setSent(true);
+            }
         }
     }
 
