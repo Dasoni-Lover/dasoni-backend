@@ -132,15 +132,15 @@ public class LetterServiceImpl implements LetterService{
     @Override
     public void saveLetter(Long hallId, User user, LetterSaveRequestDTO request) {
 
+        log.info("[1] saveLetter 진입");
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"추모관을 못 찾겠어요."));
-
-        System.out.println("request.isCompleted = " + request.isCompleted());
 
         Letter letter;
 
         if(request.getLetterId() != null){
             // 임시보관함으로 만든 것들은 업데이트
+            log.info("[3] 임시보관 직전");
             letter =  letterRepository.findById(request.getLetterId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "편지를 못 찾겠어요."));
 
@@ -155,6 +155,7 @@ public class LetterServiceImpl implements LetterService{
         }
         else{
             // 그냥 바로 만든 거는 저장
+            log.info("[3] 편지 저장");
             letter = LetterConverter.RequestToLetter(request, hall, user);
             letterRepository.save(letter);
         }
@@ -162,12 +163,14 @@ public class LetterServiceImpl implements LetterService{
         log.info("답장 여부 : {}", letter.getIsWanted());
         // 답장에 isWanted 가 true 면 답장 오도록
         if(letter.getIsWanted()) {
+            log.info("[4] createAiReply 호출 직전");
             replyService.createAiReply(hallId, letter.getId(), user);
             if(letter.getIsCompleted()) {
                 Relationship relationship = relationshipRepository
                         .findByHallIdAndUserId(hallId, user.getId())
                         .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
                 relationship.setSent(true);
+                log.info("[5] 관계 sent=true 설정");
             }
         }
     }
