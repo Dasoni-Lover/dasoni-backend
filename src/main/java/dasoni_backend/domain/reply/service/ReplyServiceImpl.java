@@ -322,10 +322,10 @@ public class ReplyServiceImpl implements ReplyService {
 
         try{
             // stability, similarityBoost, style, useSpeakerBoost, speed
-            var voiceSettings = new ElevenLabsApi.SpeechRequest.VoiceSettings((Double)0.4, (Double)0.75, (Double)0.0, Boolean.TRUE, (Double)0.85);
+            var voiceSettings = new ElevenLabsApi.SpeechRequest.VoiceSettings((Double)0.4, (Double)1.0, (Double)0.2, Boolean.TRUE, (Double)0.85);
 
             var options = ElevenLabsTextToSpeechOptions.builder()
-                    .model("eleven_turbo_v2_5")
+                    .model("eleven_multilingual_v2")
                     .voiceId(voiceId)
                     .voiceSettings(voiceSettings)
                     .outputFormat("mp3_44100_128")
