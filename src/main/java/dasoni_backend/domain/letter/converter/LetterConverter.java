@@ -127,6 +127,7 @@ public class LetterConverter {
                 .date(letter.getCreatedAt())
                 .toName(letter.getToName())
                 .content(letter.getContent())
+                .isWanted(letter.getIsWanted())
                 .build();
     }
 

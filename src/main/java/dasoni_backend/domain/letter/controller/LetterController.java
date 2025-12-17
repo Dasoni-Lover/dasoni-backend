@@ -92,9 +92,9 @@ public class LetterController {
     }
 
     // 본인추모관 편지 남기기
-    @DeleteMapping("/me/letters/send")
-    public ResponseEntity<Void> sendMeLetter(@PathVariable("letter_id") Long letterId, @RequestBody myLetterRequestDTO request, @AuthUser User user) {
-        letterService.sendMeLetter(letterId, request, user);
+    @PostMapping("/me/letters/send")
+    public ResponseEntity<Void> sendMeLetter(@RequestBody myLetterRequestDTO request, @AuthUser User user) {
+        letterService.sendMeLetter(request, user);
         return ResponseEntity.ok().build();
     }
 

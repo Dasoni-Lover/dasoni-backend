@@ -102,6 +102,16 @@ public class LetterServiceImpl implements LetterService{
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
+        Long userId = user.getId();
+        Long subjectId = hall.getSubjectId();
+
+        // 내 추모관이면 개설만 되어있으면 편지 쓰기 가능
+        if(subjectId != null && subjectId.equals(userId)) {
+            return LetterPreCheckResponseDTO.builder()
+                    .isOpen(true)
+                    .isSet(true)
+                    .build();
+        }
         // 음성이 되어있는지 관리자가 설정되어 있는지
         boolean isOpen = hall.isOpened();
 
@@ -125,7 +135,7 @@ public class LetterServiceImpl implements LetterService{
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,"추모관을 못 찾겠어요."));
 
-        System.out.println("✅ request.isCompleted = " + request.isCompleted());
+        System.out.println("request.isCompleted = " + request.isCompleted());
 
         Letter letter;
 
@@ -133,6 +143,14 @@ public class LetterServiceImpl implements LetterService{
             // 임시보관함으로 만든 것들은 업데이트
             letter =  letterRepository.findById(request.getLetterId())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "편지를 못 찾겠어요."));
+
+            if (!letter.getHall().getId().equals(hallId)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 추모관의 편지가 아닙니다.");
+            }
+            if (!letter.getUser().getId().equals(user.getId())) {
+                throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인 편지만 수정할 수 있습니다.");
+            }
+
             LetterConverter.updateLetterFromRequest(letter, request);
         }
         else{
@@ -221,7 +239,7 @@ public class LetterServiceImpl implements LetterService{
 
     @Override
     @Transactional
-    public void sendMeLetter(Long letterId, myLetterRequestDTO request, User user){
+    public void sendMeLetter(myLetterRequestDTO request, User user){
 
         Hall hall = hallRepository.findBySubjectId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("본인 추모관이 존재하지 않습니다."));
@@ -235,6 +253,13 @@ public class LetterServiceImpl implements LetterService{
     @Override
     @Transactional(readOnly = true)
     public SettingDTO getLetterSettings(Long hallId, User user) {
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new EntityNotFoundException("추모관을 찾을 수 없습니다"));
+
+        if(hall.getSubjectId() != null && hall.getSubjectId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "내 추모관에서는 AI 음성편지 설정 기능을 사용하지 않습니다");
+        }
+
         Relationship relationship = relationshipRepository
                 .findByHallIdAndUserId(hallId, user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
@@ -256,6 +281,10 @@ public class LetterServiceImpl implements LetterService{
     public void createLetterSettings(Long hallId, SettingDTO request, User user) {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("추모관을 찾을 수 없습니다"));
+
+        if(hall.getSubjectId() != null && hall.getSubjectId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "내 추모관에서는 AI 음성편지 설정 기능을 사용하지 않습니다");
+        }
 
         Relationship relationship = relationshipRepository
                 .findByHallIdAndUserId(hallId, user.getId())
@@ -292,6 +321,10 @@ public class LetterServiceImpl implements LetterService{
     public void updateLetterSettings(Long hallId, SettingDTO request, User user) {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("추모관을 찾을 수 없습니다"));
+
+        if(hall.getSubjectId() != null && hall.getSubjectId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "내 추모관에서는 AI 음성편지 설정 기능을 사용하지 않습니다");
+        }
 
         Relationship relationship = relationshipRepository
                 .findByHallIdAndUserId(hallId, user.getId())
@@ -338,6 +371,13 @@ public class LetterServiceImpl implements LetterService{
     @Transactional
     @Override
     public LetterCheckDTO checkSentToday(Long hallId, User user){
+        Hall hall = hallRepository.findById(hallId)
+                .orElseThrow(() -> new EntityNotFoundException("추모관을 찾을 수 없습니다"));
+
+        if(hall.getSubjectId() != null && hall.getSubjectId().equals(user.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "내 추모관에서는 오늘 편지 여부 기능을 사용하지 않습니다");
+        }
+
         Relationship relationship = relationshipRepository
                 .findByHallIdAndUserId(hallId, user.getId())
                 .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
