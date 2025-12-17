@@ -312,20 +312,25 @@ public class ReplyServiceImpl implements ReplyService {
 
     private byte[] generateTtsAudio(String text, String voiceId) {
 
-        // stability, similarityBoost, style, useSpeakerBoost, speed
-        var voiceSettings = new ElevenLabsApi.SpeechRequest.VoiceSettings((Double)0.4, (Double)0.75, (Double)0.0, Boolean.TRUE, (Double)0.85);
+        try{
+            // stability, similarityBoost, style, useSpeakerBoost, speed
+            var voiceSettings = new ElevenLabsApi.SpeechRequest.VoiceSettings((Double)0.4, (Double)0.75, (Double)0.0, Boolean.TRUE, (Double)0.85);
 
-        var options = ElevenLabsTextToSpeechOptions.builder()
-                .model("eleven_turbo_v2_5")
-                .voiceId(voiceId)
-                .voiceSettings(voiceSettings)
-                .outputFormat("mp3_44100_128")
-                .build();
+            var options = ElevenLabsTextToSpeechOptions.builder()
+                    .model("eleven_turbo_v2_5")
+                    .voiceId(voiceId)
+                    .voiceSettings(voiceSettings)
+                    .outputFormat("mp3_44100_128")
+                    .build();
 
-        TextToSpeechPrompt prompt = new TextToSpeechPrompt(text, options);
-        TextToSpeechResponse response = tts.call(prompt);
-        log.info("TTS 생성 완료: voiceId={}, textLength={}", voiceId, text.length());
-        return response.getResult().getOutput();
+            TextToSpeechPrompt prompt = new TextToSpeechPrompt(text, options);
+            TextToSpeechResponse response = tts.call(prompt);
+            log.info("TTS 생성 완료: voiceId={}, textLength={}", voiceId, text.length());
+            return response.getResult().getOutput();
+        } catch (Exception e) {
+            log.error("TTS generation failed. voiceId={}", voiceId, e);
+            return null;
+        }
     }
 
     @Override
