@@ -16,7 +16,6 @@ public class LetterScheduler {
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     @Transactional
     public void resetDailySentStatus() {
-
         // Repository의 벌크 업데이트 메서드 호출
         int updatedCount = relationshipRepository.resetAllSentStatus();
         System.out.println("[LetterScheduler] 편지 발송 상태 초기화 완료. 업데이트된 레코드 수: " + updatedCount);
