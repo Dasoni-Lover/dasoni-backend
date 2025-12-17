@@ -73,4 +73,26 @@ public class ElevenLabsClient {
         log.info("ElevenLabs IVC 성공, voice_id={}", voiceId);
         return voiceId;
     }
+
+    public void deleteVoice(String voiceId) {
+
+        elevenLabsWebClient.delete()
+                .uri("/v1/voices/{voiceId}", voiceId)
+                .header("xi-api-key", apiKey)
+                .retrieve()
+                .onStatus(
+                        status -> status.is4xxClientError() || status.is5xxServerError(),
+                        clientResponse -> clientResponse.bodyToMono(String.class)
+                                .flatMap(errorBody -> {
+                                    log.error("ElevenLabs Voice 삭제 실패: {}", errorBody);
+                                    return Mono.error(
+                                            new IllegalStateException("ElevenLabs Voice 삭제 실패: " + errorBody)
+                                    );
+                                })
+                )
+                .toBodilessEntity()
+                .block();
+
+        log.info("ElevenLabs Voice 삭제 완료, voiceId={}", voiceId);
+    }
 }

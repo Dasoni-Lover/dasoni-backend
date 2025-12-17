@@ -29,6 +29,7 @@ public class VoiceServiceImpl implements VoiceService {
     private final HallRepository hallRepository;
     private final ElevenLabsClient elevenLabsClient;
     private final VoiceRepository voiceRepository;
+    private final VoiceServiceTx voiceServiceTx;
 
     @Override
     @Transactional
@@ -45,11 +46,23 @@ public class VoiceServiceImpl implements VoiceService {
         Voice voice = Voice.builder()
                 .s3Key(s3Key)
                 .updateAt(LocalDateTime.now())
+                .voiceId(null)
                 .build();
 
         voiceRepository.save(voice);
         hall.setVoice(voice);
-        hallRepository.save(hall);
+        TransactionSynchronizationManager.registerSynchronization(
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    try {
+                        generateVoiceIdInternal(voice.getId(), hall.getName());
+                    } catch (Exception e) {
+                        log.error("voiceId 생성 실패 (upload)", e);
+                    }
+                }
+            }
+        );
     }
 
     @Override
@@ -71,6 +84,7 @@ public class VoiceServiceImpl implements VoiceService {
 
         Voice newVoice = Voice.builder()
                 .s3Key(s3Key)
+                .voiceId(null)
                 .updateAt(LocalDateTime.now())
                 .build();
 
@@ -78,7 +92,6 @@ public class VoiceServiceImpl implements VoiceService {
 
         //  Hall에 새 Voice 연결
         hall.setVoice(newVoice);
-        hallRepository.save(hall);
 
         log.info("새 Voice 저장 완료 → voiceId: {}", newVoice.getId());
         log.info("Hall FK 업데이트 완료 → hallId: {}", hall.getId());
@@ -95,6 +108,12 @@ public class VoiceServiceImpl implements VoiceService {
                             log.info("기존 Voice 삭제 완료 (AFTER_COMMIT)");
                         } catch (Exception e) {
                             log.warn("기존 Voice 삭제 실패 (AFTER_COMMIT): {}", e.getMessage());
+                        }
+                        // 새로운 voiceId 생성
+                        try {
+                            generateVoiceIdInternal(newVoice.getId(), hall.getName());
+                        } catch (Exception e) {
+                            log.error("voiceId 생성 실패 (update)", e);
                         }
                     }
                 }
@@ -143,7 +162,6 @@ public class VoiceServiceImpl implements VoiceService {
     }
 
     @Override
-    @Transactional
     public void generateVoiceId(Long hallId, User user) {
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new EntityNotFoundException("Hall not found"));
@@ -156,14 +174,16 @@ public class VoiceServiceImpl implements VoiceService {
         if(voice == null || voice.getS3Key() == null) {
             throw new IllegalStateException("먼저 음성 파일을 업로드해야 합니다.");
         }
+        String newVoiceId = generateVoiceIdExternal(voice.getS3Key(), hall.getName());
+        voiceServiceTx.updateVoiceId(voice.getId(), newVoiceId);
+    }
 
-        String key = voice.getS3Key();
-        byte[] audioBytes = fileUploadService.downloadFile(key);
-
-        String name = hall.getName() + "_voice";
-        String voiceId = elevenLabsClient.createIVCVoice(audioBytes, name);
-
-        voice.setVoiceId(voiceId);
-        voice.setUpdateAt(LocalDateTime.now());
+    // 키를 바탕으로 보이스 만들기
+    private String generateVoiceIdExternal(String s3Key, String hallName) {
+        // S3 다운로드
+        byte[] audioBytes = s3Service.downloadFile(s3Key);
+        // ElevenLabs voice 생성
+        String name = hallName + "_voice";
+        return elevenLabsClient.createIVCVoice(audioBytes, name);
     }
 }
