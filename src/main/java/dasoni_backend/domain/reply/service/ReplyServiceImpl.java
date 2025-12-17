@@ -345,6 +345,13 @@ public class ReplyServiceImpl implements ReplyService {
 
         // 확인된걸로 바꿈
         reply.setChecked(true);
-        return  ReplyConverter.toReplyResponseDTO(reply);
+        ReplyResponseDTO dto = ReplyConverter.toReplyResponseDTO(reply);
+
+        if (reply.getS3Key() != null) {
+            String audioUrl = s3Service.generatePresignedDownloadUrl(reply.getS3Key());
+            dto.setAudioUrl(audioUrl);
+        }
+
+        return dto;
     }
 }
