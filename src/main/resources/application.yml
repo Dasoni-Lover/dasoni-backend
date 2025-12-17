@@ -27,7 +27,6 @@ spring:
       hibernate:
         format_sql: true
     open-in-view: false
-
   ai:
     # 1) Gemini 설정
     google:
@@ -60,7 +59,9 @@ logging:
   level:
     root: INFO
     com.dasoni: DEBUG
-    org.springframework.security: DEBUG
+    org.springframework.security: WARN
+    org.apache.coyote: WARN
+    org.apache.tomcat: WARN
 
 # FastAPI URL - Docker 네트워크에서는 컨테이너 이름 사용
 fastapi:
