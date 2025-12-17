@@ -12,7 +12,7 @@ public class ReplyConverter {
                 .toName(reply.getUser().getName())
                 .fromName(reply.getHall().getName())
                 .content(reply.getContent())
-                .audioUrl(reply.getAudioUrl())
+                .audioUrl(reply.getS3Key())
                 .date(reply.getCreatedAt() != null ? reply.getCreatedAt().format(formatter) : null)
                 .build();
     }

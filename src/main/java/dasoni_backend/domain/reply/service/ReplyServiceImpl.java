@@ -155,19 +155,13 @@ public class ReplyServiceImpl implements ReplyService {
 
         log.info("\n음성 업로드 완료!\n");
 
-        // 음성 파일의 URL 생성
-        String audioUrl = s3Service.getS3Url(s3Key);
-
-        log.info("\n음성 URL 완료!\n");
-
-
         // Reply 엔티티 생성
         Reply reply = Reply.builder()
                 .hall(hall)
                 .user(user)          // 누가 요청했는지(나중에 필요하면 고인 계정으로 바꿔도 됨)
                 .letter(targetLetter)
                 .content(script)
-                .audioUrl(audioUrl)
+                .s3Key(s3Key)
                 .checked(false)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -179,7 +173,7 @@ public class ReplyServiceImpl implements ReplyService {
         return AiReplyCreateResponseDTO.builder()
                 .replyId(reply.getId())
                 .content(reply.getContent())
-                .audioUrl(reply.getAudioUrl())
+                .audioUrl(reply.getS3Key())
                 .isChecked(reply.isChecked())
                 .createdAt(reply.getCreatedAt())
                 .build();
@@ -299,19 +293,13 @@ public class ReplyServiceImpl implements ReplyService {
 
         log.info("\n음성 업로드 완료!\n");
 
-        // 음성 파일의 URL 생성
-        String audioUrl = s3Service.getS3Url(s3Key);
-
-        log.info("\n음성 URL 완료!\n");
-
-
         // Reply 엔티티 생성
         Reply reply = Reply.builder()
                 .hall(hall)
                 .user(user)          // 누가 요청했는지(나중에 필요하면 고인 계정으로 바꿔도 됨)
                 .letter(targetLetter)
                 .content(script)
-                .audioUrl(audioUrl)
+                .s3Key(s3Key)
                 .checked(false)
                 .createdAt(LocalDateTime.now())
                 .build();
