@@ -192,28 +192,36 @@ public class ReplyServiceImpl implements ReplyService {
 
     public void createAiReply(Long hallId, Long letterId, User user){
         // 추모관 검증
+        log.info("[AI] 1.createAiReply 진입: hallId={}, letterId={}, userId={}",
+                hallId, letterId, user.getId());
+
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "추모관을 찾을 수 없습니다."));
 
+        log.info("[AI] 2.홀 검증");
         // 편지 검증
         Letter targetLetter = letterRepository.findById(letterId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "편지를 찾을 수 없습니다."));
+        log.info("[AI] 3.편지 검증");
 
         // 해당 추모관이 맞는지 검증
         if (!targetLetter.getHall().getId().equals(hallId)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "해당 추모관의 편지가 아닙니다.");
         }
+        log.info("[AI] 4.추모관 검증");
 
         // 편지 작성자 검증 (본인이 쓴 편지에 대해서만 AI 답장 생성)
         if (!targetLetter.getUser().getId().equals(user.getId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "본인이 작성한 편지만 AI 답장을 생성할 수 있습니다.");
         }
+        log.info("[AI] 5.작성자 검증");
 
         // 고인 음성 존재 여부 체크
-        if(hall.getVoice() == null || hall.getVoice().getVoiceId() == null) {
+        if(hall.getVoice() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "고인 음성이 설정되지 않았습니다. 먼저 음성 파일 업로드 및 voiceId 생성을 완료해주세요.");
         }
         String voiceId = hall.getVoice().getVoiceId();
+        log.info("[AI] 6.음성 검증");
 
         // 한 달 이내 완료된 편지 중 최신 3개 조회 (방금 쓴 거 + 이전 2개)
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
