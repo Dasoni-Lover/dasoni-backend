@@ -66,6 +66,6 @@ public class Letter {
     private Boolean isCompleted = false;
 
     @Builder.Default
-    @Column(name = "is_wanted")
+    @Column(name = "is_wanted", nullable = false)
     private Boolean isWanted = false;
 }
