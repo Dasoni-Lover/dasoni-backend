@@ -10,7 +10,6 @@ import dasoni_backend.domain.notification.service.NotificationService;
 import dasoni_backend.domain.relationship.entity.Relationship;
 import dasoni_backend.domain.relationship.repository.RelationshipRepository;
 import dasoni_backend.domain.reply.converter.ReplyConverter;
-import dasoni_backend.domain.reply.dto.ReplyDTO.AiReplyCreateResponseDTO;
 import dasoni_backend.domain.reply.dto.ReplyDTO.ReplyResponseDTO;
 import dasoni_backend.domain.reply.entity.Reply;
 import dasoni_backend.domain.reply.repository.ReplyRepository;
