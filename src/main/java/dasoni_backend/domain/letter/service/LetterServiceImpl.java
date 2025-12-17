@@ -23,6 +23,7 @@ import dasoni_backend.domain.user.entity.User;
 import dasoni_backend.domain.voice.dto.VoiceDTOs.VoiceDTO;
 import dasoni_backend.domain.voice.entity.Voice;
 import dasoni_backend.domain.voice.service.VoiceService;
+import dasoni_backend.global.S3.service.FileUploadService;
 import dasoni_backend.global.S3.service.S3Service;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,7 @@ public class LetterServiceImpl implements LetterService{
     private final VoiceService voiceService;
     private final ReplyService replyService;
     private final S3Service s3Service;
+    private final FileUploadService fileUploadService;
 
     // 1. 보낸 편지함 목록 조회
     @Transactional(readOnly = true)
@@ -338,10 +340,23 @@ public class LetterServiceImpl implements LetterService{
         if (!relationship.isSet()) {
             throw new IllegalStateException("먼저 설정을 생성해주세요.");
         }
-        // 음성 파일 먼저 처리
-        if (request.getVoiceUrl() != null && !request.getVoiceUrl().isEmpty()) {
-            voiceService.updateVoice(hall.getId(),
-                    VoiceDTO.builder().url(request.getVoiceUrl()).build(), user);
+        // 현재 음성
+        Voice currentVoice = hall.getVoice();
+        String currentS3Key = currentVoice != null ? currentVoice.getS3Key() : null;
+
+        // 요청 음성
+        String requestS3Key = null;
+        if (request.getVoiceUrl() != null && !request.getVoiceUrl().isBlank()) {
+            requestS3Key = fileUploadService.extractS3Key(request.getVoiceUrl());
+        }
+
+        // 음성이 실제로 바뀐 경우에만 처리
+        if (requestS3Key != null && !requestS3Key.equals(currentS3Key)) {
+            voiceService.updateVoice(
+                    hall.getId(),
+                    VoiceDTO.builder().url(request.getVoiceUrl()).build(),
+                    user
+            );
         }
         // Relationship 업데이트
         setRelationship(request,relationship);

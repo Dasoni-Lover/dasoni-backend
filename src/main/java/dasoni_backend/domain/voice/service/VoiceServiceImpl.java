@@ -81,24 +81,23 @@ public class VoiceServiceImpl implements VoiceService {
         hallRepository.save(hall);
 
         log.info("새 Voice 저장 완료 → voiceId: {}", newVoice.getId());
-
         log.info("Hall FK 업데이트 완료 → hallId: {}", hall.getId());
 
         // 트랜잭션 커밋 후 S3 + DB 삭제
         if (oldVoice != null && oldVoice.getS3Key() != null) {
             TransactionSynchronizationManager.registerSynchronization(
-                    new TransactionSynchronization() {
-                        @Override
-                        public void afterCommit() {
-                            try {
-                                s3Service.deleteFile(oldVoice.getS3Key());
-                                voiceRepository.delete(oldVoice);
-                                log.info("기존 Voice 삭제 완료 (AFTER_COMMIT)");
-                            } catch (Exception e) {
-                                log.warn("기존 Voice 삭제 실패 (AFTER_COMMIT): {}", e.getMessage());
-                            }
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        try {
+                            s3Service.deleteFile(oldVoice.getS3Key());
+                            voiceRepository.delete(oldVoice);
+                            log.info("기존 Voice 삭제 완료 (AFTER_COMMIT)");
+                        } catch (Exception e) {
+                            log.warn("기존 Voice 삭제 실패 (AFTER_COMMIT): {}", e.getMessage());
                         }
                     }
+                }
             );
         }
     }
