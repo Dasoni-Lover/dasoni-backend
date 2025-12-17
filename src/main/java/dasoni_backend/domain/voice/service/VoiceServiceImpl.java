@@ -51,6 +51,7 @@ public class VoiceServiceImpl implements VoiceService {
 
         voiceRepository.save(voice);
         hall.setVoice(voice);
+        log.info("등록! : Hall FK 업데이트 완료 → hallId: {}", hall.getId());
         TransactionSynchronizationManager.registerSynchronization(
             new TransactionSynchronization() {
                 @Override
@@ -93,8 +94,8 @@ public class VoiceServiceImpl implements VoiceService {
         //  Hall에 새 Voice 연결
         hall.setVoice(newVoice);
 
-        log.info("새 Voice 저장 완료 → voiceId: {}", newVoice.getId());
-        log.info("Hall FK 업데이트 완료 → hallId: {}", hall.getId());
+        log.info("수정: 새 Voice 저장 완료 → voiceId: {}", newVoice.getId());
+        log.info("수정: Hall FK 업데이트 완료 → hallId: {}", hall.getId());
 
         TransactionSynchronizationManager.registerSynchronization(
             new TransactionSynchronization() {

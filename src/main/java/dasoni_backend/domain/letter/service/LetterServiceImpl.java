@@ -169,7 +169,7 @@ public class LetterServiceImpl implements LetterService{
                 Relationship relationship = relationshipRepository
                         .findByHallIdAndUserId(hallId, user.getId())
                         .orElseThrow(() -> new EntityNotFoundException("관계 정보를 찾을 수 없습니다"));
-                relationship.setSent(true);
+                relationship.setSent(false);
                 log.info("[5] 관계 sent=true 설정");
             }
         }

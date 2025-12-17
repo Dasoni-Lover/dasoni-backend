@@ -92,6 +92,7 @@ public class ReplyServiceImpl implements ReplyService {
         if(hall.getVoice() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "고인 음성이 설정되지 않았습니다. 먼저 음성 파일 업로드 및 voiceId 생성을 완료해주세요.");
         }
+        log.info("[AI] hallID : {}, VoiceID: {}, Elevenlabs:{}",hallId,hall.getVoice().getId(),hall.getVoice().getVoiceId());
         String voiceId = hall.getVoice().getVoiceId();
         log.info("[AI] 6.음성 검증");
 
