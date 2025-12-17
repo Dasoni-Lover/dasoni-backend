@@ -48,14 +48,4 @@ public class VoiceController {
         voiceService.updateVoice(hallId, request, user);
         return ResponseEntity.ok().build();
     }
-
-    // elevenlabs voiceId
-    @PostMapping("/v1/voices/add")
-    public ResponseEntity<Void> generateVoiceId(
-            @PathVariable("hall_id") Long hallId,
-            @AuthUser User user
-    ) {
-        voiceService.generateVoiceId(hallId, user);
-        return ResponseEntity.ok().build();
-    }
 }

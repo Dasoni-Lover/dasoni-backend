@@ -16,7 +16,4 @@ public interface VoiceService {
 
     // 추모관 음성파일 조회
     VoiceDTO getVoice(Long hallId, User user);
-
-    // elevenlabs 용 : create IVC voice
-    void generateVoiceId(Long hallId, User user);
 }
