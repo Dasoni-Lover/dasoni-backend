@@ -155,8 +155,7 @@ public class S3ServiceImpl implements S3Service {
             // 요청 객체에 직접 실제로 음성 파일(bytes) 올리는 작업
             // 백엔드가 직접 올리기 때문에 따로 Presigned URL 필요 x
             s3Client.putObject(putObjectRequest, RequestBody.fromBytes(fileBytes));
-            log.info("S3 파일 업로드 완료 : {}, s3Key");
-
+            log.info("S3 파일 업로드 완료");
             return getS3Url(s3Key);
         } catch (Exception e) {
             log.error("S3 파일 업로드 실패 : {}", s3Key, e);
