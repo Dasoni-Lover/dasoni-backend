@@ -97,33 +97,31 @@ public class VoiceServiceImpl implements VoiceService {
         log.info("Hall FK 업데이트 완료 → hallId: {}", hall.getId());
 
         TransactionSynchronizationManager.registerSynchronization(
-                new TransactionSynchronization() {
-                    @Override
-                    public void afterCommit() {
-
-                        // 1️⃣ 기존 Voice 정리 (있을 때만)
-                        if (oldVoice != null) {
-                            try {
-                                if (oldVoice.getS3Key() != null) {
-                                    s3Service.deleteFile(oldVoice.getS3Key());
-                                }
-                                if (oldVoice.getVoiceId() != null) {
-                                    elevenLabsClient.deleteVoice(oldVoice.getVoiceId());
-                                }
-                                voiceRepository.delete(oldVoice);
-                            } catch (Exception e) {
-                                log.warn("기존 Voice 삭제 실패", e);
-                            }
-                        }
-
-                        // 2️⃣ 새 voiceId는 무조건 생성
+            new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    // 기존 Voice 정리 (있을 때만)
+                    if (oldVoice != null) {
                         try {
-                            generateVoiceIdInternal(newVoice.getId(), hall.getName());
+                            if (oldVoice.getS3Key() != null) {
+                                s3Service.deleteFile(oldVoice.getS3Key());
+                            }
+                            if (oldVoice.getVoiceId() != null) {
+                                elevenLabsClient.deleteVoice(oldVoice.getVoiceId());
+                            }
+                            voiceRepository.delete(oldVoice);
                         } catch (Exception e) {
-                            log.error("voiceId 생성 실패 (update)", e);
+                            log.warn("기존 Voice 삭제 실패", e);
                         }
                     }
+                    // 새 voiceId는 무조건 생성
+                    try {
+                        generateVoiceIdInternal(newVoice.getId(), hall.getName());
+                    } catch (Exception e) {
+                        log.error("voiceId 생성 실패 (update)", e);
+                    }
                 }
+            }
         );
     }
 
