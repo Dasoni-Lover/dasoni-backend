@@ -273,8 +273,8 @@ public class ReplyServiceImpl implements ReplyService {
         String script = geminiVoiceScriptService.generateVoiceReplyScript(
                 currentLetterContent, // 현재 편지
                 previousEmotions,  // 감정 평가 용
-                relationDetail, //
-                Explanation, //
+                relationDetail, // 자세한 관계
+                Explanation, // 고인 설명
                 tone,
                 frequentWords,
                 calledName,
