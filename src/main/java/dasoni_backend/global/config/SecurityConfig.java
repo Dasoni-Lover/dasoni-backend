@@ -58,7 +58,8 @@ public class SecurityConfig {
                                 "/tts/**",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/swagger-resources/**"
+                                "/swagger-resources/**",
+                                "/api/share-links/**"
                         ).permitAll()
 
                         // 파일 업로드용 presigned-url (공개 필요시)
