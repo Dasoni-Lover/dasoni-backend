@@ -33,6 +33,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -134,8 +135,7 @@ public class ReplyServiceImpl implements ReplyService {
 //        );
         String script = geminiVoiceScriptService.generateVoiceReplyScript(
                 currentLetterContent,
-                p1Emotion,
-                p2Emotion,
+                p1Emotion + p2Emotion,
                 relationDetail,
                 deceasedInsight,
                 tone,
@@ -155,19 +155,13 @@ public class ReplyServiceImpl implements ReplyService {
 
         log.info("\n음성 업로드 완료!\n");
 
-        // 음성 파일의 URL 생성
-        String audioUrl = s3Service.getS3Url(s3Key);
-
-        log.info("\n음성 URL 완료!\n");
-
-
         // Reply 엔티티 생성
         Reply reply = Reply.builder()
                 .hall(hall)
                 .user(user)          // 누가 요청했는지(나중에 필요하면 고인 계정으로 바꿔도 됨)
                 .letter(targetLetter)
                 .content(script)
-                .audioUrl(audioUrl)
+                .s3Key(s3Key)
                 .checked(false)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -179,7 +173,7 @@ public class ReplyServiceImpl implements ReplyService {
         return AiReplyCreateResponseDTO.builder()
                 .replyId(reply.getId())
                 .content(reply.getContent())
-                .audioUrl(reply.getAudioUrl())
+                .audioUrl(reply.getS3Key())
                 .isChecked(reply.isChecked())
                 .createdAt(reply.getCreatedAt())
                 .build();
@@ -221,48 +215,47 @@ public class ReplyServiceImpl implements ReplyService {
         }
         String voiceId = hall.getVoice().getVoiceId();
 
-        // 6. 한 달 이내 완료된 편지 중 최신 2개 조회
+        // 한 달 이내 완료된 편지 중 최신 3개 조회 (방금 쓴 거 + 이전 2개)
         LocalDateTime oneMonthAgo = LocalDateTime.now().minusMonths(1);
 
-        List<Letter> recentTwo = letterRepository
-                .findTop3ByHall_IdAndUser_IdAndIsCompletedTrueOrderByCompletedAtDesc(
-                        hallId, user.getId()
-                ).stream()
-                .filter(l -> l.getCompletedAt() != null && l.getCompletedAt().isAfter(oneMonthAgo))
-                .limit(2)
-                .toList();
+        List<Letter> recentThree =
+            letterRepository.findTop3ByHall_IdAndUser_IdAndIsCompletedTrueAndCompletedAtAfterOrderByCompletedAtDesc(
+                    hallId, user.getId(), oneMonthAgo
+            );
 
-        // 7. 감정 편지
-        String p1Emotion = "";
-        String p2Emotion = "";
-        if (!recentTwo.isEmpty()) {
-            p1Emotion = recentTwo.getFirst().getContent();
-            if (recentTwo.size() > 1) {
-                p2Emotion = recentTwo.getLast().getContent();
-            }
-        }
-
-        // 이번 편지(content)는 current로, 나머지 2개만 감정 방향성 참고용으로 넘김 -> 얘도 체크박스로 변경
+        // currentLetter는 별도로 사용
         String currentLetterContent = targetLetter.getContent();
+
+        // recentThree에서 currentLetter 제외하고 앞에서부터 2개 사용
+        List<Letter> previousLetters = recentThree.stream()
+            .filter(l -> !l.getId().equals(targetLetter.getId()))
+            .limit(2)
+            .toList();
+
+        log.info("\n{}개 편지 조회 완료!\n",recentThree.size());
+
+        // 나머지 두개는 감정평가 용
+        String previousEmotions = previousLetters.stream()
+            .map(Letter::getContent)
+            .collect(Collectors.joining("\n\n"));
 
         // 고인 정보
         Relationship relationship = relationshipRepository
-                .findByHallIdAndUserId(hallId, user.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "관계 정보를 찾을 수 없습니다."));
-
+            .findByHallIdAndUserId(hallId, user.getId())
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "관계 정보를 찾을 수 없습니다."));
 
         List<String> userDescriptions =
-                relationship.getNatures() != null
-                ? relationship.getNatures()
-                        .stream()
-                        .map(p -> p.getValue())
-                        .toList()
-               : List.of();
+            relationship.getNatures() != null
+            ? relationship.getNatures()
+                .stream()
+                .map(p -> p.getValue())
+                .toList()
+           : List.of();
 
         String relationDetail =
                 relationship.getDetail() != null ? relationship.getDetail() : "";
 
-        String deceasedInsight =
+        String Explanation =
                 relationship.getExplanation() != null ? relationship.getExplanation() : "";
 
         String tone =
@@ -275,27 +268,23 @@ public class ReplyServiceImpl implements ReplyService {
                 relationship.getCalledName() != null ? relationship.getCalledName() : "";
         // 고인 정보 끝
 
-        // GeminiAI 답장 스크립트 생성
-//        String script = geminiVoiceScriptService.generateVoiceReplyScript(
-//                currentLetterContent,
-//                recentOthers
-//        );
+        log.info("\n고인 정보 끝!\n");
+
         String script = geminiVoiceScriptService.generateVoiceReplyScript(
-                currentLetterContent,
-                p1Emotion,
-                p2Emotion,
-                relationDetail,
-                deceasedInsight,
+                currentLetterContent, // 현재 편지
+                previousEmotions,  // 감정 평가 용
+                relationDetail, // 자세한 관계
+                Explanation, // 고인 설명
                 tone,
                 frequentWords,
                 calledName,
                 userDescriptions
         );
+        log.info("\n스크립트 완료!\n내용:\n{}",script);
 
         // Script -> Reply Voice
         byte[] audioBytes = generateTtsAudio(script, voiceId);
 
-        log.info("\n스크립트 완료!\n");
         // S3 업로드 key 생성
         String s3Key = "audios/replies/" + hallId + "/" + UUID.randomUUID() + ".mp3";
 
@@ -304,19 +293,13 @@ public class ReplyServiceImpl implements ReplyService {
 
         log.info("\n음성 업로드 완료!\n");
 
-        // 음성 파일의 URL 생성
-        String audioUrl = s3Service.getS3Url(s3Key);
-
-        log.info("\n음성 URL 완료!\n");
-
-
         // Reply 엔티티 생성
         Reply reply = Reply.builder()
                 .hall(hall)
                 .user(user)          // 누가 요청했는지(나중에 필요하면 고인 계정으로 바꿔도 됨)
                 .letter(targetLetter)
                 .content(script)
-                .audioUrl(audioUrl)
+                .s3Key(s3Key)
                 .checked(false)
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -327,22 +310,27 @@ public class ReplyServiceImpl implements ReplyService {
         notificationService.createNotification(hall, user, NotificationKind.REPLY_ARRIVED);
     }
 
-    public byte[] generateTtsAudio(String text, String voiceId) {
+    private byte[] generateTtsAudio(String text, String voiceId) {
 
-        // stability, similarityBoost, style, useSpeakerBoost, speed
-        var voiceSettings = new ElevenLabsApi.SpeechRequest.VoiceSettings((Double)0.4, (Double)0.75, (Double)0.0, Boolean.TRUE, (Double)0.85);
+        try{
+            // stability, similarityBoost, style, useSpeakerBoost, speed
+            var voiceSettings = new ElevenLabsApi.SpeechRequest.VoiceSettings((Double)0.4, (Double)0.75, (Double)0.0, Boolean.TRUE, (Double)0.85);
 
-        var options = ElevenLabsTextToSpeechOptions.builder()
-                .model("eleven_turbo_v2_5")
-                .voiceId(voiceId)
-                .voiceSettings(voiceSettings)
-                .outputFormat("mp3_44100_128")
-                .build();
+            var options = ElevenLabsTextToSpeechOptions.builder()
+                    .model("eleven_turbo_v2_5")
+                    .voiceId(voiceId)
+                    .voiceSettings(voiceSettings)
+                    .outputFormat("mp3_44100_128")
+                    .build();
 
-        TextToSpeechPrompt prompt = new TextToSpeechPrompt(text, options);
-        TextToSpeechResponse response = tts.call(prompt);
-
-        return response.getResult().getOutput();
+            TextToSpeechPrompt prompt = new TextToSpeechPrompt(text, options);
+            TextToSpeechResponse response = tts.call(prompt);
+            log.info("TTS 생성 완료: voiceId={}, textLength={}", voiceId, text.length());
+            return response.getResult().getOutput();
+        } catch (Exception e) {
+            log.error("TTS generation failed. voiceId={}", voiceId, e);
+            return null;
+        }
     }
 
     @Override
@@ -357,6 +345,13 @@ public class ReplyServiceImpl implements ReplyService {
 
         // 확인된걸로 바꿈
         reply.setChecked(true);
-        return  ReplyConverter.toReplyResponseDTO(reply);
+        ReplyResponseDTO dto = ReplyConverter.toReplyResponseDTO(reply);
+
+        if (reply.getS3Key() != null) {
+            String audioUrl = s3Service.generatePresignedDownloadUrl(reply.getS3Key());
+            dto.setAudioUrl(audioUrl);
+        }
+
+        return dto;
     }
 }

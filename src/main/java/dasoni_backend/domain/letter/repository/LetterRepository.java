@@ -26,4 +26,10 @@ public interface LetterRepository extends JpaRepository<Letter, Long> {
     // 최근 메시지 3개(완료된 편지만)
     List<Letter> findTop3ByHall_IdAndUser_IdAndIsCompletedTrueOrderByCompletedAtDesc(
             Long hallId, Long userId);
+
+    List<Letter> findTop3ByHall_IdAndUser_IdAndIsCompletedTrueAndCompletedAtAfterOrderByCompletedAtDesc(
+            Long hallId,
+            Long userId,
+            LocalDateTime completedAt
+    );
 }

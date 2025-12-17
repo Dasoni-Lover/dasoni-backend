@@ -29,8 +29,7 @@ public class AiVoiceController {
 
         String script = geminiVoiceScriptService.generateVoiceReplyScript(
                 request.getCurrentLetterContent(),
-                request.getP1Emotion(),
-                request.getP2Emotion(),
+                request.getP1Emotion()+ request.getP2Emotion(),
                 request.getRelationship(),
                 request.getDeceasedInsight(),
                 request.getTone(),

@@ -122,13 +122,13 @@ public class LetterController {
         return ResponseEntity.ok().build();
     }
 
-    // 받은 편지함 조회
+    // 받은 AI 편지함 조회
     @GetMapping("/{hall_id}/letters/reply/list")
     public ResponseEntity<ReceiveLetterListResponseDTO> getReceiveLetterList(@PathVariable("hall_id") Long hallId, @AuthUser User user) {
         return ResponseEntity.ok(replyService.getReceiveLetterList(hallId, user));
     }
 
-    // 받은 편지함 개별 조회
+    // 받은 AI 편지함 개별 조회
     @GetMapping("/{hall_id}/letters/reply/{reply_id}")
     public ResponseEntity<ReplyResponseDTO> getReplyOne(@PathVariable("hall_id") Long hallId,
                                                         @PathVariable("reply_id") Long replyId,
