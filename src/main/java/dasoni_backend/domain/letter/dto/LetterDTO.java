@@ -92,6 +92,7 @@ public class LetterDTO {
         private String content;
         @JsonProperty("isCompleted")
         private boolean isCompleted;
+        @JsonProperty("isWanted")
         private boolean isWanted;
     }
 
