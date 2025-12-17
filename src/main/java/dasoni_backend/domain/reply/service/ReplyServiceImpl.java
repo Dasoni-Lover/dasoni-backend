@@ -62,6 +62,7 @@ public class ReplyServiceImpl implements ReplyService {
         return LetterConverter.toReceiveLetterListResponseDTO(replies);
     }
 
+    @Override
     public void createAiReply(Long hallId, Long letterId, User user){
         // 추모관 검증
         log.info("[AI] 1.createAiReply 진입: hallId={}, letterId={}, userId={}",
