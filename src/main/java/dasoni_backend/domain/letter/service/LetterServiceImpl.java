@@ -158,7 +158,8 @@ public class LetterServiceImpl implements LetterService{
             letter = LetterConverter.RequestToLetter(request, hall, user);
             letterRepository.save(letter);
         }
-
+        log.info("편지보내기 id={}", letter.getId());
+        log.info("답장 여부 : {}", letter.getIsWanted());
         // 답장에 isWanted 가 true 면 답장 오도록
         if(letter.getIsWanted()) {
             replyService.createAiReply(hallId, letter.getId(), user);

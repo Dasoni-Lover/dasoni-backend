@@ -27,12 +27,12 @@ public class ElevenLabsClient {
 
     public ElevenLabsClient(WebClient.Builder builder, @Value("${elevenlabs.url}") String url) {
         this.elevenLabsWebClient = builder
-                .baseUrl(url)
-                .clientConnector(new ReactorClientHttpConnector(
-                        HttpClient.create()
-                                .responseTimeout(Duration.ofSeconds(90))
-                ))
-                .build();
+            .baseUrl(url)
+            .clientConnector(new ReactorClientHttpConnector(
+                    HttpClient.create()
+                            .responseTimeout(Duration.ofSeconds(90))
+            ))
+            .build();
     }
 
     // create IVC voice
@@ -45,25 +45,25 @@ public class ElevenLabsClient {
         // elevenlabs : request로 file, name
         bodyBuilder.part("name", name);
         bodyBuilder.part("files", audioBytes)
-                .filename("voice_sample.mp3")
-                .contentType(MediaType.APPLICATION_OCTET_STREAM);
+            .filename("voice_sample.mp3")
+            .contentType(MediaType.APPLICATION_OCTET_STREAM);
 
         JsonNode response = elevenLabsWebClient.post()
-                .uri("/v1/voices/add")
-                .header("xi-api-key", apiKey)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
-                .retrieve()
-                .onStatus(
-                        status -> status.is4xxClientError() || status.is5xxServerError(),
-                        clientResponse -> clientResponse.bodyToMono(String.class)
-                                .flatMap(errorBody -> {
-                                    log.error("ElevenLabs IVC Error: {}", errorBody);
-                                    return Mono.error(new IllegalArgumentException("ElevenLabs IVC Error: " + errorBody));
-                                })
-                )
-                .bodyToMono(JsonNode.class)
-                .block();
+            .uri("/v1/voices/add")
+            .header("xi-api-key", apiKey)
+            .contentType(MediaType.MULTIPART_FORM_DATA)
+            .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
+            .retrieve()
+            .onStatus(
+                    status -> status.is4xxClientError() || status.is5xxServerError(),
+                    clientResponse -> clientResponse.bodyToMono(String.class)
+                            .flatMap(errorBody -> {
+                                log.error("ElevenLabs IVC Error: {}", errorBody);
+                                return Mono.error(new IllegalArgumentException("ElevenLabs IVC Error: " + errorBody));
+                            })
+            )
+            .bodyToMono(JsonNode.class)
+            .block();
 
         if (response == null || !response.has("voice_id")) {
             throw new IllegalStateException("ElevenLabs IVC 응답에 voice_id 없음: " + response);
