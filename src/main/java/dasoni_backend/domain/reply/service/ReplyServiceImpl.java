@@ -310,7 +310,7 @@ public class ReplyServiceImpl implements ReplyService {
         notificationService.createNotification(hall, user, NotificationKind.REPLY_ARRIVED);
     }
 
-    public byte[] generateTtsAudio(String text, String voiceId) {
+    private byte[] generateTtsAudio(String text, String voiceId) {
 
         // stability, similarityBoost, style, useSpeakerBoost, speed
         var voiceSettings = new ElevenLabsApi.SpeechRequest.VoiceSettings((Double)0.4, (Double)0.75, (Double)0.0, Boolean.TRUE, (Double)0.85);
@@ -324,7 +324,7 @@ public class ReplyServiceImpl implements ReplyService {
 
         TextToSpeechPrompt prompt = new TextToSpeechPrompt(text, options);
         TextToSpeechResponse response = tts.call(prompt);
-
+        log.info("TTS 생성 완료: voiceId={}, textLength={}", voiceId, text.length());
         return response.getResult().getOutput();
     }
 
