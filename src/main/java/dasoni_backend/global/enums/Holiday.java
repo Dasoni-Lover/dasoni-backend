@@ -11,7 +11,8 @@ public enum Holiday {
     // 양력
     LUNAR_NEW_YEAR(1, 29, NotificationKind.LUNAR_NEW_YEAR_REMINDER),  // 설날
     CHUSEOK(9, 17, NotificationKind.CHUSEOK_REMINDER),                // 추석
-    TESTDAY(12,12,NotificationKind.LUNAR_NEW_YEAR_REMINDER);
+    TESTDAY(12,12,NotificationKind.LUNAR_NEW_YEAR_REMINDER),
+    WINTERDAY(12,19,NotificationKind.LIKELION_REMINDER);
 
     private final int month;
     private final int day;
