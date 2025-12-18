@@ -195,7 +195,7 @@ public class ReplyServiceImpl implements ReplyService {
         log.info("TTS 생성 시도: voiceId={}", voiceId);
         try{
             // stability, similarityBoost, style, useSpeakerBoost, speed
-            var voiceSettings = new ElevenLabsApi.SpeechRequest.VoiceSettings((Double)0.18, (Double)1.0, (Double)0.24, Boolean.TRUE, (Double)1.0);
+            var voiceSettings = new ElevenLabsApi.SpeechRequest.VoiceSettings((Double)0.8, (Double)1.0, (Double)0.24, Boolean.TRUE, (Double)1.0);
 
             var options = ElevenLabsTextToSpeechOptions.builder()
                     .model("eleven_multilingual_v2")
