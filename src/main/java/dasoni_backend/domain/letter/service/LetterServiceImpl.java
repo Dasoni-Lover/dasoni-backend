@@ -296,7 +296,8 @@ public class LetterServiceImpl implements LetterService{
 
         // 이미 설정되어 있는지 확인
         if (relationship.isSet()) {
-            throw new IllegalStateException("이미 설정이 완료되었습니다. 수정을 이용해주세요.");
+            updateLetterSettings(hallId, request, user);
+            return;
         }
 
         // Relationship 업데이트
@@ -336,7 +337,24 @@ public class LetterServiceImpl implements LetterService{
 
         // 설정되지 않은 경우
         if (!relationship.isSet()) {
-            throw new IllegalStateException("먼저 설정을 생성해주세요.");
+            setRelationship(request, relationship);
+
+            boolean hasVoice = false;
+            if(request.getVoiceUrl() != null && !request.getVoiceUrl().isBlank()) {
+                voiceService.uploadVoice(hallId, VoiceDTO.builder().url(request.getVoiceUrl()).build(), user);
+                hasVoice = true;
+            }
+
+            relationship.setSet(true);
+
+            if(hasVoice) {
+                hall.setOpened(true);
+                log.info("받는 편지함 오픈: hallId={}", hallId);
+            }
+
+            log.info("AI 음성편지 설정 (updae로 최초 생성) 완료: hallID={}, userId{}, hasVoice={}",
+                    hallId, user.getId(), hasVoice);
+            return;
         }
         // 현재 음성
         Voice currentVoice = hall.getVoice();
@@ -355,6 +373,8 @@ public class LetterServiceImpl implements LetterService{
                     VoiceDTO.builder().url(request.getVoiceUrl()).build(),
                     user
             );
+
+            hall.setOpened(true);
         }
         // Relationship 업데이트
         setRelationship(request,relationship);
